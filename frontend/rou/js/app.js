@@ -111,70 +111,148 @@ window.App = {
     });
   },
 
-  /* ── WORKSPACE HOME ──────────────────────────────────────── */
+  /* ── WORKSPACE HOME ──────────────────────────────────────────────── */
   renderWorkspaceHome() {
     let user = API.user();
     if (!user) {
       try {
         const t = localStorage.getItem('rou_token');
-        if (t) { const p = JSON.parse(atob(t.split('.')[1])); user = {id:p.id,role:p.role,name:p.name,email:p.email}; localStorage.setItem('rou_user',JSON.stringify(user)); }
+        if (t) { const p = JSON.parse(atob(t.split('.')[1])); user={id:p.id,role:p.role,name:p.name,email:p.email}; localStorage.setItem('rou_user',JSON.stringify(user)); }
       } catch(e) {}
     }
     if (!user) return;
 
-    const ROLE_COLORS  = { admin:'#e8520a', partner:'#7c3aed', manager:'#1a3f6b', article:'#059669' };
-    const ROLE_LABELS  = { admin:'Administrator', partner:'Partner', manager:'Manager', article:'Article' };
-    const ROLE_DESCS   = {
-      admin:   'Full access. Manage team, assign clients, control all settings.',
-      partner: 'Create and manage companies. Full ROU computation access.',
-      manager: 'Create and manage companies. Full ROU computation access.',
-      article: 'Access assigned companies only. Cannot create new companies.'
+    const ROLE_COLORS = { admin:'#e8520a', partner:'#7c3aed', manager:'#1a3f6b', article:'#059669' };
+    const ROLE_LABELS = { admin:'Administrator', partner:'Partner', manager:'Manager', article:'Article' };
+    const ROLE_DESCS  = {
+      admin:   'Full access — manage team members, assign clients, control all platform settings.',
+      partner: 'Create and manage client companies. Full Ind AS 116 ROU computation access.',
+      manager: 'Create and manage client companies. Full Ind AS 116 ROU computation access.',
+      article: 'Access assigned companies only. Contact your manager to be assigned to a client.'
     };
-    const color = ROLE_COLORS[user.role] || '#1a3f6b';
-    const label = ROLE_LABELS[user.role] || user.role;
+    const color    = ROLE_COLORS[user.role] || '#1a3f6b';
+    const label    = ROLE_LABELS[user.role] || user.role;
     const isArticle = user.role === 'article';
     _refreshUserDisplay(user);
 
-    // Top bar avatar + name
-    const av = document.getElementById('ws-avatar');
+    // Topbar pill
+    const av  = document.getElementById('ws-avatar');
     if (av) { av.textContent = (user.name||user.email||'?').charAt(0).toUpperCase(); av.style.background = color; av.style.color = '#fff'; }
-    const nn = document.getElementById('ws-user-name'); if (nn) nn.textContent = user.name || user.email;
-    const rn = document.getElementById('ws-user-role'); if (rn) rn.textContent = label;
+    const wun = document.getElementById('ws-user-name'); if (wun) wun.textContent = user.name || user.email || '';
+    const wur = document.getElementById('ws-user-role'); if (wur) wur.textContent = label;
+
+    // Dropdown header
+    const ddn = document.getElementById('dd-name');  if (ddn) ddn.textContent = user.name || '';
+    const dde = document.getElementById('dd-email'); if (dde) dde.textContent = user.email || '';
 
     // Greeting
-    const h = new Date().getHours();
-    const gt = h < 12 ? 'Good morning,' : h < 17 ? 'Good afternoon,' : 'Good evening,';
-    const gte = document.querySelector('.ws-greeting-text'); if (gte) gte.textContent = gt;
-    const gne = document.getElementById('ws-greeting-name'); if (gne) gne.textContent = user.name || 'there';
+    const h   = new Date().getHours();
+    const gt  = h < 12 ? 'Good morning,' : h < 17 ? 'Good afternoon,' : 'Good evening,';
+    const gel = document.querySelector('.ws-greeting-label'); if (gel) gel.textContent = gt;
+    const gne = document.getElementById('ws-greeting-name');  if (gne) gne.textContent = user.name || 'there';
 
-    // Admin quick link
-    const adminQ = document.getElementById('ws-quick-admin');
-    if (adminQ) adminQ.style.display = (user.role === 'admin') ? 'flex' : 'none';
+    // Right panel account header
+    const pav = document.getElementById('ws-profile-avatar'); if (pav) { pav.textContent = (user.name||'?').charAt(0).toUpperCase(); pav.style.background = color; pav.style.color = '#fff'; }
+    const pnm = document.getElementById('ws-profile-name');   if (pnm) pnm.textContent = user.name || '';
+    const pem = document.getElementById('ws-profile-email');  if (pem) pem.textContent = user.email || '';
+    const prb = document.getElementById('ws-profile-role');   if (prb) prb.textContent = label;
+    const pni = document.getElementById('ws-name-input');     if (pni) pni.value = user.name || '';
 
-    // Add company button — disable for articles
-    // Manage add-company buttons
-    ['ws-add-company-btn','ws-quick-add-company-btn'].forEach(id => {
-      const btn = document.getElementById(id);
-      if (!btn) return;
-      if (isArticle) {
-        btn.classList.add('disabled'); btn.style.display = 'none';
-      } else {
-        btn.classList.remove('disabled'); btn.style.display = '';
-        btn.onclick = () => Modal.openAddClient();
-      }
+    // Platform info
+    const s   = DB.get('settings') || {};
+    const prd = document.getElementById('ws-info-period');
+    if (prd) prd.textContent = s.periodShort || s.periodLabel || 'Not set — click to configure';
+    const irl = document.getElementById('ws-info-role'); if (irl) irl.textContent = label;
+
+    // Role card
+    const rb = document.getElementById('ws-role-badge');
+    if (rb) { rb.textContent = label; rb.style.cssText = `background:${color}14;color:${color};display:inline-flex;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:700;`; }
+    const rd = document.getElementById('ws-role-desc'); if (rd) rd.textContent = ROLE_DESCS[user.role] || '';
+
+    // Add company buttons — hide for articles
+    ['ws-add-company-btn','ws-action-add'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = isArticle ? 'none' : '';
     });
 
-    // Role badge + description
-    const rb = document.getElementById('ws-role-badge');
-    if (rb) {
-      const icons = { admin:'🔴', partner:'🏛', manager:'👔', article:'📋' };
-      rb.textContent = (icons[user.role]||'') + ' ' + label;
-      rb.style.cssText = `background:${color}18;color:${color};display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:8px`;
-    }
-    const rd = document.getElementById('ws-role-desc');
-    if (rd) rd.textContent = ROLE_DESCS[user.role] || '';
+    // Admin action — only for admin
+    const adminA = document.getElementById('ws-action-admin');
+    if (adminA) adminA.style.display = user.role === 'admin' ? 'flex' : 'none';
 
     this.renderCompaniesGrid();
+  },
+
+  toggleUserDropdown(e) {
+    e.stopPropagation();
+    const dd = document.getElementById('ws-dropdown');
+    if (dd) dd.classList.toggle('open');
+  },
+
+  openChangePwModal() {
+    document.getElementById('ws-dropdown')?.classList.remove('open');
+    ['pm-pw-current','pm-pw-new','pm-pw-confirm'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+    const al = document.getElementById('pw-modal-alert'); if (al) { al.style.display='none'; }
+    document.getElementById('modal-change-pw')?.classList.add('open');
+  },
+
+  closeChangePwModal() {
+    document.getElementById('modal-change-pw')?.classList.remove('open');
+  },
+
+  async submitChangePw() {
+    const cur     = document.getElementById('pm-pw-current')?.value;
+    const nw      = document.getElementById('pm-pw-new')?.value;
+    const conf    = document.getElementById('pm-pw-confirm')?.value;
+    const alertEl = document.getElementById('pw-modal-alert');
+    const showA   = (msg, type) => {
+      if (!alertEl) return;
+      alertEl.textContent = msg; alertEl.style.display = 'block';
+      alertEl.style.background = type==='ok' ? '#f0fdf4' : '#fef2f2';
+      alertEl.style.border = '1.5px solid '+(type==='ok' ? '#bbf7d0' : '#fecaca');
+      alertEl.style.color  = type==='ok' ? '#065f46' : '#991b1b';
+    };
+    if (!cur||!nw||!conf) { showA('All three fields are required.','err'); return; }
+    if (nw.length < 8)    { showA('New password must be at least 8 characters.','err'); return; }
+    if (nw !== conf)       { showA('New passwords do not match.','err'); return; }
+    try {
+      const r = await fetch('/api/auth/change-password', {
+        method:'PUT', headers:{'Content-Type':'application/json','Authorization':'Bearer '+API.token()},
+        body: JSON.stringify({ currentPassword:cur, newPassword:nw })
+      });
+      const d = await r.json();
+      if (!r.ok) { showA(d.error||'Failed.','err'); return; }
+      showA('Password changed successfully!','ok');
+      setTimeout(() => this.closeChangePwModal(), 1800);
+    } catch(e) { showA('Network error. Please try again.','err'); }
+  },
+
+  async saveNameInline() {
+    const input   = document.getElementById('ws-name-input');
+    const alertEl = document.getElementById('ws-name-alert');
+    const name    = input?.value.trim();
+    if (!name) { _inlineAlert(alertEl,'Name cannot be empty.','error'); return; }
+    try {
+      const r = await fetch('/api/auth/profile', {
+        method:'PUT', headers:{'Content-Type':'application/json','Authorization':'Bearer '+API.token()},
+        body: JSON.stringify({ name })
+      });
+      const d = await r.json();
+      if (!r.ok) { _inlineAlert(alertEl, d.error||'Update failed.','error'); return; }
+      localStorage.setItem('rou_token', d.token);
+      localStorage.setItem('rou_user', JSON.stringify(d.user));
+      _inlineAlert(alertEl,'Name updated.','success');
+      _refreshUserDisplay(d.user);
+      this.renderWorkspaceHome();
+    } catch(e) { _inlineAlert(alertEl,'Network error.','error'); }
+  },
+
+  togglePwSection() {
+    const sec = document.getElementById('ws-pw-section');
+    const ch  = document.getElementById('ws-pw-chevron');
+    if (!sec) return;
+    const open = sec.style.display === 'none' || !sec.style.display;
+    sec.style.display = open ? 'block' : 'none';
+    if (ch) ch.style.transform = open ? 'rotate(180deg)' : '';
   },
 
   renderCompaniesGrid(filter) {
@@ -359,42 +437,6 @@ window.App = {
 
 
   /* ── ACCOUNT CARD IN WS-HOME ─────────────────────────────────────── */
-  _populateAccountCard(user) {
-    if (!user) { try { user = JSON.parse(localStorage.getItem('rou_user')||'null'); } catch(e){} }
-    if (!user) return;
-    const ROLE_COLORS = { admin:'#e8520a', partner:'#7c3aed', manager:'#1a3f6b', article:'#059669' };
-    const ROLE_LABELS = { admin:'Administrator', partner:'Partner', manager:'Manager', article:'Article' };
-    const color = ROLE_COLORS[user.role] || '#1a3f6b';
-
-    const av = document.getElementById('ws-profile-avatar');
-    if (av) { av.textContent = (user.name||'?').charAt(0).toUpperCase(); av.style.background = color; }
-    const nn = document.getElementById('ws-profile-name');  if (nn) nn.textContent = user.name || '';
-    const en = document.getElementById('ws-profile-email'); if (en) en.textContent = user.email || '';
-    const rb = document.getElementById('ws-profile-role');  if (rb) { rb.textContent = ROLE_LABELS[user.role]||user.role; }
-
-    const ni = document.getElementById('ws-name-input'); if (ni) ni.value = user.name || '';
-
-    // Show/hide add company + admin buttons based on role
-    // ws-add-company-btn (topbar), ws-quick-add-company-btn (panel)
-    ['ws-add-company-btn','ws-quick-add-company-btn'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = user.role === 'article' ? 'none' : '';
-    });
-    const adminBtn = document.getElementById('ws-quick-admin');
-    if (adminBtn) adminBtn.style.display = user.role === 'admin' ? 'flex' : 'none';
-
-    // Clear pw fields and close section
-    ['ws-pw-current','ws-pw-new','ws-pw-confirm'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.value = '';
-    });
-    const pws = document.getElementById('ws-pw-section');
-    if (pws) pws.style.display = 'none';
-    const ch = document.getElementById('ws-pw-chevron');
-    if (ch) ch.style.transform = '';
-    ['ws-account-alert','ws-pw-alert'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.style.display = 'none';
-    });
-  },
 
   togglePwSection() {
     const sec = document.getElementById('ws-pw-section');
@@ -664,3 +706,9 @@ window.App = {
     // kept for compatibility — workspace home handles display now
   }
 };
+
+
+/* Close dropdown on outside click */
+document.addEventListener('click', function() {
+  document.getElementById('ws-dropdown')?.classList.remove('open');
+});
