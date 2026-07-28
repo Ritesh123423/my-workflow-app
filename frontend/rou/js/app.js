@@ -346,7 +346,7 @@ window.App = {
     const ROLE_LABELS = { admin:'Administrator', partner:'Partner', manager:'Manager', article:'Article' };
     const color = ROLE_COLORS[user.role] || '#1a3f6b';
 
-    // Header avatar + name + email + role
+    // Header
     const av = document.getElementById('pv-avatar');
     if (av) { av.textContent = (user.name||'?').charAt(0).toUpperCase(); av.style.background = color; }
     const nn = document.getElementById('pv-name');        if (nn) nn.textContent = user.name || '';
@@ -359,6 +359,10 @@ window.App = {
     const ei = document.getElementById('pv-email-input'); if (ei) ei.value = user.email || '';
     const ri = document.getElementById('pv-role-input');  if (ri) ri.value = ROLE_LABELS[user.role] || user.role;
 
+    // Show Add Company button for non-articles
+    const addBtn = document.getElementById('pv-add-company-btn');
+    if (addBtn) addBtn.style.display = (user.role !== 'article') ? 'inline-flex' : 'none';
+
     // Clear pw + alerts
     ['pv-pw-current','pv-pw-new','pv-pw-confirm'].forEach(id => {
       const el = document.getElementById(id); if (el) el.value = '';
@@ -367,7 +371,6 @@ window.App = {
       const el = document.getElementById(id); if (el) el.style.display = 'none';
     });
 
-    // Companies
     this._renderProfileCompanies();
   },
 
@@ -382,14 +385,14 @@ window.App = {
       const user = API.user();
       const isArt = user && user.role === 'article';
       list.innerHTML = `<div style="text-align:center;padding:48px 20px;color:#94a3b8">
-        <div style="font-size:32px;margin-bottom:12px">${isArt ? '⏳' : '🏢'}</div>
-        <div style="font-size:14px;font-weight:600;color:#475569;margin-bottom:6px">${isArt ? 'No companies assigned yet' : 'No companies yet'}</div>
-        <div style="font-size:12.5px;line-height:1.6">${isArt ? 'Ask your manager or admin to assign you to a company.' : 'Go back and add your first company from the workspace.'}</div>
+        <div style="font-size:36px;margin-bottom:12px">${isArt ? '⏳' : '🏢'}</div>
+        <div style="font-size:13.5px;font-weight:600;color:#475569;margin-bottom:6px">${isArt ? 'No companies assigned yet' : 'No companies yet'}</div>
+        <div style="font-size:12px;line-height:1.6">${isArt ? 'Ask your manager or admin to assign you to a client company.' : 'Use "+ Add Company" above to create your first company.'}</div>
       </div>`;
       return;
     }
 
-    const COLORS = ['#0f2a47','#1a3f6b','#e8520a','#059669','#7c3aed','#d97706','#0891b2','#be123c'];
+    const COLORS = ['#0a1e3d','#1a3f6b','#e8520a','#059669','#7c3aed','#d97706','#0891b2','#be123c'];
     const current = this.currentClient;
 
     list.innerHTML = clients.map((c, i) => {
@@ -398,26 +401,31 @@ window.App = {
       const init   = (c.name||'?').replace(/[^A-Za-z0-9 ]/g,'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase() || '?';
       const active = current && current.id === c.id;
       return `<div onclick="App._openCompanyFromProfile('${c.id}')" style="
-          display:flex;align-items:center;gap:13px;padding:13px 16px;
-          border-radius:11px;border:1.5px solid ${active ? '#e8520a' : '#e2e8f0'};
-          background:${active ? '#fff8f5' : '#fff'};margin-bottom:9px;cursor:pointer;
-          transition:all 0.15s;box-shadow:${active ? '0 0 0 3px rgba(232,82,10,0.08)' : 'none'}"
-        onmouseover="this.style.borderColor='${active ? '#e8520a' : '#94a3b8'}';this.style.transform='translateX(2px)'"
-        onmouseout="this.style.borderColor='${active ? '#e8520a' : '#e2e8f0'}';this.style.transform='none'">
-        <div style="width:40px;height:40px;border-radius:10px;background:${col};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0">${init}</div>
+          display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:11px;
+          border:1.5px solid ${active ? '#e8520a' : '#e2e8f0'};
+          background:${active ? '#fff8f5' : '#fafbfc'};
+          margin-bottom:8px;cursor:pointer;transition:all 0.15s;
+          box-shadow:${active ? '0 0 0 3px rgba(232,82,10,0.08)' : 'none'}"
+        onmouseover="this.style.borderColor='${active ? '#e8520a' : '#0a1e3d'}';this.style.background='${active ? '#fff8f5' : '#f0f4f8'}'"
+        onmouseout="this.style.borderColor='${active ? '#e8520a' : '#e2e8f0'}';this.style.background='${active ? '#fff8f5' : '#fafbfc'}'">
+        <div style="width:42px;height:42px;border-radius:10px;background:${col};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;letter-spacing:-0.5px">${init}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:13.5px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name}</div>
-          <div style="font-size:11.5px;color:#94a3b8;margin-top:2px">${c.code||'—'} · ${rous} ROU${rous!==1?'s':''}</div>
+          <div style="font-size:11.5px;color:#94a3b8;margin-top:2px;display:flex;align-items:center;gap:6px">
+            <span>${c.code||'—'}</span>
+            <span style="width:3px;height:3px;border-radius:50%;background:#cbd5e1;display:inline-block"></span>
+            <span>${rous} ROU${rous!==1?'s':''}</span>
+          </div>
         </div>
         ${active
-          ? '<span style="flex-shrink:0;font-size:11px;font-weight:700;color:#e8520a;background:#fff3ee;padding:3px 10px;border-radius:20px;border:1px solid rgba(232,82,10,0.2)">Active</span>'
-          : '<div style="flex-shrink:0;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#1a3f6b;background:#eff6ff;padding:5px 12px;border-radius:20px;border:1px solid #bfdbfe">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></div>'
+          ? `<span style="flex-shrink:0;font-size:11px;font-weight:700;color:#e8520a;background:#fff3ee;padding:3px 10px;border-radius:20px;border:1px solid rgba(232,82,10,0.2);white-space:nowrap">● Active</span>`
+          : `<div style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#1a3f6b;background:#eff6ff;padding:5px 12px;border-radius:8px;border:1px solid #bfdbfe;white-space:nowrap">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></div>`
         }
       </div>`;
     }).join('');
   },
 
-  _openCompanyFromProfile(id) {
+    _openCompanyFromProfile(id) {
     const clients = DB.get('clients') || [];
     const client  = clients.find(c => c.id === id);
     if (!client) { toast('Company not found','error'); return; }
