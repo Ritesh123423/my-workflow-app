@@ -4,242 +4,345 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign In — KG Somani ROU Platform</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --brand: #1a3a5c;
-    --brand-mid: #1e4976;
+    --brand: #0f2a47;
+    --brand2: #1a3f6b;
     --accent: #e8520a;
-    --accent-light: #fff3ee;
-    --green: #16a34a;
+    --accent2: #ff6b2b;
+    --green: #059669;
     --red: #dc2626;
-    --bg: #f0f4f8;
+    --bg: #f1f5f9;
     --card: #ffffff;
-    --text: #1e293b;
+    --text: #0f172a;
     --text2: #475569;
     --text3: #94a3b8;
     --border: #e2e8f0;
-    --input-bg: #f8fafc;
-    --shadow: 0 4px 24px rgba(0,0,0,0.08);
-    --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.05), 0 8px 32px rgba(0,0,0,0.08);
+    --shadow-btn: 0 4px 14px rgba(15,42,71,0.35);
+    --radius: 14px;
   }
+
+  /* Prevent flash — hide body until auth check done */
+  body { visibility: hidden; }
+  body.ready { visibility: visible; }
+
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, sans-serif;
     background: var(--bg);
     min-height: 100vh;
     display: flex;
+    align-items: stretch;
+  }
+
+  /* LEFT PANEL */
+  .left-panel {
+    width: 420px;
+    flex-shrink: 0;
+    background: linear-gradient(160deg, var(--brand) 0%, #163260 50%, #1a3f6b 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 48px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+  .left-panel::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(232,82,10,0.18) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .left-panel::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -60px;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .lp-logo { position: relative; z-index: 1; }
+  .lp-icon {
+    width: 52px; height: 52px;
+    background: var(--accent);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 800; color: #fff;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 24px rgba(232,82,10,0.4);
+  }
+  .lp-firm { font-size: 22px; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 6px; letter-spacing: -0.3px; }
+  .lp-sub { font-size: 13px; color: rgba(255,255,255,0.55); letter-spacing: 0.2px; }
+  .lp-features { position: relative; z-index: 1; }
+  .lp-feat {
+    display: flex; align-items: flex-start; gap: 14px;
+    margin-bottom: 22px;
+  }
+  .lp-feat-icon {
+    width: 36px; height: 36px; flex-shrink: 0;
+    background: rgba(255,255,255,0.08);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .lp-feat-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 2px; }
+  .lp-feat-desc { font-size: 11.5px; color: rgba(255,255,255,0.45); line-height: 1.5; }
+  .lp-footer { font-size: 11px; color: rgba(255,255,255,0.3); position: relative; z-index: 1; }
+
+  /* RIGHT PANEL */
+  .right-panel {
+    flex: 1;
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px;
-    background-image: radial-gradient(ellipse at 20% 50%, rgba(26,58,92,0.06) 0%, transparent 60%),
-                      radial-gradient(ellipse at 80% 20%, rgba(232,82,10,0.04) 0%, transparent 50%);
+    padding: 40px 32px;
   }
-  .auth-wrap { width: 100%; max-width: 440px; }
-  .brand-header {
-    text-align: center;
-    margin-bottom: 32px;
-  }
-  .brand-logo {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
-  }
-  .brand-icon {
-    width: 48px; height: 48px;
-    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-mid) 100%);
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 800; color: #fff; letter-spacing: -0.5px;
-    box-shadow: 0 4px 12px rgba(26,58,92,0.3);
-  }
-  .brand-name { font-size: 20px; font-weight: 700; color: var(--brand); letter-spacing: -0.3px; }
-  .brand-sub { font-size: 12px; color: var(--text3); margin-top: 4px; letter-spacing: 0.2px; }
-  .card {
-    background: var(--card);
-    border-radius: 16px;
-    box-shadow: var(--shadow-lg);
-    overflow: hidden;
-    border: 1px solid var(--border);
-  }
-  .card-top {
-    background: linear-gradient(135deg, var(--brand) 0%, #1e4976 100%);
-    padding: 28px 32px 24px;
-    color: #fff;
-  }
-  .card-top h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-  .card-top p { font-size: 13px; color: rgba(255,255,255,0.7); }
-  .card-body { padding: 28px 32px 32px; }
-  .form-group { margin-bottom: 18px; }
+  .form-box { width: 100%; max-width: 400px; }
+  .form-heading { margin-bottom: 32px; }
+  .form-heading h1 { font-size: 26px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; margin-bottom: 6px; }
+  .form-heading p { font-size: 14px; color: var(--text3); }
+  .form-heading p a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .form-heading p a:hover { text-decoration: underline; }
+
+  .form-group { margin-bottom: 16px; }
   .form-label {
-    display: block; font-size: 12.5px; font-weight: 600;
-    color: var(--text2); margin-bottom: 7px; letter-spacing: 0.2px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12.5px; font-weight: 600; color: var(--text2);
+    margin-bottom: 7px; letter-spacing: 0.1px;
   }
-  .form-input {
-    width: 100%; padding: 11px 14px; font-size: 14px;
-    background: var(--input-bg); border: 1.5px solid var(--border);
-    border-radius: 8px; color: var(--text); outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s; font-family: inherit;
-  }
-  .form-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(26,58,92,0.1); }
-  .form-input.error { border-color: var(--red); }
   .input-wrap { position: relative; }
-  .input-wrap .toggle-pw {
-    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-    background: none; border: none; cursor: pointer; color: var(--text3); font-size: 15px; padding: 2px;
+  .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -webkit-appearance: none;
   }
-  .error-msg { font-size: 11.5px; color: var(--red); margin-top: 5px; display: none; }
-  .error-msg.show { display: block; }
+  .form-input::placeholder { color: var(--text3); }
+  .form-input:focus { border-color: var(--brand2); box-shadow: 0 0 0 3px rgba(26,63,107,0.1); }
+  .form-input.has-icon { padding-right: 44px; }
+  .input-icon {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; color: var(--text3);
+    font-size: 16px; padding: 2px; line-height: 1;
+    transition: color 0.15s;
+  }
+  .input-icon:hover { color: var(--text2); }
+
   .alert {
-    border-radius: 8px; padding: 12px 14px; font-size: 13px;
-    margin-bottom: 18px; display: none; line-height: 1.5;
+    display: flex; align-items: flex-start; gap: 10px;
+    border-radius: 10px; padding: 12px 14px; font-size: 13px;
+    margin-bottom: 16px; line-height: 1.5; display: none;
   }
-  .alert.error { background: #fef2f2; border: 1px solid #fecaca; color: var(--red); }
-  .alert.success { background: #f0fdf4; border: 1px solid #bbf7d0; color: var(--green); }
-  .alert.show { display: block; }
-  .btn {
-    width: 100%; padding: 12px; font-size: 14px; font-weight: 600;
-    border: none; border-radius: 8px; cursor: pointer; font-family: inherit;
-    transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px;
+  .alert.show { display: flex; }
+  .alert-error { background: #fef2f2; border: 1.5px solid #fecaca; color: #991b1b; }
+  .alert-success { background: #f0fdf4; border: 1.5px solid #bbf7d0; color: #065f46; }
+  .alert-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+  .btn-submit {
+    width: 100%;
+    padding: 13px;
+    font-size: 14.5px;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand2) 100%);
+    color: #fff;
+    box-shadow: var(--shadow-btn);
+    transition: all 0.18s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    letter-spacing: 0.1px;
+    margin-top: 4px;
   }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-mid) 100%);
-    color: #fff; box-shadow: 0 4px 12px rgba(26,58,92,0.3);
-  }
-  .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(26,58,92,0.35); }
-  .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
-  .spinner {
-    width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4);
-    border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none;
-  }
+  .btn-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(15,42,71,0.4); }
+  .btn-submit:active:not(:disabled) { transform: translateY(0); }
+  .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; transform: none !important; }
+
+  .spinner { width: 16px; height: 16px; border: 2.5px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; display: none; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
   .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
   .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-  .divider span { font-size: 12px; color: var(--text3); white-space: nowrap; }
-  .footer-link { text-align: center; margin-top: 20px; font-size: 13px; color: var(--text2); }
-  .footer-link a { color: var(--brand); font-weight: 600; text-decoration: none; }
-  .footer-link a:hover { text-decoration: underline; }
-  .role-badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
-    background: var(--accent-light); color: var(--accent);
-    margin-top: 6px;
+  .divider span { font-size: 12px; color: var(--text3); }
+
+  .register-link {
+    text-align: center;
+    font-size: 13.5px;
+    color: var(--text2);
+  }
+  .register-link a { color: var(--accent); font-weight: 700; text-decoration: none; }
+  .register-link a:hover { text-decoration: underline; }
+
+  /* Responsive */
+  @media (max-width: 780px) {
+    .left-panel { display: none; }
+    body { background: var(--card); }
+    .right-panel { padding: 28px 20px; }
   }
 </style>
 </head>
 <body>
-<div class="auth-wrap">
-  <div class="brand-header">
-    <div class="brand-logo">
-      <div class="brand-icon">ROU</div>
-      <div>
-        <div class="brand-name">KG Somani & Co LLP</div>
-      </div>
-    </div>
-    <div class="brand-sub">Ind AS 116 · Right of Use Asset Platform</div>
+
+<!-- LEFT -->
+<div class="left-panel">
+  <div class="lp-logo">
+    <div class="lp-icon">ROU</div>
+    <div class="lp-firm">K G Somani & Co LLP</div>
+    <div class="lp-sub">Chartered Accountants · Ind AS 116 Platform</div>
   </div>
-
-  <div class="card">
-    <div class="card-top">
-      <h1>Welcome back</h1>
-      <p>Sign in to access your workspace</p>
+  <div class="lp-features">
+    <div class="lp-feat">
+      <div class="lp-feat-icon">📐</div>
+      <div>
+        <div class="lp-feat-title">Precise Lease Computation</div>
+        <div class="lp-feat-desc">PV-based ROU asset & liability with IBR, escalations, reassessments</div>
+      </div>
     </div>
-    <div class="card-body">
-      <div class="alert error" id="alert-error"></div>
-      <div class="alert success" id="alert-success"></div>
+    <div class="lp-feat">
+      <div class="lp-feat-icon">📊</div>
+      <div>
+        <div class="lp-feat-title">Excel Workpapers</div>
+        <div class="lp-feat-desc">One-click export — Schedule III, Journal Entries, Disclosures</div>
+      </div>
+    </div>
+    <div class="lp-feat">
+      <div class="lp-feat-icon">🔒</div>
+      <div>
+        <div class="lp-feat-title">Role-Based Access</div>
+        <div class="lp-feat-desc">Admin, Partner, Manager, Article — each with right permissions</div>
+      </div>
+    </div>
+    <div class="lp-feat">
+      <div class="lp-feat-icon">☁️</div>
+      <div>
+        <div class="lp-feat-title">Cloud Sync</div>
+        <div class="lp-feat-desc">All data persisted to PostgreSQL — access from any device</div>
+      </div>
+    </div>
+  </div>
+  <div class="lp-footer">© 2024 K G Somani & Co LLP · Confidential</div>
+</div>
 
-      <div class="form-group">
-        <label class="form-label">Email Address</label>
+<!-- RIGHT -->
+<div class="right-panel">
+  <div class="form-box">
+    <div class="form-heading">
+      <h1>Welcome back</h1>
+      <p>Don't have an account? <a href="register.html">Create one</a></p>
+    </div>
+
+    <div class="alert alert-error" id="alert-error">
+      <span class="alert-icon">⚠️</span>
+      <span id="alert-error-msg"></span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <div class="input-wrap">
         <input class="form-input" id="email" type="email" placeholder="you@kgsomani.com" autocomplete="email">
-        <div class="error-msg" id="email-err">Please enter a valid email address.</div>
       </div>
+    </div>
 
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <div class="input-wrap">
-          <input class="form-input" id="password" type="password" placeholder="••••••••" autocomplete="current-password">
-          <button class="toggle-pw" type="button" onclick="togglePw('password', this)" tabindex="-1">👁</button>
-        </div>
-        <div class="error-msg" id="pw-err">Password is required.</div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <div class="input-wrap">
+        <input class="form-input has-icon" id="password" type="password" placeholder="Enter your password" autocomplete="current-password">
+        <button class="input-icon" type="button" onclick="togglePw()" tabindex="-1" id="pw-toggle">👁</button>
       </div>
+    </div>
 
-      <button class="btn btn-primary" id="login-btn" onclick="doLogin()">
-        <div class="spinner" id="spinner"></div>
-        <span id="btn-text">Sign In</span>
-      </button>
+    <button class="btn-submit" id="login-btn" onclick="doLogin()">
+      <div class="spinner" id="spinner"></div>
+      <span id="btn-text">Sign In →</span>
+    </button>
 
-      <div class="divider"><span>Don't have an account?</span></div>
+    <div class="divider"><span>or</span></div>
 
-      <div class="footer-link">
-        <a href="register.html">Create an account</a>
-        &nbsp;·&nbsp;
-        <span style="color:var(--text3);font-size:12px">Articles can register freely</span>
-      </div>
+    <div class="register-link">
+      New to the platform? <a href="register.html">Create an account</a>
     </div>
   </div>
 </div>
 
 <script>
-  // Redirect if already logged in
-  const token = localStorage.getItem('rou_token');
-  if (token) {
-    try {
-      const p = JSON.parse(atob(token.split('.')[1]));
-      if (p.exp * 1000 > Date.now()) window.location.href = 'index.html';
-    } catch {}
-  }
+  // ── Auth check — must run BEFORE showing page ─────────────
+  (function() {
+    var token = localStorage.getItem('rou_token');
+    if (token) {
+      try {
+        var p = JSON.parse(atob(token.split('.')[1]));
+        if (p.exp * 1000 > Date.now()) {
+          // Already logged in — redirect without showing login page
+          window.location.replace(p.role === 'admin' ? 'admin.html' : 'index.html');
+          return; // stop here, don't show page
+        }
+      } catch(e) {}
+      localStorage.removeItem('rou_token');
+      localStorage.removeItem('rou_user');
+    }
+    // Not logged in — show the page
+    document.body.classList.add('ready');
+  })();
 
-  function togglePw(id, btn) {
-    const el = document.getElementById(id);
+  function togglePw() {
+    var el = document.getElementById('password');
+    var btn = document.getElementById('pw-toggle');
     el.type = el.type === 'password' ? 'text' : 'password';
     btn.textContent = el.type === 'password' ? '👁' : '🙈';
+  }
+
+  function showError(msg) {
+    document.getElementById('alert-error-msg').textContent = msg;
+    document.getElementById('alert-error').classList.add('show');
   }
 
   function setLoading(v) {
     document.getElementById('login-btn').disabled = v;
     document.getElementById('spinner').style.display = v ? 'block' : 'none';
-    document.getElementById('btn-text').textContent = v ? 'Signing in…' : 'Sign In';
-  }
-
-  function showError(msg) {
-    const el = document.getElementById('alert-error');
-    el.textContent = msg; el.classList.add('show');
-    document.getElementById('alert-success').classList.remove('show');
-  }
-
-  function clearAlerts() {
-    document.getElementById('alert-error').classList.remove('show');
-    document.getElementById('alert-success').classList.remove('show');
+    document.getElementById('btn-text').textContent = v ? 'Signing in…' : 'Sign In →';
   }
 
   async function doLogin() {
-    clearAlerts();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
+    document.getElementById('alert-error').classList.remove('show');
+    var email = document.getElementById('email').value.trim();
+    var password = document.getElementById('password').value;
     if (!email || !password) { showError('Please enter your email and password.'); return; }
 
     setLoading(true);
     try {
-      const r = await fetch('/api/auth/login', {
+      var r = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email: email, password: password })
       });
-      const data = await r.json();
-      if (!r.ok) { showError(data.error || 'Login failed.'); setLoading(false); return; }
+      var data = await r.json();
+      if (!r.ok) { showError(data.error || 'Login failed. Please try again.'); setLoading(false); return; }
+
       localStorage.setItem('rou_token', data.token);
       localStorage.setItem('rou_user', JSON.stringify(data.user));
-      // Redirect admin to admin panel, others to ROU app
-      if (data.user.role === 'admin') window.location.href = 'admin.html';
-      else window.location.href = 'index.html';
-    } catch {
-      showError('Network error. Please check your connection.');
+      // use replace() so back button doesn't return to login
+      window.location.replace(data.user.role === 'admin' ? 'admin.html' : 'index.html');
+    } catch(e) {
+      showError('Network error. Please check your connection and try again.');
       setLoading(false);
     }
   }
 
-  document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !document.getElementById('login-btn').disabled) doLogin();
+  });
 </script>
 </body>
 </html>
