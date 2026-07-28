@@ -1,3 +1,14 @@
+/* ── Alert helper for profile view ── */
+function _pvAlert(el, msg, type) {
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = type === 'success' ? '#f0fdf4' : '#fef2f2';
+  el.style.border     = '1.5px solid ' + (type === 'success' ? '#bbf7d0' : '#fecaca');
+  el.style.color      = type === 'success' ? '#065f46' : '#991b1b';
+  if (type === 'success') setTimeout(function() { el.style.display = 'none'; }, 3500);
+}
+
 /* ── Standalone alert helper for profile page ── */
 function _pageAlert(el, msg, type) {
   if (!el) return;
@@ -237,7 +248,7 @@ window.App = {
   },
 
   showPage(page) {
-    ['dashboard','rous','add-rou','schedule','export','audit','bulk-import','reassess-override','profile'].forEach(p => {
+    ['dashboard','rous','add-rou','schedule','export','audit','bulk-import','reassess-override'].forEach(p => {
       const el = document.getElementById('page-' + p);
       if (el) el.style.display = 'none';
     });
@@ -246,7 +257,7 @@ window.App = {
     document.querySelectorAll('.nav-item').forEach(el => {
       el.classList.toggle('active', el.dataset.page === page);
     });
-    const titles = { dashboard:'Dashboard', rous:'All ROUs', 'add-rou':'Add ROU', schedule:'Schedule', export:'Export to Excel', audit:'Audit Log', 'bulk-import':'Bulk Import', 'reassess-override':'Reassessment Override', profile:'My Profile' };
+    const titles = { dashboard:'Dashboard', rous:'All ROUs', 'add-rou':'Add ROU', schedule:'Schedule', export:'Export to Excel', audit:'Audit Log', 'bulk-import':'Bulk Import', 'reassess-override':'Reassessment Override' };
     const tb = document.getElementById('topbar-title');
     if (tb) tb.textContent = titles[page] || page;
     if (page === 'dashboard') this.renderDashboard();
@@ -255,7 +266,6 @@ window.App = {
     if (page === 'export')    this.prepareExport();
     if (page === 'audit')     AuditLog.render();
     if (page === 'reassess-override') ReassessOverride.render();
-    if (page === 'profile')   this.renderProfilePage();
     document.querySelector('.main-content')?.scrollTo(0,0);
   },
 
@@ -291,117 +301,79 @@ window.App = {
   },
 
   /* ── PROFILE ─────────────────────────────────────────────── */
-  openProfile() {
-    const user = API.user();
-    if (!user) return;
-    const ROLE_COLORS = { admin:'#e8520a', partner:'#7c3aed', manager:'#1a3f6b', article:'#059669' };
-    const ROLE_LABELS = { admin:'Administrator', partner:'Partner', manager:'Manager', article:'Article' };
-    const color = ROLE_COLORS[user.role] || '#1a3f6b';
 
-    const av = document.getElementById('profile-avatar');
-    if (av) { av.textContent = (user.name||'?').charAt(0).toUpperCase(); av.style.background = color; }
-    const nd = document.getElementById('profile-name-display'); if (nd) nd.textContent = user.name||'';
-    const ed = document.getElementById('profile-email-display'); if (ed) ed.textContent = user.email||'';
-    const rd = document.getElementById('profile-role-display');
-    if (rd) {
-      rd.textContent = ROLE_LABELS[user.role]||user.role;
-      rd.style.cssText = `background:${color}18;color:${color};display:inline-flex;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-top:5px`;
-    }
-    const ni = document.getElementById('profile-name-input'); if (ni) ni.value = user.name||'';
-    const ei = document.getElementById('profile-email-input'); if (ei) ei.value = user.email||'';
-    const ri = document.getElementById('profile-role-input'); if (ri) ri.value = ROLE_LABELS[user.role]||user.role;
 
-    ['profile-pw-current','profile-pw-new','profile-pw-confirm'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.value = '';
+
+
+
+  /* ══════════════════════════════════════════════════
+     PROFILE VIEW — standalone full-page view
+  ══════════════════════════════════════════════════ */
+
+  /* Which view was active before opening profile */
+  _profileFrom: null,
+
+  openProfileView() {
+    this._profileFrom = document.getElementById('view-app').classList.contains('active') ? 'app'
+                      : document.getElementById('view-home').classList.contains('active') ? 'home'
+                      : 'home';
+    // Hide all views
+    ['view-home','view-app','view-profile'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.classList.remove('active'); el.style.display = 'none'; }
     });
-    ['profile-details-alert','profile-pw-alert'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.style.display = 'none';
-    });
-    if (typeof switchProfileTab === 'function') switchProfileTab('details');
-    Modal.open('modal-profile');
+    const pv = document.getElementById('view-profile');
+    if (pv) { pv.style.display = 'flex'; pv.classList.add('active'); }
+    this._populateProfileView();
   },
 
-  async saveProfile() {
-    const name = document.getElementById('profile-name-input')?.value.trim();
-    if (!name) { profileAlert('details','Name cannot be empty.','error'); return; }
-    try {
-      const r = await fetch('/api/auth/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+API.token() },
-        body: JSON.stringify({ name })
-      });
-      const d = await r.json();
-      if (!r.ok) { profileAlert('details', d.error||'Update failed.','error'); return; }
-      localStorage.setItem('rou_token', d.token);
-      localStorage.setItem('rou_user', JSON.stringify(d.user));
-      profileAlert('details','Profile updated!','success');
-      _refreshUserDisplay(d.user);
+  closeProfileView() {
+    const pv = document.getElementById('view-profile');
+    if (pv) { pv.style.display = 'none'; pv.classList.remove('active'); }
+    if (this._profileFrom === 'app' && this.currentClient) {
+      document.getElementById('view-app').classList.add('active');
+    } else {
+      document.getElementById('view-home').classList.add('active');
       this.renderWorkspaceHome();
-      const nd = document.getElementById('profile-name-display'); if (nd) nd.textContent = d.user.name;
-      const av = document.getElementById('profile-avatar'); if (av) av.textContent = d.user.name.charAt(0).toUpperCase();
-    } catch (e) { profileAlert('details','Network error. Try again.','error'); }
+    }
+    this._profileFrom = null;
   },
 
-  async changePassword() {
-    const cur  = document.getElementById('profile-pw-current')?.value;
-    const nw   = document.getElementById('profile-pw-new')?.value;
-    const conf = document.getElementById('profile-pw-confirm')?.value;
-    if (!cur||!nw||!conf) { profileAlert('password','All fields are required.','error'); return; }
-    if (nw.length < 8)    { profileAlert('password','New password must be at least 8 characters.','error'); return; }
-    if (nw !== conf)       { profileAlert('password','New passwords do not match.','error'); return; }
-    try {
-      const r = await fetch('/api/auth/change-password', {
-        method: 'PUT',
-        headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+API.token() },
-        body: JSON.stringify({ currentPassword:cur, newPassword:nw })
-      });
-      const d = await r.json();
-      if (!r.ok) { profileAlert('password', d.error||'Failed.','error'); return; }
-      profileAlert('password','Password changed successfully!','success');
-      ['profile-pw-current','profile-pw-new','profile-pw-confirm'].forEach(id => {
-        const el = document.getElementById(id); if (el) el.value = '';
-      });
-    } catch (e) { profileAlert('password','Network error. Try again.','error'); }
-  },
-
-
-  /* ── PROFILE PAGE ──────────────────────────────────────────────────────── */
-  renderProfilePage() {
+  _populateProfileView() {
     const user = API.user();
     if (!user) return;
     const ROLE_COLORS = { admin:'#e8520a', partner:'#7c3aed', manager:'#1a3f6b', article:'#059669' };
     const ROLE_LABELS = { admin:'Administrator', partner:'Partner', manager:'Manager', article:'Article' };
     const color = ROLE_COLORS[user.role] || '#1a3f6b';
 
-    // Avatar + header
-    const av = document.getElementById('profile-page-avatar');
+    // Header avatar + name + email + role
+    const av = document.getElementById('pv-avatar');
     if (av) { av.textContent = (user.name||'?').charAt(0).toUpperCase(); av.style.background = color; }
-    const pn = document.getElementById('profile-page-name');   if (pn) pn.textContent = user.name || '';
-    const pe = document.getElementById('profile-page-email');  if (pe) pe.textContent = user.email || '';
-    const rb = document.getElementById('profile-page-role-badge');
-    if (rb) {
-      rb.textContent = ROLE_LABELS[user.role] || user.role;
-      rb.style.cssText = `background:${color}18;color:${color};display:inline-flex;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-top:5px`;
-    }
+    const nn = document.getElementById('pv-name');        if (nn) nn.textContent = user.name || '';
+    const en = document.getElementById('pv-email');       if (en) en.textContent = user.email || '';
+    const rb = document.getElementById('pv-role-badge');  if (rb) rb.textContent = ROLE_LABELS[user.role] || user.role;
+    const tb = document.getElementById('pv-topbar-name'); if (tb) tb.textContent = user.name || '';
+
     // Inputs
-    const ni = document.getElementById('profile-page-name-input');   if (ni) ni.value = user.name || '';
-    const ei = document.getElementById('profile-page-email-input');  if (ei) ei.value = user.email || '';
-    const ri = document.getElementById('profile-page-role-input');   if (ri) ri.value = ROLE_LABELS[user.role] || user.role;
-    // Clear pw fields + alerts
-    ['profile-page-pw-current','profile-page-pw-new','profile-page-pw-confirm'].forEach(id => {
+    const ni = document.getElementById('pv-name-input');  if (ni) ni.value = user.name || '';
+    const ei = document.getElementById('pv-email-input'); if (ei) ei.value = user.email || '';
+    const ri = document.getElementById('pv-role-input');  if (ri) ri.value = ROLE_LABELS[user.role] || user.role;
+
+    // Clear pw + alerts
+    ['pv-pw-current','pv-pw-new','pv-pw-confirm'].forEach(id => {
       const el = document.getElementById(id); if (el) el.value = '';
     });
-    ['profile-page-alert','profile-pw-page-alert'].forEach(id => {
+    ['pv-details-alert','pv-pw-alert'].forEach(id => {
       const el = document.getElementById(id); if (el) el.style.display = 'none';
     });
 
-    // Companies list
-    this.renderProfileCompanies();
+    // Companies
+    this._renderProfileCompanies();
   },
 
-  renderProfileCompanies() {
-    const list  = document.getElementById('profile-companies-list');
-    const count = document.getElementById('profile-companies-count');
+  _renderProfileCompanies() {
+    const list  = document.getElementById('pv-companies-list');
+    const count = document.getElementById('pv-co-count');
     if (!list) return;
     const clients = DB.get('clients') || [];
     if (count) count.textContent = clients.length + ' compan' + (clients.length === 1 ? 'y' : 'ies');
@@ -409,10 +381,10 @@ window.App = {
     if (!clients.length) {
       const user = API.user();
       const isArt = user && user.role === 'article';
-      list.innerHTML = `<div style="text-align:center;padding:36px 20px;color:var(--text3)">
-        <div style="font-size:28px;margin-bottom:10px">${isArt ? '⏳' : '🏢'}</div>
-        <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px">${isArt ? 'No companies assigned' : 'No companies yet'}</div>
-        <div style="font-size:12px">${isArt ? 'Ask your manager or admin to assign you to a company.' : 'Go back to the workspace to add your first company.'}</div>
+      list.innerHTML = `<div style="text-align:center;padding:48px 20px;color:#94a3b8">
+        <div style="font-size:32px;margin-bottom:12px">${isArt ? '⏳' : '🏢'}</div>
+        <div style="font-size:14px;font-weight:600;color:#475569;margin-bottom:6px">${isArt ? 'No companies assigned yet' : 'No companies yet'}</div>
+        <div style="font-size:12.5px;line-height:1.6">${isArt ? 'Ask your manager or admin to assign you to a company.' : 'Go back and add your first company from the workspace.'}</div>
       </div>`;
       return;
     }
@@ -421,91 +393,92 @@ window.App = {
     const current = this.currentClient;
 
     list.innerHTML = clients.map((c, i) => {
-      const rous    = (DB.get('rous_' + c.id) || []).length;
-      const col     = COLORS[i % COLORS.length];
-      const init    = (c.name||'?').replace(/[^A-Za-z0-9 ]/g,'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase() || '?';
-      const active  = current && current.id === c.id;
-      return `<div onclick="App.switchToCompany('${c.id}')" style="
-          display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;
-          border:1.5px solid ${active ? 'var(--accent)' : 'var(--border)'};
-          background:${active ? '#fff3ee' : '#fff'};margin-bottom:8px;transition:all 0.15s;
-        " onmouseover="if(!${active}) this.style.borderColor='#94a3b8'" onmouseout="if(!${active}) this.style.borderColor='var(--border)'">
-        <div style="width:38px;height:38px;border-radius:9px;background:${col};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0">${init}</div>
+      const rous   = (DB.get('rous_' + c.id) || []).length;
+      const col    = COLORS[i % COLORS.length];
+      const init   = (c.name||'?').replace(/[^A-Za-z0-9 ]/g,'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase() || '?';
+      const active = current && current.id === c.id;
+      return `<div onclick="App._openCompanyFromProfile('${c.id}')" style="
+          display:flex;align-items:center;gap:13px;padding:13px 16px;
+          border-radius:11px;border:1.5px solid ${active ? '#e8520a' : '#e2e8f0'};
+          background:${active ? '#fff8f5' : '#fff'};margin-bottom:9px;cursor:pointer;
+          transition:all 0.15s;box-shadow:${active ? '0 0 0 3px rgba(232,82,10,0.08)' : 'none'}"
+        onmouseover="this.style.borderColor='${active ? '#e8520a' : '#94a3b8'}';this.style.transform='translateX(2px)'"
+        onmouseout="this.style.borderColor='${active ? '#e8520a' : '#e2e8f0'}';this.style.transform='none'">
+        <div style="width:40px;height:40px;border-radius:10px;background:${col};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0">${init}</div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:13.5px;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name}</div>
-          <div style="font-size:11.5px;color:var(--text3);margin-top:2px">${c.code || '—'} · ${rous} ROU${rous!==1?'s':''}</div>
+          <div style="font-size:13.5px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name}</div>
+          <div style="font-size:11.5px;color:#94a3b8;margin-top:2px">${c.code||'—'} · ${rous} ROU${rous!==1?'s':''}</div>
         </div>
         ${active
-          ? '<span style="font-size:11px;font-weight:700;color:var(--accent);background:#fff3ee;padding:3px 9px;border-radius:20px;border:1px solid rgba(232,82,10,0.25);flex-shrink:0">Current</span>'
-          : '<svg style="flex-shrink:0;color:#cbd5e1" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>'
+          ? '<span style="flex-shrink:0;font-size:11px;font-weight:700;color:#e8520a;background:#fff3ee;padding:3px 10px;border-radius:20px;border:1px solid rgba(232,82,10,0.2)">Active</span>'
+          : '<div style="flex-shrink:0;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#1a3f6b;background:#eff6ff;padding:5px 12px;border-radius:20px;border:1px solid #bfdbfe">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></div>'
         }
       </div>`;
     }).join('');
   },
 
-  switchToCompany(id) {
+  _openCompanyFromProfile(id) {
     const clients = DB.get('clients') || [];
     const client  = clients.find(c => c.id === id);
-    if (!client) { toast('Company not found', 'error'); return; }
+    if (!client) { toast('Company not found','error'); return; }
+    // Close profile view
+    const pv = document.getElementById('view-profile');
+    if (pv) { pv.style.display = 'none'; pv.classList.remove('active'); }
+    // Enter the company
     this.currentClient = client;
     DB.set('last_client', id);
-    // Update sidebar active company label
+    document.getElementById('view-home')?.classList.remove('active');
+    document.getElementById('view-app').classList.add('active');
     const sn = document.getElementById('sidebar-client-name'); if (sn) sn.textContent = client.name;
     const rous = DB.get('rous_' + client.id) || [];
     const ss = document.getElementById('sidebar-client-sub'); if (ss) ss.textContent = `${rous.length} ROU${rous.length!==1?'s':''}`;
-    // Navigate to dashboard
     this.showPage('dashboard');
-    toast('Switched to ' + client.name, 'success');
+    toast('Opened: ' + client.name, 'success');
   },
 
-  /* ── PROFILE SAVE (works from both page fields and modal fields) ──────── */
-  async saveProfile() {
-    // Try page fields first, fall back to modal fields
-    const nameInput = document.getElementById('profile-page-name-input') ||
-                      document.getElementById('profile-name-input');
-    const alertEl   = document.getElementById('profile-page-alert') ||
-                      document.getElementById('profile-details-alert');
+  async saveProfileView() {
+    const nameInput = document.getElementById('pv-name-input');
+    const alertEl   = document.getElementById('pv-details-alert');
     const name = nameInput?.value.trim();
-    if (!name) { _pageAlert(alertEl, 'Name cannot be empty.', 'error'); return; }
+    if (!name) { _pvAlert(alertEl,'Name cannot be empty.','error'); return; }
     try {
       const r = await fetch('/api/auth/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+API.token() },
+        method:'PUT', headers:{'Content-Type':'application/json','Authorization':'Bearer '+API.token()},
         body: JSON.stringify({ name })
       });
       const d = await r.json();
-      if (!r.ok) { _pageAlert(alertEl, d.error||'Update failed.', 'error'); return; }
+      if (!r.ok) { _pvAlert(alertEl, d.error||'Update failed.','error'); return; }
       localStorage.setItem('rou_token', d.token);
       localStorage.setItem('rou_user', JSON.stringify(d.user));
-      _pageAlert(alertEl, 'Name updated successfully!', 'success');
+      _pvAlert(alertEl,'Name updated successfully!','success');
       _refreshUserDisplay(d.user);
-      // Update page header live
-      const pn = document.getElementById('profile-page-name'); if (pn) pn.textContent = d.user.name;
-      const av = document.getElementById('profile-page-avatar'); if (av) av.textContent = d.user.name.charAt(0).toUpperCase();
-    } catch(e) { _pageAlert(alertEl, 'Network error. Try again.', 'error'); }
+      // Update profile view header
+      const pn = document.getElementById('pv-name'); if (pn) pn.textContent = d.user.name;
+      const av = document.getElementById('pv-avatar'); if (av) av.textContent = d.user.name.charAt(0).toUpperCase();
+      const tb = document.getElementById('pv-topbar-name'); if (tb) tb.textContent = d.user.name;
+    } catch(e) { _pvAlert(alertEl,'Network error. Try again.','error'); }
   },
 
-  /* ── CHANGE PASSWORD (works from both page fields and modal fields) ────── */
-  async changePassword() {
-    const curEl   = document.getElementById('profile-page-pw-current')  || document.getElementById('profile-pw-current');
-    const newEl   = document.getElementById('profile-page-pw-new')      || document.getElementById('profile-pw-new');
-    const confEl  = document.getElementById('profile-page-pw-confirm')  || document.getElementById('profile-pw-confirm');
-    const alertEl = document.getElementById('profile-pw-page-alert')    || document.getElementById('profile-pw-alert');
-    const cur = curEl?.value, nw = newEl?.value, conf = confEl?.value;
-    if (!cur||!nw||!conf) { _pageAlert(alertEl, 'All fields are required.', 'error'); return; }
-    if (nw.length < 8)    { _pageAlert(alertEl, 'New password must be at least 8 characters.', 'error'); return; }
-    if (nw !== conf)       { _pageAlert(alertEl, 'New passwords do not match.', 'error'); return; }
+  async changePasswordView() {
+    const cur  = document.getElementById('pv-pw-current')?.value;
+    const nw   = document.getElementById('pv-pw-new')?.value;
+    const conf = document.getElementById('pv-pw-confirm')?.value;
+    const alertEl = document.getElementById('pv-pw-alert');
+    if (!cur||!nw||!conf) { _pvAlert(alertEl,'All three fields are required.','error'); return; }
+    if (nw.length < 8)    { _pvAlert(alertEl,'New password must be at least 8 characters.','error'); return; }
+    if (nw !== conf)       { _pvAlert(alertEl,'New passwords do not match.','error'); return; }
     try {
       const r = await fetch('/api/auth/change-password', {
-        method: 'PUT',
-        headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+API.token() },
+        method:'PUT', headers:{'Content-Type':'application/json','Authorization':'Bearer '+API.token()},
         body: JSON.stringify({ currentPassword:cur, newPassword:nw })
       });
       const d = await r.json();
-      if (!r.ok) { _pageAlert(alertEl, d.error||'Failed.', 'error'); return; }
-      _pageAlert(alertEl, 'Password changed successfully!', 'success');
-      [curEl, newEl, confEl].forEach(el => { if (el) el.value = ''; });
-    } catch(e) { _pageAlert(alertEl, 'Network error. Try again.', 'error'); }
+      if (!r.ok) { _pvAlert(alertEl, d.error||'Failed.','error'); return; }
+      _pvAlert(alertEl,'Password changed successfully! Please remember your new password.','success');
+      ['pv-pw-current','pv-pw-new','pv-pw-confirm'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.value = '';
+      });
+    } catch(e) { _pvAlert(alertEl,'Network error. Try again.','error'); }
   },
 
   /* ── ADMIN LOGIN (ROU admin panel inside app) ────────────── */
