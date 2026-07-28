@@ -333,6 +333,16 @@ document.documentElement.style.visibility = 'hidden';
       </div>
     </div>
     <div class="sidebar-bottom">
+      <div id="sidebar-user-bar" style="padding:10px 16px 12px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:4px">
+        <div style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border-radius:9px;background:rgba(255,255,255,0.06);transition:background 0.15s" onclick="App.openProfile()" onmouseover="this.style.background='rgba(255,255,255,0.11)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+          <div id="sidebar-user-avatar" style="width:32px;height:32px;border-radius:8px;background:#e8520a;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">?</div>
+          <div style="flex:1;min-width:0">
+            <div id="sidebar-user-name" style="font-size:12.5px;font-weight:600;color:rgba(255,255,255,0.92);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading…</div>
+            <div id="sidebar-user-role" style="font-size:10.5px;color:rgba(255,255,255,0.45);margin-top:1px">—</div>
+          </div>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
       <div class="nav-item" onclick="App.goHome()" style="color:rgba(255,180,120,0.8)">
         <span class="nav-icon-text" style="color:rgba(255,160,100,0.6)">SW</span> Switch Company
       </div>
@@ -349,6 +359,11 @@ document.documentElement.style.visibility = 'hidden';
           <strong id="topbar-period">Set Period</strong>
         </div>
         <button class="btn btn-ghost btn-sm" id="topbar-admin-btn" onclick="Modal.openAdminLogin()" title="Admin Panel — Date & Escalation Defaults, Backup, Settings" style="border:1px solid var(--border);font-weight:600">⚙ Admin</button>
+        <!-- Profile pill in topbar -->
+        <div id="topbar-user-pill" onclick="App.openProfile()" title="My Profile" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:5px 10px 5px 5px;border-radius:8px;border:1px solid var(--border);background:#fff;transition:all 0.15s" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'">
+          <div id="topbar-user-avatar" style="width:26px;height:26px;border-radius:6px;background:#1a3f6b;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">?</div>
+          <span id="topbar-user-name" style="font-size:12.5px;font-weight:600;color:#1e293b;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</span>
+        </div>
         <button class="btn btn-accent btn-sm" onclick="App.showPage('add-rou')">+ Add ROU</button>
       </div>
     </div>
@@ -1749,6 +1764,37 @@ function profileAlert(tab, msg, type) {
       wrap.appendChild(btn);
     })(y);
   }
+})();
+</script>
+
+
+<script>
+/* Update sidebar user bar + topbar pill after App.init() */
+(function patchSidebarUserBar() {
+  var token = localStorage.getItem('rou_token');
+  if (!token) return;
+  try {
+    var p = JSON.parse(atob(token.split('.')[1]));
+    var ROLE_COLORS = { admin:'#e8520a', partner:'#7c3aed', manager:'#1a3f6b', article:'#059669' };
+    var ROLE_LABELS = { admin:'Administrator', partner:'Partner', manager:'Manager', article:'Article' };
+    var color = ROLE_COLORS[p.role] || '#1a3f6b';
+    var label = ROLE_LABELS[p.role] || p.role;
+    var initial = (p.name || '?').charAt(0).toUpperCase();
+
+    // Sidebar user bar
+    var av  = document.getElementById('sidebar-user-avatar');
+    var nm  = document.getElementById('sidebar-user-name');
+    var rl  = document.getElementById('sidebar-user-role');
+    if (av) { av.textContent = initial; av.style.background = color; }
+    if (nm) nm.textContent = p.name || p.email || 'User';
+    if (rl) rl.textContent = label;
+
+    // Topbar pill
+    var tav = document.getElementById('topbar-user-avatar');
+    var tnm = document.getElementById('topbar-user-name');
+    if (tav) { tav.textContent = initial; tav.style.background = color; }
+    if (tnm) tnm.textContent = p.name || p.email || 'User';
+  } catch(e) {}
 })();
 </script>
 
