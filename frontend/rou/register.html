@@ -4,248 +4,377 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Create Account — KG Somani ROU Platform</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --brand: #1a3a5c; --brand-mid: #1e4976; --accent: #e8520a;
-    --green: #16a34a; --red: #dc2626; --amber: #d97706;
-    --bg: #f0f4f8; --card: #ffffff; --text: #1e293b; --text2: #475569; --text3: #94a3b8;
-    --border: #e2e8f0; --input-bg: #f8fafc;
+    --brand: #0f2a47; --brand2: #1a3f6b; --accent: #e8520a; --accent2: #ff6b2b;
+    --green: #059669; --red: #dc2626; --amber: #d97706; --purple: #7c3aed;
+    --bg: #f1f5f9; --card: #ffffff;
+    --text: #0f172a; --text2: #475569; --text3: #94a3b8;
+    --border: #e2e8f0;
   }
-  body {
-    font-family: 'Inter', sans-serif; background: var(--bg); min-height: 100vh;
-    display: flex; align-items: center; justify-content: center; padding: 24px;
-    background-image: radial-gradient(ellipse at 20% 50%, rgba(26,58,92,0.06) 0%, transparent 60%);
+  /* Prevent flash */
+  body { visibility: hidden; font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); min-height: 100vh; display: flex; align-items: stretch; }
+  body.ready { visibility: visible; }
+
+  /* LEFT PANEL */
+  .left-panel {
+    width: 380px; flex-shrink: 0;
+    background: linear-gradient(160deg, var(--brand) 0%, #163260 60%, var(--brand2) 100%);
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 48px 40px; position: relative; overflow: hidden;
   }
-  .auth-wrap { width: 100%; max-width: 500px; }
-  .brand-header { text-align: center; margin-bottom: 28px; }
-  .brand-logo { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 6px; }
-  .brand-icon {
-    width: 44px; height: 44px;
-    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-mid) 100%);
-    border-radius: 11px; display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 800; color: #fff;
-    box-shadow: 0 4px 12px rgba(26,58,92,0.3);
+  .left-panel::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(232,82,10,0.2) 0%, transparent 70%);
+    border-radius: 50%;
   }
-  .brand-name { font-size: 19px; font-weight: 700; color: var(--brand); }
-  .brand-sub { font-size: 12px; color: var(--text3); }
-  .card { background: var(--card); border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.12); border: 1px solid var(--border); overflow: hidden; }
-  .card-top { background: linear-gradient(135deg, var(--brand) 0%, #1e4976 100%); padding: 26px 32px 22px; color: #fff; }
-  .card-top h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; }
-  .card-top p { font-size: 13px; color: rgba(255,255,255,0.7); }
-  .card-body { padding: 26px 32px 30px; }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .form-full { grid-column: 1 / -1; }
-  .form-group { margin-bottom: 0; }
-  .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; letter-spacing: 0.2px; }
-  .form-input {
-    width: 100%; padding: 10px 13px; font-size: 14px; background: var(--input-bg);
-    border: 1.5px solid var(--border); border-radius: 8px; color: var(--text); outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s; font-family: inherit;
+  .lp-icon {
+    width: 50px; height: 50px; background: var(--accent); border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 18px;
+    box-shadow: 0 8px 24px rgba(232,82,10,0.4); position: relative; z-index:1;
   }
-  .form-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(26,58,92,0.08); }
+  .lp-firm { font-size: 21px; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 6px; position: relative; z-index:1; }
+  .lp-sub { font-size: 12.5px; color: rgba(255,255,255,0.5); position: relative; z-index:1; }
+  .lp-steps { position: relative; z-index:1; }
+  .lp-step { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 20px; }
+  .lp-step-num {
+    width: 28px; height: 28px; flex-shrink: 0;
+    background: rgba(255,255,255,0.1); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.7);
+  }
+  .lp-step-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); margin-bottom: 2px; }
+  .lp-step-desc { font-size: 11.5px; color: rgba(255,255,255,0.45); line-height: 1.5; }
+  .lp-footer { font-size: 11px; color: rgba(255,255,255,0.3); position: relative; z-index:1; }
+
+  /* RIGHT PANEL */
+  .right-panel { flex: 1; display: flex; align-items: center; justify-content: center; padding: 36px 28px; overflow-y: auto; }
+  .form-box { width: 100%; max-width: 480px; }
+  .form-heading { margin-bottom: 28px; }
+  .form-heading h1 { font-size: 24px; font-weight: 800; color: var(--text); letter-spacing: -0.4px; margin-bottom: 5px; }
+  .form-heading p { font-size: 13.5px; color: var(--text3); }
+  .form-heading p a { color: var(--accent); font-weight: 600; text-decoration: none; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .form-full { grid-column: 1/-1; }
+  .form-group { }
+  .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; letter-spacing: 0.1px; }
   .input-wrap { position: relative; }
-  .toggle-pw { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text3); font-size: 14px; }
-  .role-selector { margin: 18px 0; }
-  .role-selector label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 10px; }
+  .form-input {
+    width: 100%; padding: 11px 14px; font-size: 13.5px;
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 9px; color: var(--text); outline: none; font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none;
+  }
+  .form-input::placeholder { color: var(--text3); }
+  .form-input:focus { border-color: var(--brand2); box-shadow: 0 0 0 3px rgba(26,63,107,0.08); }
+  .form-input.has-icon { padding-right: 42px; }
+  .input-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text3); font-size: 15px; }
+
+  /* ROLE SELECTOR */
+  .role-section { margin-bottom: 16px; }
+  .role-section-label { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 10px; display: block; letter-spacing: 0.1px; }
   .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .role-card {
-    border: 2px solid var(--border); border-radius: 10px; padding: 14px 10px;
-    cursor: pointer; text-align: center; transition: all 0.15s; background: var(--input-bg);
+    border: 2px solid var(--border); border-radius: 11px; padding: 14px 10px 12px;
+    cursor: pointer; text-align: center; transition: all 0.15s; background: #fafbfc;
+    user-select: none;
   }
-  .role-card:hover { border-color: var(--brand); background: #f0f6ff; }
-  .role-card.selected { border-color: var(--brand); background: #eff6ff; }
-  .role-card.locked { border-color: #fde68a; background: #fffbeb; cursor: default; }
-  .role-icon { font-size: 22px; margin-bottom: 6px; }
-  .role-name { font-size: 12px; font-weight: 700; color: var(--text); }
-  .role-desc { font-size: 10.5px; color: var(--text3); margin-top: 3px; line-height: 1.4; }
-  .role-badge-locked { font-size: 10px; font-weight: 600; color: var(--amber); margin-top: 4px; }
-  .admin-token-block {
+  .role-card:hover:not(.locked-card) { border-color: #94a3b8; background: #f8fafc; transform: translateY(-1px); }
+  .role-card.selected { border-color: var(--brand2); background: #eff6ff; box-shadow: 0 0 0 3px rgba(26,63,107,0.1); }
+  .role-card.locked-card { cursor: default; background: #fffbeb; border-color: #fde68a; }
+  .role-card.locked-card.selected { border-color: var(--amber); background: #fffbeb; box-shadow: 0 0 0 3px rgba(217,119,6,0.1); }
+  .role-emoji { font-size: 22px; margin-bottom: 7px; display: block; }
+  .role-name { font-size: 12.5px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .role-desc { font-size: 10.5px; color: var(--text3); line-height: 1.4; }
+  .role-lock { font-size: 10px; font-weight: 700; color: var(--amber); margin-top: 5px; }
+
+  /* ADMIN TOKEN BLOCK */
+  .token-block {
     background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 10px;
-    padding: 16px; margin: 14px 0; display: none;
+    padding: 14px 16px; margin-bottom: 16px; display: none; animation: fadeIn 0.2s ease;
   }
-  .admin-token-block.show { display: block; }
-  .admin-token-block .label { font-size: 12px; font-weight: 700; color: var(--amber); margin-bottom: 8px; }
-  .admin-token-block .hint { font-size: 11.5px; color: #78350f; margin-bottom: 10px; line-height: 1.5; }
-  .alert { border-radius: 8px; padding: 12px 14px; font-size: 13px; margin-bottom: 16px; display: none; line-height: 1.5; }
-  .alert.error { background: #fef2f2; border: 1px solid #fecaca; color: var(--red); }
-  .alert.success { background: #f0fdf4; border: 1px solid #bbf7d0; color: var(--green); }
-  .alert.show { display: block; }
-  .btn { width: 100%; padding: 12px; font-size: 14px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; font-family: inherit; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 18px; }
-  .btn-primary { background: linear-gradient(135deg, var(--brand) 0%, var(--brand-mid) 100%); color: #fff; box-shadow: 0 4px 12px rgba(26,58,92,0.25); }
-  .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(26,58,92,0.35); }
-  .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-  .spinner { width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .pw-strength { height: 4px; border-radius: 2px; margin-top: 6px; background: var(--border); overflow: hidden; }
+  .token-block.show { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  .token-block-title { font-size: 12px; font-weight: 700; color: var(--amber); margin-bottom: 6px; }
+  .token-block-desc { font-size: 11.5px; color: #78350f; margin-bottom: 10px; line-height: 1.5; }
+
+  /* PASSWORD STRENGTH */
+  .pw-strength-wrap { margin-top: 6px; }
+  .pw-strength-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
   .pw-strength-bar { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; width: 0%; }
-  .footer-link { text-align: center; margin-top: 18px; font-size: 13px; color: var(--text2); }
-  .footer-link a { color: var(--brand); font-weight: 600; text-decoration: none; }
-  .section-gap { margin-top: 18px; }
+  .pw-strength-label { font-size: 10.5px; color: var(--text3); margin-top: 4px; }
+
+  /* ALERT */
+  .alert { display: none; align-items: flex-start; gap: 10px; border-radius: 10px; padding: 12px 14px; font-size: 13px; margin-bottom: 14px; line-height: 1.5; }
+  .alert.show { display: flex; }
+  .alert-error { background: #fef2f2; border: 1.5px solid #fecaca; color: #991b1b; }
+  .alert-success { background: #f0fdf4; border: 1.5px solid #bbf7d0; color: #065f46; }
+  .alert-icon { flex-shrink: 0; margin-top: 1px; }
+
+  /* SUBMIT */
+  .btn-submit {
+    width: 100%; padding: 13px; font-size: 14.5px; font-weight: 700;
+    border: none; border-radius: 10px; cursor: pointer; font-family: inherit;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand2) 100%);
+    color: #fff; box-shadow: 0 4px 14px rgba(15,42,71,0.35);
+    transition: all 0.18s; display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-top: 6px;
+  }
+  .btn-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(15,42,71,0.4); }
+  .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; transform: none !important; }
+  .spinner { width: 16px; height: 16px; border: 2.5px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .signin-link { text-align: center; margin-top: 18px; font-size: 13.5px; color: var(--text2); }
+  .signin-link a { color: var(--accent); font-weight: 700; text-decoration: none; }
+
+  @media (max-width: 780px) {
+    .left-panel { display: none; }
+    body { background: var(--card); }
+  }
 </style>
 </head>
 <body>
-<div class="auth-wrap">
-  <div class="brand-header">
-    <div class="brand-logo">
-      <div class="brand-icon">ROU</div>
-      <div><div class="brand-name">KG Somani & Co LLP</div></div>
-    </div>
-    <div class="brand-sub">Ind AS 116 · Right of Use Asset Platform</div>
+
+<!-- LEFT -->
+<div class="left-panel">
+  <div>
+    <div class="lp-icon">ROU</div>
+    <div class="lp-firm">K G Somani & Co LLP</div>
+    <div class="lp-sub">Chartered Accountants · Ind AS 116</div>
   </div>
-
-  <div class="card">
-    <div class="card-top">
-      <h1>Create Account</h1>
-      <p>Join the KG Somani audit platform</p>
-    </div>
-    <div class="card-body">
-      <div class="alert error" id="alert-error"></div>
-      <div class="alert success" id="alert-success"></div>
-
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">Full Name *</label>
-          <input class="form-input" id="name" type="text" placeholder="Ritesh Sharma" autocomplete="name">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Email Address *</label>
-          <input class="form-input" id="email" type="email" placeholder="you@kgsomani.com" autocomplete="email">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Password *</label>
-          <div class="input-wrap">
-            <input class="form-input" id="password" type="password" placeholder="Min. 8 characters" oninput="checkPwStrength(this.value)">
-            <button class="toggle-pw" type="button" onclick="togglePw('password',this)" tabindex="-1">👁</button>
-          </div>
-          <div class="pw-strength"><div class="pw-strength-bar" id="pw-bar"></div></div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Confirm Password *</label>
-          <div class="input-wrap">
-            <input class="form-input" id="confirm-pw" type="password" placeholder="Repeat password">
-            <button class="toggle-pw" type="button" onclick="togglePw('confirm-pw',this)" tabindex="-1">👁</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="role-selector section-gap">
-        <label>Select Your Role *</label>
-        <div class="role-grid">
-          <div class="role-card selected" data-role="article" onclick="selectRole('article',this)">
-            <div class="role-icon">📋</div>
-            <div class="role-name">Article</div>
-            <div class="role-desc">Audit staff — register freely</div>
-          </div>
-          <div class="role-card locked" data-role="manager" onclick="selectRole('manager',this)">
-            <div class="role-icon">👔</div>
-            <div class="role-name">Manager</div>
-            <div class="role-desc">Requires admin approval token</div>
-            <div class="role-badge-locked">🔒 Token required</div>
-          </div>
-          <div class="role-card locked" data-role="partner" onclick="selectRole('partner',this)">
-            <div class="role-icon">🏛</div>
-            <div class="role-name">Partner</div>
-            <div class="role-desc">Requires admin approval token</div>
-            <div class="role-badge-locked">🔒 Token required</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="admin-token-block" id="admin-token-block">
-        <div class="label">⚠️ Admin Approval Required</div>
-        <div class="hint">Manager and Partner accounts require an approval token issued by the Administrator. Contact your admin to obtain a 24-hour token before registering.</div>
-        <label class="form-label">Admin Approval Token *</label>
-        <input class="form-input" id="admin-token" type="text" placeholder="Paste the token provided by admin">
-      </div>
-
-      <button class="btn btn-primary" id="reg-btn" onclick="doRegister()">
-        <div class="spinner" id="spinner"></div>
-        <span id="btn-text">Create Account</span>
-      </button>
-
-      <div class="footer-link">
-        Already have an account? <a href="login.html">Sign in</a>
+  <div class="lp-steps">
+    <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:18px">Getting Started</div>
+    <div class="lp-step">
+      <div class="lp-step-num">1</div>
+      <div>
+        <div class="lp-step-title">Create your account</div>
+        <div class="lp-step-desc">Articles register freely. Managers & Partners need an admin token.</div>
       </div>
     </div>
+    <div class="lp-step">
+      <div class="lp-step-num">2</div>
+      <div>
+        <div class="lp-step-title">Sign in & access your workspace</div>
+        <div class="lp-step-desc">Your companies and leases are synced to cloud instantly.</div>
+      </div>
+    </div>
+    <div class="lp-step">
+      <div class="lp-step-num">3</div>
+      <div>
+        <div class="lp-step-title">Add clients & compute ROUs</div>
+        <div class="lp-step-desc">Full Ind AS 116 schedule — PV, depreciation, reassessments, exports.</div>
+      </div>
+    </div>
+  </div>
+  <div class="lp-footer">© 2024 K G Somani & Co LLP · Confidential</div>
+</div>
+
+<!-- RIGHT -->
+<div class="right-panel">
+  <div class="form-box">
+    <div class="form-heading">
+      <h1>Create your account</h1>
+      <p>Already registered? <a href="login.html">Sign in instead</a></p>
+    </div>
+
+    <div class="alert alert-error" id="alert-error">
+      <span class="alert-icon">⚠️</span>
+      <span id="alert-error-msg"></span>
+    </div>
+    <div class="alert alert-success" id="alert-success">
+      <span class="alert-icon">✅</span>
+      <span id="alert-success-msg"></span>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        <input class="form-input" id="name" type="text" placeholder="Ritesh Sharma" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Work Email *</label>
+        <input class="form-input" id="email" type="email" placeholder="you@kgsomani.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password *</label>
+        <div class="input-wrap">
+          <input class="form-input has-icon" id="password" type="password" placeholder="Min. 8 characters" oninput="checkStrength(this.value)">
+          <button class="input-icon" type="button" onclick="togglePw('password','pw-eye')" tabindex="-1" id="pw-eye">👁</button>
+        </div>
+        <div class="pw-strength-wrap">
+          <div class="pw-strength-track"><div class="pw-strength-bar" id="pw-bar"></div></div>
+          <div class="pw-strength-label" id="pw-label">Enter a password</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Password *</label>
+        <div class="input-wrap">
+          <input class="form-input has-icon" id="confirm-pw" type="password" placeholder="Repeat password">
+          <button class="input-icon" type="button" onclick="togglePw('confirm-pw','cpw-eye')" tabindex="-1" id="cpw-eye">👁</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="role-section">
+      <span class="role-section-label">Select Your Role *</span>
+      <div class="role-grid">
+        <div class="role-card selected" data-role="article" onclick="selectRole('article',this)">
+          <span class="role-emoji">📋</span>
+          <div class="role-name">Article</div>
+          <div class="role-desc">Audit staff</div>
+          <div class="role-desc" style="color:var(--green);font-weight:600;margin-top:4px">Free signup</div>
+        </div>
+        <div class="role-card locked-card" data-role="manager" onclick="selectRole('manager',this)">
+          <span class="role-emoji">👔</span>
+          <div class="role-name">Manager</div>
+          <div class="role-desc">Senior staff</div>
+          <div class="role-lock">🔒 Token required</div>
+        </div>
+        <div class="role-card locked-card" data-role="partner" onclick="selectRole('partner',this)">
+          <span class="role-emoji">🏛</span>
+          <div class="role-name">Partner</div>
+          <div class="role-desc">Firm partner</div>
+          <div class="role-lock">🔒 Token required</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="token-block" id="token-block">
+      <div class="token-block-title">⚠️ Admin Approval Token Required</div>
+      <div class="token-block-desc">Manager and Partner registrations require a 24-hour approval token issued by the Administrator. Contact your admin to get this token before proceeding.</div>
+      <label class="form-label">Approval Token *</label>
+      <input class="form-input" id="admin-token" type="text" placeholder="Paste the token from your admin">
+    </div>
+
+    <button class="btn-submit" id="reg-btn" onclick="doRegister()">
+      <div class="spinner" id="spinner"></div>
+      <span id="btn-text">Create Account →</span>
+    </button>
+
+    <div class="signin-link">Already have an account? <a href="login.html">Sign in</a></div>
   </div>
 </div>
 
 <script>
-  let selectedRole = 'article';
+  // ── Auth check — prevent flash ────────────────────────────
+  (function() {
+    var token = localStorage.getItem('rou_token');
+    if (token) {
+      try {
+        var p = JSON.parse(atob(token.split('.')[1]));
+        if (p.exp * 1000 > Date.now()) {
+          window.location.replace(p.role === 'admin' ? 'admin.html' : 'index.html');
+          return;
+        }
+      } catch(e) {}
+      localStorage.removeItem('rou_token');
+      localStorage.removeItem('rou_user');
+    }
+    document.body.classList.add('ready');
+  })();
+
+  var selectedRole = 'article';
 
   function selectRole(role, el) {
-    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.role-card').forEach(function(c) { c.classList.remove('selected'); });
     el.classList.add('selected');
     selectedRole = role;
-    const block = document.getElementById('admin-token-block');
+    var block = document.getElementById('token-block');
     if (role === 'manager' || role === 'partner') block.classList.add('show');
     else block.classList.remove('show');
   }
 
-  function togglePw(id, btn) {
-    const el = document.getElementById(id);
+  function togglePw(inputId, btnId) {
+    var el = document.getElementById(inputId);
+    var btn = document.getElementById(btnId);
     el.type = el.type === 'password' ? 'text' : 'password';
     btn.textContent = el.type === 'password' ? '👁' : '🙈';
   }
 
-  function checkPwStrength(pw) {
-    const bar = document.getElementById('pw-bar');
-    let score = 0;
+  var strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+  var strengthColors = ['', '#dc2626', '#f97316', '#eab308', '#059669'];
+
+  function checkStrength(pw) {
+    var score = 0;
     if (pw.length >= 8) score++;
     if (/[A-Z]/.test(pw)) score++;
     if (/[0-9]/.test(pw)) score++;
     if (/[^A-Za-z0-9]/.test(pw)) score++;
-    const colors = ['#dc2626','#f97316','#eab308','#16a34a'];
+    var bar = document.getElementById('pw-bar');
+    var lbl = document.getElementById('pw-label');
     bar.style.width = (score * 25) + '%';
-    bar.style.background = colors[score - 1] || '#e2e8f0';
+    bar.style.background = strengthColors[score] || '#e2e8f0';
+    lbl.textContent = pw.length === 0 ? 'Enter a password' : (strengthLabels[score] || '');
+    lbl.style.color = strengthColors[score] || 'var(--text3)';
   }
 
   function showError(msg) {
-    const el = document.getElementById('alert-error');
-    el.textContent = msg; el.classList.add('show');
+    document.getElementById('alert-error-msg').textContent = msg;
+    document.getElementById('alert-error').classList.add('show');
     document.getElementById('alert-success').classList.remove('show');
+  }
+
+  function showSuccess(msg) {
+    document.getElementById('alert-success-msg').textContent = msg;
+    document.getElementById('alert-success').classList.add('show');
+    document.getElementById('alert-error').classList.remove('show');
   }
 
   function setLoading(v) {
     document.getElementById('reg-btn').disabled = v;
     document.getElementById('spinner').style.display = v ? 'block' : 'none';
-    document.getElementById('btn-text').textContent = v ? 'Creating account…' : 'Create Account';
+    document.getElementById('btn-text').textContent = v ? 'Creating account…' : 'Create Account →';
   }
 
   async function doRegister() {
     document.getElementById('alert-error').classList.remove('show');
     document.getElementById('alert-success').classList.remove('show');
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const confirmPw = document.getElementById('confirm-pw').value;
-    const adminToken = document.getElementById('admin-token').value.trim();
 
-    if (!name || !email || !password) return showError('Please fill in all required fields.');
-    if (password.length < 8) return showError('Password must be at least 8 characters.');
+    var name = document.getElementById('name').value.trim();
+    var email = document.getElementById('email').value.trim();
+    var password = document.getElementById('password').value;
+    var confirmPw = document.getElementById('confirm-pw').value;
+    var adminToken = document.getElementById('admin-token').value.trim();
+
+    if (!name) return showError('Please enter your full name.');
+    if (!email || !/\S+@\S+\.\S+/.test(email)) return showError('Please enter a valid email address.');
+    if (!password || password.length < 8) return showError('Password must be at least 8 characters.');
     if (password !== confirmPw) return showError('Passwords do not match.');
     if ((selectedRole === 'manager' || selectedRole === 'partner') && !adminToken) {
-      return showError('An admin approval token is required for Manager or Partner accounts.');
+      return showError('An admin approval token is required for Manager and Partner accounts.');
     }
 
     setLoading(true);
     try {
-      const body = { name, email, password, role: selectedRole };
+      var body = { name: name, email: email, password: password, role: selectedRole };
       if (adminToken) body.adminToken = adminToken;
-      const r = await fetch('/api/auth/register', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+
+      var r = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
       });
-      const data = await r.json();
-      if (!r.ok) { showError(data.error || 'Registration failed.'); setLoading(false); return; }
+      var data = await r.json();
+      if (!r.ok) { showError(data.error || 'Registration failed. Please try again.'); setLoading(false); return; }
+
+      // ── KEY FIX: store token THEN show success, THEN redirect ──
       localStorage.setItem('rou_token', data.token);
       localStorage.setItem('rou_user', JSON.stringify(data.user));
-      const el = document.getElementById('alert-success');
-      el.textContent = 'Account created! Redirecting…'; el.classList.add('show');
-      setTimeout(() => window.location.href = 'index.html', 1200);
-    } catch {
-      showError('Network error. Please try again.');
+      showSuccess('Account created successfully! Taking you to your workspace…');
+
+      // Delay slightly so user sees the success message, then replace (not push)
+      setTimeout(function() {
+        window.location.replace('index.html');
+      }, 1000);
+
+    } catch(e) {
+      showError('Network error. Please check your connection and try again.');
       setLoading(false);
     }
   }
