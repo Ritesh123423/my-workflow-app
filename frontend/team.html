@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AuditFlow — Team</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <h2>🔍 AuditFlow</h2>
+        <span>Workflow Management</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item"><span class="icon">📊</span> Dashboard</a>
+        <a href="audit.html" class="nav-item"><span class="icon">📋</span> Audits</a>
+        <a href="team.html" class="nav-item active"><span class="icon">👥</span> Team</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="avatar" id="user-avatar">?</div>
+          <div>
+            <div class="name" id="user-name">Loading...</div>
+            <div class="role" id="user-role"></div>
+          </div>
+        </div>
+        <button class="logout-btn" onclick="logout()">Sign Out</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1>Team Members</h1>
+        <p>All registered users in the system</p>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Joined</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="team-body">
+            <tr><td colspan="5"><div class="empty-state"><div class="icon">👥</div><p>No team members yet.</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="js/team.js"></script>
+</body>
+</html>
