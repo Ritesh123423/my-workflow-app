@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account — KG Somani ROU Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --brand: #1a3a5c; --brand-mid: #1e4976; --accent: #e8520a;
+    --green: #16a34a; --red: #dc2626; --amber: #d97706;
+    --bg: #f0f4f8; --card: #ffffff; --text: #1e293b; --text2: #475569; --text3: #94a3b8;
+    --border: #e2e8f0; --input-bg: #f8fafc;
+  }
+  body {
+    font-family: 'Inter', sans-serif; background: var(--bg); min-height: 100vh;
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+    background-image: radial-gradient(ellipse at 20% 50%, rgba(26,58,92,0.06) 0%, transparent 60%);
+  }
+  .auth-wrap { width: 100%; max-width: 500px; }
+  .brand-header { text-align: center; margin-bottom: 28px; }
+  .brand-logo { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .brand-icon {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-mid) 100%);
+    border-radius: 11px; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; color: #fff;
+    box-shadow: 0 4px 12px rgba(26,58,92,0.3);
+  }
+  .brand-name { font-size: 19px; font-weight: 700; color: var(--brand); }
+  .brand-sub { font-size: 12px; color: var(--text3); }
+  .card { background: var(--card); border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.12); border: 1px solid var(--border); overflow: hidden; }
+  .card-top { background: linear-gradient(135deg, var(--brand) 0%, #1e4976 100%); padding: 26px 32px 22px; color: #fff; }
+  .card-top h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; }
+  .card-top p { font-size: 13px; color: rgba(255,255,255,0.7); }
+  .card-body { padding: 26px 32px 30px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-full { grid-column: 1 / -1; }
+  .form-group { margin-bottom: 0; }
+  .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; letter-spacing: 0.2px; }
+  .form-input {
+    width: 100%; padding: 10px 13px; font-size: 14px; background: var(--input-bg);
+    border: 1.5px solid var(--border); border-radius: 8px; color: var(--text); outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s; font-family: inherit;
+  }
+  .form-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(26,58,92,0.08); }
+  .input-wrap { position: relative; }
+  .toggle-pw { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text3); font-size: 14px; }
+  .role-selector { margin: 18px 0; }
+  .role-selector label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 10px; }
+  .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .role-card {
+    border: 2px solid var(--border); border-radius: 10px; padding: 14px 10px;
+    cursor: pointer; text-align: center; transition: all 0.15s; background: var(--input-bg);
+  }
+  .role-card:hover { border-color: var(--brand); background: #f0f6ff; }
+  .role-card.selected { border-color: var(--brand); background: #eff6ff; }
+  .role-card.locked { border-color: #fde68a; background: #fffbeb; cursor: default; }
+  .role-icon { font-size: 22px; margin-bottom: 6px; }
+  .role-name { font-size: 12px; font-weight: 700; color: var(--text); }
+  .role-desc { font-size: 10.5px; color: var(--text3); margin-top: 3px; line-height: 1.4; }
+  .role-badge-locked { font-size: 10px; font-weight: 600; color: var(--amber); margin-top: 4px; }
+  .admin-token-block {
+    background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 10px;
+    padding: 16px; margin: 14px 0; display: none;
+  }
+  .admin-token-block.show { display: block; }
+  .admin-token-block .label { font-size: 12px; font-weight: 700; color: var(--amber); margin-bottom: 8px; }
+  .admin-token-block .hint { font-size: 11.5px; color: #78350f; margin-bottom: 10px; line-height: 1.5; }
+  .alert { border-radius: 8px; padding: 12px 14px; font-size: 13px; margin-bottom: 16px; display: none; line-height: 1.5; }
+  .alert.error { background: #fef2f2; border: 1px solid #fecaca; color: var(--red); }
+  .alert.success { background: #f0fdf4; border: 1px solid #bbf7d0; color: var(--green); }
+  .alert.show { display: block; }
+  .btn { width: 100%; padding: 12px; font-size: 14px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; font-family: inherit; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 18px; }
+  .btn-primary { background: linear-gradient(135deg, var(--brand) 0%, var(--brand-mid) 100%); color: #fff; box-shadow: 0 4px 12px rgba(26,58,92,0.25); }
+  .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(26,58,92,0.35); }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .spinner { width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .pw-strength { height: 4px; border-radius: 2px; margin-top: 6px; background: var(--border); overflow: hidden; }
+  .pw-strength-bar { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; width: 0%; }
+  .footer-link { text-align: center; margin-top: 18px; font-size: 13px; color: var(--text2); }
+  .footer-link a { color: var(--brand); font-weight: 600; text-decoration: none; }
+  .section-gap { margin-top: 18px; }
+</style>
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="brand-header">
+    <div class="brand-logo">
+      <div class="brand-icon">ROU</div>
+      <div><div class="brand-name">KG Somani & Co LLP</div></div>
+    </div>
+    <div class="brand-sub">Ind AS 116 · Right of Use Asset Platform</div>
+  </div>
+
+  <div class="card">
+    <div class="card-top">
+      <h1>Create Account</h1>
+      <p>Join the KG Somani audit platform</p>
+    </div>
+    <div class="card-body">
+      <div class="alert error" id="alert-error"></div>
+      <div class="alert success" id="alert-success"></div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input class="form-input" id="name" type="text" placeholder="Ritesh Sharma" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address *</label>
+          <input class="form-input" id="email" type="email" placeholder="you@kgsomani.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password *</label>
+          <div class="input-wrap">
+            <input class="form-input" id="password" type="password" placeholder="Min. 8 characters" oninput="checkPwStrength(this.value)">
+            <button class="toggle-pw" type="button" onclick="togglePw('password',this)" tabindex="-1">👁</button>
+          </div>
+          <div class="pw-strength"><div class="pw-strength-bar" id="pw-bar"></div></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password *</label>
+          <div class="input-wrap">
+            <input class="form-input" id="confirm-pw" type="password" placeholder="Repeat password">
+            <button class="toggle-pw" type="button" onclick="togglePw('confirm-pw',this)" tabindex="-1">👁</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="role-selector section-gap">
+        <label>Select Your Role *</label>
+        <div class="role-grid">
+          <div class="role-card selected" data-role="article" onclick="selectRole('article',this)">
+            <div class="role-icon">📋</div>
+            <div class="role-name">Article</div>
+            <div class="role-desc">Audit staff — register freely</div>
+          </div>
+          <div class="role-card locked" data-role="manager" onclick="selectRole('manager',this)">
+            <div class="role-icon">👔</div>
+            <div class="role-name">Manager</div>
+            <div class="role-desc">Requires admin approval token</div>
+            <div class="role-badge-locked">🔒 Token required</div>
+          </div>
+          <div class="role-card locked" data-role="partner" onclick="selectRole('partner',this)">
+            <div class="role-icon">🏛</div>
+            <div class="role-name">Partner</div>
+            <div class="role-desc">Requires admin approval token</div>
+            <div class="role-badge-locked">🔒 Token required</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-token-block" id="admin-token-block">
+        <div class="label">⚠️ Admin Approval Required</div>
+        <div class="hint">Manager and Partner accounts require an approval token issued by the Administrator. Contact your admin to obtain a 24-hour token before registering.</div>
+        <label class="form-label">Admin Approval Token *</label>
+        <input class="form-input" id="admin-token" type="text" placeholder="Paste the token provided by admin">
+      </div>
+
+      <button class="btn btn-primary" id="reg-btn" onclick="doRegister()">
+        <div class="spinner" id="spinner"></div>
+        <span id="btn-text">Create Account</span>
+      </button>
+
+      <div class="footer-link">
+        Already have an account? <a href="login.html">Sign in</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let selectedRole = 'article';
+
+  function selectRole(role, el) {
+    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedRole = role;
+    const block = document.getElementById('admin-token-block');
+    if (role === 'manager' || role === 'partner') block.classList.add('show');
+    else block.classList.remove('show');
+  }
+
+  function togglePw(id, btn) {
+    const el = document.getElementById(id);
+    el.type = el.type === 'password' ? 'text' : 'password';
+    btn.textContent = el.type === 'password' ? '👁' : '🙈';
+  }
+
+  function checkPwStrength(pw) {
+    const bar = document.getElementById('pw-bar');
+    let score = 0;
+    if (pw.length >= 8) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    const colors = ['#dc2626','#f97316','#eab308','#16a34a'];
+    bar.style.width = (score * 25) + '%';
+    bar.style.background = colors[score - 1] || '#e2e8f0';
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('alert-error');
+    el.textContent = msg; el.classList.add('show');
+    document.getElementById('alert-success').classList.remove('show');
+  }
+
+  function setLoading(v) {
+    document.getElementById('reg-btn').disabled = v;
+    document.getElementById('spinner').style.display = v ? 'block' : 'none';
+    document.getElementById('btn-text').textContent = v ? 'Creating account…' : 'Create Account';
+  }
+
+  async function doRegister() {
+    document.getElementById('alert-error').classList.remove('show');
+    document.getElementById('alert-success').classList.remove('show');
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPw = document.getElementById('confirm-pw').value;
+    const adminToken = document.getElementById('admin-token').value.trim();
+
+    if (!name || !email || !password) return showError('Please fill in all required fields.');
+    if (password.length < 8) return showError('Password must be at least 8 characters.');
+    if (password !== confirmPw) return showError('Passwords do not match.');
+    if ((selectedRole === 'manager' || selectedRole === 'partner') && !adminToken) {
+      return showError('An admin approval token is required for Manager or Partner accounts.');
+    }
+
+    setLoading(true);
+    try {
+      const body = { name, email, password, role: selectedRole };
+      if (adminToken) body.adminToken = adminToken;
+      const r = await fetch('/api/auth/register', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      });
+      const data = await r.json();
+      if (!r.ok) { showError(data.error || 'Registration failed.'); setLoading(false); return; }
+      localStorage.setItem('rou_token', data.token);
+      localStorage.setItem('rou_user', JSON.stringify(data.user));
+      const el = document.getElementById('alert-success');
+      el.textContent = 'Account created! Redirecting…'; el.classList.add('show');
+      setTimeout(() => window.location.href = 'index.html', 1200);
+    } catch {
+      showError('Network error. Please try again.');
+      setLoading(false);
+    }
+  }
+</script>
+</body>
+</html>
