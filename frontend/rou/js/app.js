@@ -76,6 +76,7 @@ window.App = {
     const color = ROLE_COLORS[user.role] || '#1a3f6b';
     const label = ROLE_LABELS[user.role] || user.role;
     const isArticle = user.role === 'article';
+    this._refreshUserDisplay(user);
 
     // Top bar avatar + name
     const av = document.getElementById('ws-avatar');
@@ -304,7 +305,7 @@ window.App = {
       localStorage.setItem('rou_token', d.token);
       localStorage.setItem('rou_user', JSON.stringify(d.user));
       profileAlert('details','Profile updated!','success');
-      // Refresh UI
+      this._refreshUserDisplay(d.user);
       this.renderWorkspaceHome();
       const nd = document.getElementById('profile-name-display'); if (nd) nd.textContent = d.user.name;
       const av = document.getElementById('profile-avatar'); if (av) av.textContent = d.user.name.charAt(0).toUpperCase();
