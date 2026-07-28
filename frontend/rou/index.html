@@ -13,46 +13,280 @@ document.documentElement.style.visibility = 'hidden';
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
+
+<style>
+/* ════════════════════════════════
+   WORKSPACE HOME — NEW DESIGN
+════════════════════════════════ */
+#view-home {
+  background: #f1f5f9 !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+  flex-direction: column !important;
+  min-height: 100vh;
+}
+
+.ws-topbar {
+  background: #0f2a47;
+  padding: 0 32px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+.ws-brand { display: flex; align-items: center; gap: 12px; }
+.ws-brand-icon {
+  width: 36px; height: 36px; background: #e8520a; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: #fff; flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(232,82,10,0.4);
+}
+.ws-brand-name { font-size: 14px; font-weight: 700; color: #fff; line-height: 1.2; }
+.ws-brand-sub { font-size: 10.5px; color: rgba(255,255,255,0.45); margin-top: 1px; }
+.ws-topbar-right { display: flex; align-items: center; gap: 12px; }
+.ws-user-pill {
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+  padding: 6px 12px 6px 6px; border-radius: 10px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+  transition: background 0.15s;
+}
+.ws-user-pill:hover { background: rgba(255,255,255,0.14); }
+.ws-user-avatar {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.ws-user-info { min-width: 0; }
+.ws-user-name { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; }
+.ws-user-role { font-size: 10.5px; color: rgba(255,255,255,0.5); margin-top: 1px; }
+
+.ws-body {
+  flex: 1; display: flex; gap: 24px;
+  padding: 28px 32px; max-width: 1200px; width: 100%; margin: 0 auto;
+  box-sizing: border-box;
+}
+.ws-left { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+.ws-right { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
+
+.ws-greeting { }
+.ws-greeting-text { font-size: 13px; font-weight: 500; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.ws-greeting-name { font-size: 26px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; margin-bottom: 4px; }
+.ws-greeting-sub { font-size: 13.5px; color: #64748b; }
+
+.ws-companies-card {
+  background: #fff; border-radius: 14px; border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04);
+  overflow: hidden; flex: 1;
+}
+.ws-companies-header {
+  padding: 16px 20px; border-bottom: 1px solid #f1f5f9;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.ws-section-title { font-size: 13px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.4px; }
+.ws-search-wrap { position: relative; }
+.ws-search {
+  padding: 7px 12px; font-size: 13px; background: #f8fafc;
+  border: 1.5px solid #e2e8f0; border-radius: 8px; color: #0f172a;
+  outline: none; font-family: inherit; width: 180px; transition: border-color 0.15s;
+}
+.ws-search:focus { border-color: #1a3f6b; }
+.ws-add-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; background: #0f2a47; color: #fff;
+  border: none; border-radius: 8px; font-size: 12.5px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap;
+}
+.ws-add-btn:hover { background: #1a3f6b; transform: translateY(-1px); }
+.ws-add-btn.disabled { background: #94a3b8; cursor: not-allowed; transform: none !important; opacity: 0.7; }
+
+.ws-companies-list { padding: 12px; display: flex; flex-direction: column; gap: 8px; min-height: 200px; }
+
+.ws-company-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; border-radius: 10px; border: 1.5px solid #e2e8f0;
+  cursor: pointer; transition: all 0.15s; background: #fff;
+}
+.ws-company-item:hover { border-color: #0f2a47; background: #f8fafc; transform: translateX(2px); }
+.ws-company-item:active { transform: translateX(0); }
+.ws-company-logo {
+  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; color: #fff;
+}
+.ws-company-info { flex: 1; min-width: 0; }
+.ws-company-name { font-size: 14px; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ws-company-meta { font-size: 11.5px; color: #94a3b8; margin-top: 2px; }
+.ws-company-rous { font-size: 12px; font-weight: 600; color: #475569; }
+.ws-company-arrow { color: #cbd5e1; transition: color 0.15s; }
+.ws-company-item:hover .ws-company-arrow { color: #0f2a47; }
+
+.ws-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 20px; text-align: center; }
+.ws-empty-icon { font-size: 36px; margin-bottom: 12px; }
+.ws-empty-title { font-size: 14px; font-weight: 700; color: #475569; margin-bottom: 4px; }
+.ws-empty-desc { font-size: 12.5px; color: #94a3b8; }
+
+/* RIGHT PANEL */
+.ws-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ws-stat {
+  background: #fff; border-radius: 12px; padding: 18px 16px;
+  border: 1px solid #e2e8f0; text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.ws-stat-val { font-size: 28px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; }
+.ws-stat-label { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 4px; }
+
+.ws-quick-card {
+  background: #fff; border-radius: 12px; padding: 18px;
+  border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.ws-quick-list { display: flex; flex-direction: column; gap: 6px; }
+.ws-quick-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: 9px; cursor: pointer;
+  border: none; background: transparent; font-family: inherit; text-decoration: none;
+  transition: background 0.12s; text-align: left; width: 100%;
+}
+.ws-quick-item:hover { background: #f8fafc; }
+.ws-quick-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.ws-quick-title { font-size: 13px; font-weight: 600; color: #0f172a; }
+.ws-quick-desc { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+
+.ws-role-card {
+  background: #fff; border-radius: 12px; padding: 16px;
+  border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.ws-role-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+.ws-role-desc { font-size: 12px; color: #64748b; line-height: 1.6; }
+
+.ws-signout-btn {
+  position: fixed; bottom: 20px; right: 24px;
+  padding: 8px 16px; font-size: 12.5px; font-weight: 600;
+  background: transparent; border: 1.5px solid #e2e8f0;
+  border-radius: 8px; color: #94a3b8; cursor: pointer; font-family: inherit;
+  transition: all 0.15s;
+}
+.ws-signout-btn:hover { background: #fef2f2; border-color: #fecaca; color: #dc2626; }
+
+/* PROFILE MODAL STYLES */
+.profile-tab { transition: color 0.15s, border-color 0.15s; }
+.form-hint { font-size: 11.5px; color: #94a3b8; margin-top: 5px; line-height: 1.5; }
+</style>
+
 </head>
 <body>
 
 <!-- ══════════════════════════════════════
-     VIEW 1: HOME
+     VIEW 1: HOME — Workspace Hub
 ══════════════════════════════════════ -->
 <div id="view-home" class="view active">
-  <div class="home-card">
-    <div class="home-logo">
-      <div class="home-logo-icon" style="font-size:13px;font-weight:800;color:#fff;font-family:Inter,sans-serif;letter-spacing:-0.5px">ROU</div>
+
+  <!-- TOP NAV BAR -->
+  <div class="ws-topbar">
+    <div class="ws-brand">
+      <div class="ws-brand-icon">ROU</div>
       <div>
-        <h1>EbixCash ROU Master</h1>
-        <span>EbixCash World Money Limited · Ind AS 116</span>
-        <span style="display:inline-block;margin-top:4px;background:#f1f5f9;color:#64748b;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;letter-spacing:0.5px"></span>
+        <div class="ws-brand-name">K G Somani & Co LLP</div>
+        <div class="ws-brand-sub">Ind AS 116 · ROU Platform</div>
       </div>
     </div>
-    <div style="margin-top:6px;margin-bottom:4px;font-size:11px;color:#8094ab;font-weight:500;letter-spacing:0.2px">Ind AS 116 Lease Accounting Platform</div>
-    <div class="home-divider"></div>
-    <div class="home-label">Select Company</div>
-    <select id="home-client-select" class="home-select">
-      <option value="">- No companies yet -</option>
-    </select>
-    <div class="home-actions">
-      <button class="btn btn-primary btn-full" onclick="App.openClient()" style="background:linear-gradient(135deg,var(--ebix) 0%,#a33a00 100%);box-shadow:0 4px 16px rgba(232,82,10,0.35)">
-        Open Company Dashboard
-      </button>
-      <button class="btn btn-ghost btn-full" onclick="Modal.openAddClient()">
-        Add New Company
-      </button>
+    <div class="ws-topbar-right">
+      <div class="ws-user-pill" id="ws-user-pill" onclick="App.openProfile()">
+        <div class="ws-user-avatar" id="ws-avatar">?</div>
+        <div class="ws-user-info">
+          <div class="ws-user-name" id="ws-user-name">Loading…</div>
+          <div class="ws-user-role" id="ws-user-role">—</div>
+        </div>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:#94a3b8;flex-shrink:0"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
     </div>
-    <div class="home-admin-link">
-      <a id="home-admin-link" role="button" tabindex="0" onclick="Modal.openAdminLogin()">⚙ Admin Panel — Settings &amp; Escalation Defaults</a>
-    </div>
-    <div class="home-admin-link" style="margin-top:8px">
-      <a href="../index.html">← Workspace hub</a>
-      &nbsp;·&nbsp;
-      <a href="../login.html">Task workflow</a>
-    </div>
-    <div class="home-admin-link" style="margin-top:8px" id="home-user-bar"></div>
   </div>
+
+  <!-- MAIN WORKSPACE CONTENT -->
+  <div class="ws-body">
+
+    <!-- LEFT: GREETING + COMPANIES -->
+    <div class="ws-left">
+      <div class="ws-greeting" id="ws-greeting">
+        <div class="ws-greeting-text">Good morning</div>
+        <div class="ws-greeting-name" id="ws-greeting-name">—</div>
+        <div class="ws-greeting-sub" id="ws-greeting-sub">Select a company to start working</div>
+      </div>
+
+      <!-- COMPANY SEARCH + LIST -->
+      <div class="ws-companies-card">
+        <div class="ws-companies-header">
+          <div class="ws-section-title">Companies</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="ws-search-wrap">
+              <input class="ws-search" id="ws-company-search" type="text" placeholder="Search companies…" oninput="App.filterCompanies()">
+            </div>
+            <button class="ws-add-btn" id="ws-add-company-btn" onclick="Modal.openAddClient()" title="Add New Company">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              Add
+            </button>
+          </div>
+        </div>
+        <div class="ws-companies-list" id="ws-companies-list">
+          <div class="ws-empty">
+            <div class="ws-empty-icon">🏢</div>
+            <div class="ws-empty-title">No companies yet</div>
+            <div class="ws-empty-desc" id="ws-empty-desc">Add your first company to get started</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: STATS + QUICK ACTIONS -->
+    <div class="ws-right">
+      <div class="ws-stats-grid" id="ws-stats-grid">
+        <div class="ws-stat">
+          <div class="ws-stat-val" id="ws-stat-companies">0</div>
+          <div class="ws-stat-label">Companies</div>
+        </div>
+        <div class="ws-stat">
+          <div class="ws-stat-val" id="ws-stat-rous">0</div>
+          <div class="ws-stat-label">Total ROUs</div>
+        </div>
+      </div>
+
+      <div class="ws-quick-card">
+        <div class="ws-section-title" style="margin-bottom:14px">Quick Actions</div>
+        <div class="ws-quick-list">
+          <button class="ws-quick-item" id="ws-quick-add-company" onclick="Modal.openAddClient()">
+            <div class="ws-quick-icon" style="background:rgba(26,63,107,0.1);color:#1a3f6b">🏢</div>
+            <div>
+              <div class="ws-quick-title">New Company</div>
+              <div class="ws-quick-desc">Add a client for Ind AS 116</div>
+            </div>
+          </button>
+          <button class="ws-quick-item" onclick="App.openProfile()">
+            <div class="ws-quick-icon" style="background:rgba(5,150,105,0.1);color:#059669">👤</div>
+            <div>
+              <div class="ws-quick-title">My Profile</div>
+              <div class="ws-quick-desc">Update name or password</div>
+            </div>
+          </button>
+          <a class="ws-quick-item" id="ws-quick-admin" href="admin.html" style="display:none">
+            <div class="ws-quick-icon" style="background:rgba(232,82,10,0.1);color:#e8520a">⚙</div>
+            <div>
+              <div class="ws-quick-title">Admin Panel</div>
+              <div class="ws-quick-desc">Manage team & assignments</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="ws-role-card" id="ws-role-card">
+        <div class="ws-role-badge" id="ws-role-badge"></div>
+        <div class="ws-role-desc" id="ws-role-desc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIGN OUT -->
+  <button class="ws-signout-btn" onclick="App.signOut()">Sign out</button>
 </div>
 
 <!-- ══════════════════════════════════════
@@ -1285,6 +1519,72 @@ document.documentElement.style.visibility = 'hidden';
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="Modal.close('modal-admin-panel')">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="modal-profile">
+  <div class="modal" style="width:480px">
+    <div class="modal-header">
+      <h3>My Profile</h3>
+      <button class="modal-close" onclick="Modal.close('modal-profile')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- User info header -->
+      <div id="profile-header" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:#f8fafc;border-radius:10px;margin-bottom:20px;border:1px solid #e2e8f0">
+        <div id="profile-avatar" style="width:48px;height:48px;border-radius:12px;background:#1a3f6b;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0">?</div>
+        <div>
+          <div id="profile-name-display" style="font-size:15px;font-weight:700;color:#0f172a"></div>
+          <div id="profile-email-display" style="font-size:12px;color:#94a3b8;margin-top:2px"></div>
+          <div id="profile-role-display" style="display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-top:5px"></div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div style="display:flex;border-bottom:1px solid #e2e8f0;margin-bottom:18px">
+        <div class="profile-tab active" onclick="switchProfileTab('details')" id="ptab-details" style="padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid #1a3f6b;color:#1a3f6b">Profile Details</div>
+        <div class="profile-tab" onclick="switchProfileTab('password')" id="ptab-password" style="padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:#94a3b8">Change Password</div>
+      </div>
+
+      <!-- TAB: DETAILS -->
+      <div id="profile-tab-details">
+        <div id="profile-details-alert" style="display:none;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;line-height:1.5"></div>
+        <div class="form-row">
+          <label class="form-label">Full Name</label>
+          <input class="form-input" id="profile-name-input" type="text" placeholder="Your full name">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Email Address</label>
+          <input class="form-input" id="profile-email-input" type="email" disabled style="background:#f1f5f9;cursor:not-allowed;color:#94a3b8">
+          <div class="form-hint">Email cannot be changed. Contact admin if needed.</div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Role</label>
+          <input class="form-input" id="profile-role-input" type="text" disabled style="background:#f1f5f9;cursor:not-allowed;color:#64748b">
+          <div class="form-hint">Roles are assigned by the Administrator.</div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:4px" onclick="App.saveProfile()">Save Changes</button>
+      </div>
+
+      <!-- TAB: PASSWORD -->
+      <div id="profile-tab-password" style="display:none">
+        <div id="profile-pw-alert" style="display:none;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;line-height:1.5"></div>
+        <div class="form-row">
+          <label class="form-label">Current Password</label>
+          <input class="form-input" id="profile-pw-current" type="password" placeholder="Enter current password">
+        </div>
+        <div class="form-row">
+          <label class="form-label">New Password</label>
+          <input class="form-input" id="profile-pw-new" type="password" placeholder="Min. 8 characters">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Confirm New Password</label>
+          <input class="form-input" id="profile-pw-confirm" type="password" placeholder="Repeat new password">
+        </div>
+        <button class="btn btn-primary" style="margin-top:4px" onclick="App.changePassword()">Update Password</button>
+      </div>
     </div>
   </div>
 </div>
