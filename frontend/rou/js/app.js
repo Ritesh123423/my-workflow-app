@@ -113,7 +113,13 @@ window.App = {
 
   /* ── WORKSPACE HOME ──────────────────────────────────────── */
   renderWorkspaceHome() {
-    const user = API.user();
+    let user = API.user();
+    if (!user) {
+      try {
+        const t = localStorage.getItem('rou_token');
+        if (t) { const p = JSON.parse(atob(t.split('.')[1])); user = {id:p.id,role:p.role,name:p.name,email:p.email}; localStorage.setItem('rou_user',JSON.stringify(user)); }
+      } catch(e) {}
+    }
     if (!user) return;
 
     const ROLE_COLORS  = { admin:'#e8520a', partner:'#7c3aed', manager:'#1a3f6b', article:'#059669' };
@@ -131,7 +137,7 @@ window.App = {
 
     // Top bar avatar + name
     const av = document.getElementById('ws-avatar');
-    if (av) { av.textContent = (user.name||'?').charAt(0).toUpperCase(); av.style.background = color; }
+    if (av) { av.textContent = (user.name||user.email||'?').charAt(0).toUpperCase(); av.style.background = color; av.style.color = '#fff'; }
     const nn = document.getElementById('ws-user-name'); if (nn) nn.textContent = user.name || user.email;
     const rn = document.getElementById('ws-user-role'); if (rn) rn.textContent = label;
 
@@ -146,16 +152,17 @@ window.App = {
     if (adminQ) adminQ.style.display = (user.role === 'admin') ? 'flex' : 'none';
 
     // Add company button — disable for articles
-    const addBtn = document.getElementById('ws-add-company-btn');
-    if (addBtn) {
+    // Manage add-company buttons
+    ['ws-add-company-btn','ws-quick-add-company-btn'].forEach(id => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
       if (isArticle) {
-        addBtn.classList.add('disabled');
-        addBtn.onclick = e => { e.preventDefault(); toast('Articles cannot create companies. Ask your manager or admin.','error',4000); };
+        btn.classList.add('disabled'); btn.style.display = 'none';
       } else {
-        addBtn.classList.remove('disabled');
-        addBtn.onclick = () => Modal.openAddClient();
+        btn.classList.remove('disabled'); btn.style.display = '';
+        btn.onclick = () => Modal.openAddClient();
       }
-    }
+    });
 
     // Role badge + description
     const rb = document.getElementById('ws-role-badge');
@@ -353,6 +360,7 @@ window.App = {
 
   /* ── ACCOUNT CARD IN WS-HOME ─────────────────────────────────────── */
   _populateAccountCard(user) {
+    if (!user) { try { user = JSON.parse(localStorage.getItem('rou_user')||'null'); } catch(e){} }
     if (!user) return;
     const ROLE_COLORS = { admin:'#e8520a', partner:'#7c3aed', manager:'#1a3f6b', article:'#059669' };
     const ROLE_LABELS = { admin:'Administrator', partner:'Partner', manager:'Manager', article:'Article' };
@@ -367,10 +375,13 @@ window.App = {
     const ni = document.getElementById('ws-name-input'); if (ni) ni.value = user.name || '';
 
     // Show/hide add company + admin buttons based on role
-    const addBtn   = document.getElementById('ws-quick-add-company');
+    // ws-add-company-btn (topbar), ws-quick-add-company-btn (panel)
+    ['ws-add-company-btn','ws-quick-add-company-btn'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = user.role === 'article' ? 'none' : '';
+    });
     const adminBtn = document.getElementById('ws-quick-admin');
-    if (addBtn)   addBtn.style.display   = user.role === 'article' ? 'none' : 'flex';
-    if (adminBtn) adminBtn.style.display = user.role === 'admin'   ? 'flex' : 'none';
+    if (adminBtn) adminBtn.style.display = user.role === 'admin' ? 'flex' : 'none';
 
     // Clear pw fields and close section
     ['ws-pw-current','ws-pw-new','ws-pw-confirm'].forEach(id => {
