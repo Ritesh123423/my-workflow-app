@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Master Audit Workflow | Ind AS 116 ROU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     VIEW 1: HOME
+══════════════════════════════════════ -->
+<div id="view-home" class="view active">
+  <div class="home-card">
+    <div class="home-logo">
+      <div class="home-logo-icon" style="font-size:13px;font-weight:800;color:#fff;font-family:Inter,sans-serif;letter-spacing:-0.5px">ROU</div>
+      <div>
+        <h1>EbixCash ROU Master</h1>
+        <span>EbixCash World Money Limited · Ind AS 116</span>
+        <span style="display:inline-block;margin-top:4px;background:#f1f5f9;color:#64748b;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;letter-spacing:0.5px"></span>
+      </div>
+    </div>
+    <div style="margin-top:6px;margin-bottom:4px;font-size:11px;color:#8094ab;font-weight:500;letter-spacing:0.2px">Ind AS 116 Lease Accounting Platform</div>
+    <div class="home-divider"></div>
+    <div class="home-label">Select Company</div>
+    <select id="home-client-select" class="home-select">
+      <option value="">- No companies yet -</option>
+    </select>
+    <div class="home-actions">
+      <button class="btn btn-primary btn-full" onclick="App.openClient()" style="background:linear-gradient(135deg,var(--ebix) 0%,#a33a00 100%);box-shadow:0 4px 16px rgba(232,82,10,0.35)">
+        Open Company Dashboard
+      </button>
+      <button class="btn btn-ghost btn-full" onclick="Modal.openAddClient()">
+        Add New Company
+      </button>
+    </div>
+    <div class="home-admin-link">
+      <a id="home-admin-link" role="button" tabindex="0" onclick="Modal.openAdminLogin()">⚙ Admin Panel — Settings &amp; Escalation Defaults</a>
+    </div>
+    <div class="home-admin-link" style="margin-top:8px">
+      <a href="../index.html">← Workspace hub</a>
+      &nbsp;·&nbsp;
+      <a href="../login.html">Task workflow</a>
+    </div>
+    <div class="home-admin-link" style="margin-top:8px" id="home-user-bar"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     VIEW 2: APP (sidebar + content)
+══════════════════════════════════════ -->
+<div id="view-app" class="view">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">ROU</div>
+      <div>
+        <h2>EbixCash ROU Master</h2>
+        <p>EbixCash Group · Ind AS 116</p>
+      </div>
+    </div>
+    <div class="sidebar-client">
+      <div class="sidebar-client-label">Active Company</div>
+      <div class="sidebar-client-name" id="sidebar-client-name">—</div>
+      <div class="sidebar-client-sub" id="sidebar-client-sub">—</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-item active" onclick="App.showPage('dashboard')" data-page="dashboard">
+        <span class="nav-icon-text">DB</span> Dashboard
+        <span class="nav-badge" id="nav-badge-rous">0</span>
+      </div>
+      <div class="nav-item" onclick="App.showPage('rous')" data-page="rous">
+        <span class="nav-icon-text">ROU</span> All ROUs
+      </div>
+      <div class="nav-item" onclick="App.showPage('add-rou')" data-page="add-rou">
+        <span class="nav-icon-text">+</span> Add ROU
+      </div>
+      <div class="nav-item" onclick="App.showPage('bulk-import')" data-page="bulk-import">
+        <span class="nav-icon-text">IMP</span> Bulk Import
+      </div>
+      <div class="nav-item" onclick="App.showPage('reassess-override')" data-page="reassess-override">
+        <span class="nav-icon-text">RA</span> Reassessment Override
+      </div>
+      <div class="nav-item" onclick="App.showPage('export')" data-page="export">
+        <span class="nav-icon-text">XLS</span> Export to Excel
+      </div>
+      <div class="nav-item" onclick="App.showPage('audit')" data-page="audit">
+        <span class="nav-icon-text">LOG</span> Audit Log
+      </div>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="nav-item" onclick="App.goHome()" style="color:rgba(255,180,120,0.8)">
+        <span class="nav-icon-text" style="color:rgba(255,160,100,0.6)">SW</span> Switch Company
+      </div>
+    </div>
+  </div>
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="topbar-title" id="topbar-title">Dashboard</span>
+      </div>
+      <div class="topbar-right">
+        <div class="period-selector" id="topbar-period-selector" onclick="Modal.openPeriodSelector()">
+          <strong id="topbar-period">Set Period</strong>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="topbar-admin-btn" onclick="Modal.openAdminLogin()" title="Admin Panel — Date & Escalation Defaults, Backup, Settings" style="border:1px solid var(--border);font-weight:600">⚙ Admin</button>
+        <button class="btn btn-accent btn-sm" onclick="App.showPage('add-rou')">+ Add ROU</button>
+      </div>
+    </div>
+
+    <!-- PAGE: DASHBOARD -->
+    <div class="page-body" id="page-dashboard">
+      <div id="dashboard-no-client" class="no-client-banner" style="display:none">
+        <h2>No ROUs Added Yet</h2>
+        <p>Start by adding your first Right of Use lease for this client.</p>
+        <button class="btn btn-accent" onclick="App.showPage('add-rou')">+ Add First ROU</button>
+      </div>
+      <!-- Status counts row: 5 cards -->
+      <div class="stats-row" id="dashboard-stats" style="grid-template-columns:repeat(5,1fr)">
+        <div class="stat-card accent">
+          <div class="stat-label">Total ROUs</div>
+          <div class="stat-value" id="stat-total-rous">0</div>
+          <div class="stat-sub">All leases</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active</div>
+          <div class="stat-value" id="stat-active" style="color:var(--green)">0</div>
+          <div class="stat-sub">Running</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Mid-Period Expired</div>
+          <div class="stat-value" id="stat-mid-expired" style="color:var(--orange)">0</div>
+          <div class="stat-sub">Closed in FY</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Expired / Closed</div>
+          <div class="stat-value" id="stat-expired" style="color:var(--gray)">0</div>
+          <div class="stat-sub">Before period</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Reassessed</div>
+          <div class="stat-value" id="stat-reassessed" style="color:var(--accent)">0</div>
+          <div class="stat-sub">Modified</div>
+        </div>
+      </div>
+      <!-- Financial summary row: 5 cards -->
+      <div class="stats-row" id="dashboard-fin-stats" style="grid-template-columns:repeat(5,1fr);margin-bottom:16px">
+        <div class="stat-card">
+          <div class="stat-label">Monthly Rent</div>
+          <div class="stat-value" id="stat-total-rent" style="font-size:15px;color:var(--accent)">—</div>
+          <div class="stat-sub">Active leases only</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">FY Rent Expense</div>
+          <div class="stat-value" id="stat-fy-rent" style="font-size:15px;color:var(--accent)">—</div>
+          <div class="stat-sub">Active + mid-expired</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Lease Liability</div>
+          <div class="stat-value" id="stat-total-liab" style="font-size:15px;color:var(--navy)">—</div>
+          <div class="stat-sub">Active leases only</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">ROU Net Block</div>
+          <div class="stat-value" id="stat-total-rou-nbv" style="font-size:15px;color:var(--text)">—</div>
+          <div class="stat-sub">Active leases only</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">FY Depreciation</div>
+          <div class="stat-value" id="stat-total-dep" style="font-size:15px;color:var(--orange)">—</div>
+          <div class="stat-sub">Active + mid-expired</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Recent ROUs</h3>
+          <button class="btn btn-ghost btn-sm" onclick="App.showPage('rous')">View All →</button>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table id="dashboard-rou-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Branch</th>
+                  <th>Rent/Month</th>
+                  <th>Period</th>
+                  <th>IBR</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-rou-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: ALL ROUs -->
+    <div class="page-body" id="page-rous" style="display:none">
+      <div class="filter-bar">
+        <input class="search-input" id="rou-search" type="text" placeholder="Search by branch or party name…" oninput="App.filterROUs()">
+        <select class="form-select" style="width:160px" id="rou-status-filter" onchange="App.filterROUs()">
+          <option value="">All Statuses</option>
+          <option value="Active">Active</option>
+          <option value="Expired">Expired</option>
+          <option value="Reassessed">Reassessed</option>
+          <option value="Renewed">Renewed</option>
+        </select>
+        <button class="btn btn-accent btn-sm" onclick="App.showPage('add-rou')">+ Add ROU</button>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>All ROUs</h3>
+          <span id="rou-count-label" style="font-size:12px;color:var(--text3)">0 leases</span>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Branch</th>
+                  <th>Party / Lessor</th>
+                  <th>Rent/Month</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                  <th>IBR</th>
+                  <th>Sec Dep</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="all-rou-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: ADD/EDIT ROU -->
+    <div class="page-body" id="page-add-rou" style="display:none">
+
+      <!-- LIVE PREVIEW -->
+      <div id="rp-preview-card">
+        <div class="rp-bar-hdr">
+          <span style="color:#fff;font-size:11px;font-weight:600;letter-spacing:0.2px">Live Preview</span>
+          <span id="rp-timing-tag" style="font-size:10px;color:rgba(255,255,255,0.4)">Fill the form below</span>
+        </div>
+        <div id="rp-empty" style="padding:12px 20px;font-size:12px;color:var(--text3);text-align:center">
+          Enter start date, end date, rent and IBR to see live figures.
+        </div>
+        <div id="rp-content" style="display:none">
+          <div class="rp-kpi-grid" style="grid-template-columns:repeat(6,1fr);border-bottom:1px solid var(--border)">
+            <div class="rp-k"><div class="rp-k-lbl">Tenure</div><div class="rp-k-val" id="rp-tenure">—</div><div class="rp-k-sub">months</div></div>
+            <div class="rp-k"><div class="rp-k-lbl">Lease Liability</div><div class="rp-k-val" id="rp-liability" style="color:var(--accent)">—</div><div class="rp-k-sub">PV of payments</div></div>
+            <div class="rp-k"><div class="rp-k-lbl">ROU Asset</div><div class="rp-k-val" id="rp-rou-cost" style="color:var(--navy)">—</div><div class="rp-k-sub">at commencement</div></div>
+            <div class="rp-k"><div class="rp-k-lbl">Monthly Dep</div><div class="rp-k-val" id="rp-dep">—</div><div class="rp-k-sub">straight-line</div></div>
+            <div class="rp-k"><div class="rp-k-lbl">Total Outflow</div><div class="rp-k-val" id="rp-outflow">—</div><div class="rp-k-sub">undiscounted</div></div>
+            <div class="rp-k"><div class="rp-k-lbl">Total Interest</div><div class="rp-k-val" id="rp-interest" style="color:var(--orange)">—</div><div class="rp-k-sub">P&amp;L</div></div>
+          </div>
+          <div id="rp-secdep-row" style="display:none;border-bottom:1px solid var(--border)">
+            <div class="rp-kpi-grid" style="grid-template-columns:repeat(4,1fr)">
+              <div class="rp-k"><div class="rp-k-lbl">SD Gross</div><div class="rp-k-val" id="rp-sd-gross">—</div></div>
+              <div class="rp-k"><div class="rp-k-lbl">Ind AS Day 1</div><div class="rp-k-val" id="rp-sd-indas" style="color:var(--green2)">—</div></div>
+              <div class="rp-k"><div class="rp-k-lbl">Difference</div><div class="rp-k-val" id="rp-sd-discount" style="color:var(--orange)">—</div></div>
+              <div class="rp-k"><div class="rp-k-lbl">Tracked Separately</div><div class="rp-k-val" id="rp-sd-prepaid">Not in ROU</div></div>
+            </div>
+          </div>
+          <div style="padding:10px 18px;background:#f9fafb">
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);margin-bottom:6px">Commencement Journal</div>
+            <table style="width:100%;font-size:11px;border-collapse:collapse">
+              <thead><tr style="border-bottom:1px solid var(--border)">
+                <th style="text-align:left;padding:3px 0;color:var(--text3);font-weight:600;width:55%">Account</th>
+                <th style="text-align:right;padding:3px 10px;color:var(--accent);font-weight:600">Dr</th>
+                <th style="text-align:right;padding:3px 0;color:var(--text3);font-weight:600">Cr</th>
+              </tr></thead>
+              <tbody id="rp-journal"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORM -->
+      <div class="card">
+        <div class="card-header">
+          <h3 id="add-rou-title" style="font-size:15px;font-weight:700">Add New ROU</h3>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm" onclick="App.showPage('rous')">Cancel</button>
+            <button class="btn btn-primary btn-sm" onclick="Form.save()">Save ROU</button>
+          </div>
+        </div>
+
+        <div class="card-body" style="padding:24px 28px 32px">
+          <input type="hidden" id="rou-edit-id">
+
+          <!-- Calendar-mode banner: only visible when admin has set Calendar Period for this client -->
+          <div id="schedule-basis-banner" style="display:none;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;margin-bottom:18px;font-size:12px;color:#78350f;line-height:1.5">
+            <strong>📆 Calendar Period mode is active for this company.</strong>
+            All ROUs (including this one) will be computed against actual calendar months — end-of-month payment dates (30-Apr, 31-May, …) and pro-rated rent for partial first/last months by days. This is controlled by Admin Panel &gt; Date &amp; Escalation Defaults; switching admin back to Default instantly reverts every schedule under this company to the original month-bucket logic.
+          </div>
+
+          <!-- STEP 1: IDENTIFICATION -->
+          <div class="step-hdr">
+            <div class="step-num">1</div>
+            <span class="step-title">Identification</span>
+            <span class="step-sub">Who, where, and what kind of lease</span>
+          </div>
+          <div class="g4">
+            <div class="form-row">
+              <label class="form-label">Branch Name <span class="req">*</span></label>
+              <input class="form-input" id="f-branch" type="text" placeholder="e.g. Mumbai Office">
+              <div class="form-error" id="f-branch-err"></div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Lessor / Party</label>
+              <input class="form-input" id="f-party" type="text" placeholder="e.g. ABC Properties Pvt Ltd">
+            </div>
+            <div class="form-row s2">
+              <label class="form-label">Address</label>
+              <input class="form-input" id="f-address" type="text" placeholder="Premises address (optional)">
+            </div>
+          </div>
+          <div class="g4">
+            <div class="form-row">
+              <label class="form-label">Status <span class="req">*</span></label>
+              <select class="form-select" id="f-status">
+                <option value="Active">Active</option>
+                <option value="Expired">Expired</option>
+                <option value="Renewed">Renewed</option>
+                <option value="Reassessed">Reassessed</option>
+              </select>
+            </div>
+            <div class="form-row s3">
+              <label class="form-label">Classification</label>
+              <select class="form-select" id="f-lease-type" onchange="Form.onLeaseTypeChange()">
+                <option value="full">Full Recognition — ROU asset &amp; lease liability</option>
+                <option value="short-term">Short-term Exemption — term &le; 12 months</option>
+                <option value="low-value">Low-value Asset Exemption</option>
+              </select>
+              <div class="form-hint" id="f-lease-type-hint" style="display:none">Straight-line expense only — no ROU or liability.</div>
+            </div>
+          </div>
+
+          <div class="sec-divider"></div>
+
+          <!-- STEP 2: LEASE TERMS -->
+          <div class="step-hdr">
+            <div class="step-num">2</div>
+            <span class="step-title">Lease Terms</span>
+            <span class="step-sub">Dates, rent, IBR, timing and escalation</span>
+          </div>
+          <div class="g4">
+            <div class="form-row">
+              <label class="form-label">Start Date <span class="req">*</span></label>
+              <input class="form-input" id="f-start" type="date" oninput="Form.updateCustomStepsPreview();Form.updateSDCustomStepsPreview();">
+              <div class="form-error" id="f-start-err"></div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">End By</label>
+              <div style="display:flex;border:1.5px solid #dde3ec;border-radius:8px;overflow:hidden;height:40px">
+                <div class="form-radio active" id="f-endmode-date" onclick="Form.setEndMode('date')" style="flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;cursor:pointer;color:var(--text2)">End Date</div>
+                <div style="width:1px;background:#dde3ec"></div>
+                <div class="form-radio" id="f-endmode-tenure" onclick="Form.setEndMode('tenure')" style="flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;cursor:pointer;color:var(--text2)">Tenure</div>
+              </div>
+            </div>
+            <div class="form-row" id="f-enddate-wrap">
+              <label class="form-label">End Date <span class="req">*</span></label>
+              <input class="form-input" id="f-end" type="date" onchange="Form.syncTenure()">
+            </div>
+            <div class="form-row" id="f-tenure-wrap" style="display:none">
+              <label class="form-label">Tenure (Months) <span class="req">*</span></label>
+              <input class="form-input" id="f-tenure" type="number" min="1" placeholder="60" onchange="Form.syncEndDate()">
+            </div>
+          </div>
+          <div class="g4">
+            <div class="form-row">
+              <label class="form-label">Monthly Rent (Rs.) <span class="req">*</span></label>
+              <input class="form-input" id="f-rent" type="number" step="0.01" placeholder="100000" oninput="Form.clearComputedLiability()">
+              <div class="form-error" id="f-rent-err"></div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Discount rate (PV) % p.a. <span class="req">*</span></label>
+              <input class="form-input" id="f-ibr" type="number" step="0.01" placeholder="9" oninput="Form.clearComputedLiability()">
+              <div class="form-error" id="f-ibr-err"></div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Interest rate (unwind) % p.a.</label>
+              <input class="form-input" id="f-interest-ibr" type="number" step="0.000000000001" placeholder="Leave blank to use discount rate">
+              <div class="gs-toggle-row">
+                <label class="gs-toggle-label">
+                  <input type="checkbox" id="f-interest-ibr-auto" onchange="Form.applyGoalSeekLease()">
+                  <span class="gs-pill">⚡ Auto Goal Seek</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Payment Timing <span class="req">*</span></label>
+              <select class="form-select" id="f-pay-timing">
+                <option value="advance">Advance (start of month)</option>
+                <option value="arrears">Arrears (end of month)</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Tenure</label>
+              <input class="form-input" id="f-tenure-display" type="text" readonly style="background:#f4f6f9;color:var(--text3)" placeholder="Auto">
+            </div>
+          </div>
+          
+          <!-- ESCALATION SECTION - Enhanced visibility -->
+          <div style="background:#f0fdf4;border:2px solid #86efac;border-radius:10px;padding:18px;margin-top:18px;margin-bottom:18px;">
+            <div style="margin-bottom:14px;">
+              <div style="font-size:12px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:0.5px;">Rent Escalation</div>
+              <div style="font-size:10px;color:#15803d;margin-top:2px;">Configure if rent increases over the lease term</div>
+            </div>
+            <div class="g4" style="align-items:end;margin-bottom:0;">
+              <div class="form-row" style="margin-bottom:0">
+                <label class="form-label">Escalation Type</label>
+                <select class="form-select" id="f-esc-type" onchange="Form.onEscChange()">
+                  <option value="none">None</option>
+                  <option value="fixed">Fixed % every N months</option>
+                  <option value="custom">Custom steps</option>
+                </select>
+              </div>
+              <div id="f-esc-fixed-row" class="s2" style="display:none">
+                <div class="g2" style="margin-bottom:0">
+                  <div class="form-row" style="margin-bottom:0">
+                    <label class="form-label">%</label>
+                    <input class="form-input" id="f-esc-pct" type="number" step="0.01" placeholder="5">
+                  </div>
+                  <div class="form-row" style="margin-bottom:0">
+                    <label class="form-label">Every N Months</label>
+                    <input class="form-input" id="f-esc-freq" type="number" placeholder="12">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="f-esc-fixed" hidden></div>
+            <div class="conditional-block" id="f-esc-custom" hidden style="margin-bottom:0;margin-top:12px;background:#fff;">
+              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+                <label class="form-label" style="margin-bottom:0">Rent Steps</label>
+                <div style="display:flex;border:1.5px solid #dde3ec;border-radius:8px;overflow:hidden;height:30px;">
+                  <div class="form-radio active" id="f-esc-basis-month" onclick="Form.setEscStepBasis('month')" style="padding:0 12px;display:flex;align-items:center;font-size:11px;font-weight:600;cursor:pointer;color:var(--text2)">Month Number</div>
+                  <div style="width:1px;background:#dde3ec"></div>
+                  <div class="form-radio" id="f-esc-basis-period" onclick="Form.setEscStepBasis('period')" style="padding:0 12px;display:flex;align-items:center;font-size:11px;font-weight:600;cursor:pointer;color:var(--text2)">Calendar Period</div>
+                </div>
+              </div>
+              <div class="form-hint" style="margin-bottom:8px"><strong>Month Number:</strong> enter custom steps as month 1, 2, 3… from lease start.<br><strong>Calendar Period:</strong> enter custom steps as actual From/To dates (engine converts internally).<br><em style="color:var(--text3)">Note: this toggle only changes how steps are <u>entered</u>. Whether the actual SCHEDULE uses calendar-aligned dates with pro-rated partial months is controlled by the Admin Panel &gt; Date &amp; Escalation Defaults setting, and applies only to ROUs created after that setting is saved. Existing ROUs are never silently switched.</em></div>
+              <table class="step-table" id="custom-steps-table">
+                <thead id="custom-steps-thead"><tr><th>From Month</th><th>To Month</th><th>Monthly Rent (Rs.)</th><th></th></tr></thead>
+                <tbody id="custom-steps-tbody"></tbody>
+              </table>
+              <div id="custom-steps-preview" style="display:none;margin-top:8px;padding:8px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;font-size:11.5px;color:#166534;line-height:1.5"></div>
+              <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="Form.addCustomStep()">+ Add Step</button>
+            </div>
+          </div>
+
+          <div class="toggle-wrap" style="margin-bottom:14px;margin-top:16px">
+            <label class="toggle"><input type="checkbox" id="f-has-adjustments" onchange="Form.toggleAdjustments()"><span class="slider"></span></label>
+            <div>
+              <div class="toggle-label">ROU Cost Adjustments (Optional)</div>
+              <div class="toggle-sub">Initial direct costs, lease incentives, or variable rent</div>
+            </div>
+          </div>
+          <div class="conditional-block" id="f-adjustments-block" hidden>
+            <div class="g3" style="margin-bottom:0">
+              <div class="form-row" style="margin-bottom:0">
+                <label class="form-label">Initial Direct Costs (Rs.)</label>
+                <input class="form-input" id="f-idc" type="number" step="0.01" placeholder="0">
+              </div>
+              <div class="form-row" style="margin-bottom:0">
+                <label class="form-label">Lease Incentives (Rs.)</label>
+                <input class="form-input" id="f-incentives" type="number" step="0.01" placeholder="0">
+              </div>
+              <div class="form-row" style="margin-bottom:0">
+                <label class="form-label">Variable Rent / Month (Rs.)</label>
+                <input class="form-input" id="f-var-rent" type="number" step="0.01" placeholder="0">
+              </div>
+            </div>
+          </div>
+
+          <div class="sec-divider"></div>
+
+          <!-- STEP 3: SECURITY DEPOSIT -->
+          <div class="step-hdr">
+            <div class="step-num">3</div>
+            <span class="step-title">Security Deposit</span>
+            <span class="step-sub">Leave blank if there is no deposit</span>
+          </div>
+          <div class="g4">
+            <div class="form-row">
+              <label class="form-label">Amount (Rs.)</label>
+              <input class="form-input" id="f-secdep" type="number" step="0.01" placeholder="0" oninput="Form.onSecDepChange()">
+            </div>
+            <div class="form-row">
+              <label class="form-label">Discount rate (PV) % p.a.</label>
+              <input class="form-input" id="f-secdep-ibr" type="number" step="0.01" placeholder="9">
+
+            </div>
+            <div class="form-row">
+              <label class="form-label">Unwinding rate % p.a.</label>
+              <input class="form-input" id="f-secdep-interest-ibr" type="number" step="0.000000000001" placeholder="Leave blank to use discount rate">
+              <div class="gs-toggle-row">
+                <label class="gs-toggle-label">
+                  <input type="checkbox" id="f-secdep-interest-ibr-auto" onchange="Form.applyGoalSeekSD()">
+                  <span class="gs-pill">⚡ Auto Goal Seek</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Paid Date</label>
+              <input class="form-input" id="f-secdep-paid" type="date">
+            </div>
+            <div class="form-row">
+              <label class="form-label">Maturity Date</label>
+              <input class="form-input" id="f-secdep-maturity" type="date">
+            </div>
+          </div>
+          <div class="form-row" style="max-width:520px;margin-top:8px">
+            <label class="form-label">PV calculation method</label>
+            <select class="form-select" id="f-secdep-unwind-start">
+              <option value="month_start">1st month included in PV</option>
+              <option value="month_end">1st month excluded from PV</option>
+            </select>
+          </div>
+
+          <!-- SD ROU CALCULATION METHOD -->
+          <div class="form-row" style="max-width:520px;margin-top:8px">
+            <label class="form-label">SD Notional ROU Calculation Method</label>
+            <select class="form-select" id="f-secdep-calc-method">
+              <option value="gross_difference">Gross SD - Opening PV (Default)</option>
+              <option value="pv_difference">Last Month PV - Opening PV</option>
+            </select>
+            <div class="form-hint">Determines how the notional discount is calculated for ROU adjustment</div>
+          </div>
+
+          <!-- SD ESCALATION -->
+          <div class="form-row" style="margin-top:16px">
+            <label class="form-label">Security Deposit Escalation</label>
+            <select class="form-select" id="f-secdep-esc-type" onchange="Form.onSDEscChange()">
+              <option value="none">No Escalation</option>
+              <option value="fixed">Fixed % Escalation</option>
+              <option value="custom">Custom Steps</option>
+            </select>
+          </div>
+          <div class="conditional-block" id="f-secdep-esc-fixed-block" hidden>
+            <div class="g3">
+              <div class="form-row">
+                <label class="form-label">Escalation %</label>
+                <input class="form-input" id="f-secdep-esc-pct" type="number" step="0.01" placeholder="5">
+              </div>
+              <div class="form-row">
+                <label class="form-label">Frequency (months)</label>
+                <input class="form-input" id="f-secdep-esc-freq" type="number" step="1" placeholder="12">
+              </div>
+              <div class="form-row">
+                <label class="form-label">First Escalation After (months)</label>
+                <input class="form-input" id="f-secdep-esc-first" type="number" step="1" placeholder="12">
+              </div>
+            </div>
+          </div>
+          <div class="conditional-block" id="f-secdep-esc-custom-block" hidden>
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+              <label class="form-label" style="margin-bottom:0">SD Steps</label>
+              <div style="display:flex;border:1.5px solid #dde3ec;border-radius:8px;overflow:hidden;height:30px;">
+                <div class="form-radio active" id="f-sdesc-basis-month" onclick="Form.setSDEscStepBasis('month')" style="padding:0 12px;display:flex;align-items:center;font-size:11px;font-weight:600;cursor:pointer;color:var(--text2)">Month Number</div>
+                <div style="width:1px;background:#dde3ec"></div>
+                <div class="form-radio" id="f-sdesc-basis-period" onclick="Form.setSDEscStepBasis('period')" style="padding:0 12px;display:flex;align-items:center;font-size:11px;font-weight:600;cursor:pointer;color:var(--text2)">Calendar Period</div>
+              </div>
+            </div>
+            <table class="step-table">
+              <thead id="secdep-custom-steps-thead">
+                <tr>
+                  <th>From Month</th>
+                  <th>To Month</th>
+                  <th>SD Amount (Rs.)</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="secdep-custom-steps-tbody"></tbody>
+            </table>
+            <div id="secdep-custom-steps-preview" style="display:none;margin-top:8px;padding:8px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;font-size:11.5px;color:#166534;line-height:1.5"></div>
+            <button type="button" class="btn btn-ghost btn-sm add-row-btn" onclick="Form.addSDCustomStep()">+ Add Step</button>
+
+          </div>
+
+          <div id="f-secdep-dates" style="display:none"></div>
+
+          <div class="sec-divider"></div>
+
+          <!-- STEP 4: OPENING BALANCES -->
+          <div class="step-hdr">
+            <div class="step-num">4</div>
+            <span class="step-title">Opening Balances</span>
+            <span class="step-sub">Only for mid-term leases — skip if starting fresh</span>
+          </div>
+          <div class="toggle-wrap" style="margin-bottom:14px">
+            <label class="toggle"><input type="checkbox" id="f-has-opening" onchange="Form.toggleOpening()"><span class="slider"></span></label>
+            <div>
+              <div class="toggle-label">This lease was entered mid-way through its term</div>
+              <div class="toggle-sub">The schedule will resume from the date and balances below</div>
+            </div>
+          </div>
+          <div class="conditional-block" id="f-opening-block" hidden>
+            <div class="g4">
+              <div class="form-row"><label class="form-label">Opening Date</label><input class="form-input" id="f-open-date" type="date"></div>
+              <div class="form-row"><label class="form-label">ROU Net Block (Rs.)</label><input class="form-input" id="f-open-rou" type="number" step="0.01" placeholder="Carrying NBV"></div>
+              <div class="form-row"><label class="form-label">Acc. Depreciation (Rs.)</label><input class="form-input" id="f-open-accdep" type="number" step="0.01"></div>
+              <div class="form-row">
+                <label class="form-label">Lease Liability (Rs.)</label>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <input class="form-input" id="f-open-liab" type="number" step="0.01" style="flex:1">
+                  <button type="button" class="btn btn-sm btn-ghost" onclick="Form.autoCalcOpeningLiability()" title="Auto-calculate from PV of remaining payments">
+                    <span style="font-size:14px;">🔢</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="g2" style="margin-bottom:0">
+              <div class="form-row"><label class="form-label">Sec Deposit — Ind AS Value (Rs.)</label><input class="form-input" id="f-open-sdindas" type="number" step="0.01" placeholder="0"></div>
+              <div class="form-row"><label class="form-label">Sec Deposit — Gross (Rs.)</label><input class="form-input" id="f-open-sdgross" type="number" step="0.01" placeholder="0"></div>
+            </div>
+          </div>
+
+          <div class="sec-divider"></div>
+
+          <!-- STEP 5: REASSESSMENT -->
+          <div class="step-hdr">
+            <div class="step-num">5</div>
+            <span class="step-title">Reassessment</span>
+            <span class="step-sub">Para 44–46 — skip if no modification has occurred</span>
+          </div>
+          <div class="toggle-wrap" style="margin-bottom:14px">
+            <label class="toggle"><input type="checkbox" id="f-has-reassess" onchange="Form.toggleReassess()"><span class="slider"></span></label>
+            <div>
+              <div class="toggle-label">This lease has been modified or reassessed</div>
+              <div class="toggle-sub">Add one event per modification — computed automatically</div>
+            </div>
+          </div>
+          <div class="conditional-block" id="f-reassess-block" hidden>
+            <div id="reassess-list"></div>
+            <button class="btn btn-ghost btn-sm" onclick="Form.addReassessment()">+ Add Modification</button>
+          </div>
+
+          <div class="sec-divider"></div>
+
+          <!-- STEP 6: OPTIONS -->
+          <div class="step-hdr">
+            <div class="step-num">6</div>
+            <span class="step-title">Lease Options</span>
+            <span class="step-sub">Renewal, termination or purchase options — skip if none</span>
+          </div>
+          <div class="toggle-wrap" style="margin-bottom:14px">
+            <label class="toggle"><input type="checkbox" id="f-has-options" onchange="Form.toggleOptions()"><span class="slider"></span></label>
+            <div>
+              <div class="toggle-label">This lease has renewal, termination or purchase options</div>
+              <div class="toggle-sub">Documents the Para 19 judgement for disclosure</div>
+            </div>
+          </div>
+          <div class="conditional-block" id="f-options-block" hidden>
+            <div class="g4">
+              <div class="form-row">
+                <label class="form-label">Option Type</label>
+                <select class="form-select" id="f-option-type">
+                  <option value="renewal">Renewal option</option>
+                  <option value="termination">Termination option</option>
+                  <option value="purchase">Purchase option</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <label class="form-label">Certainty</label>
+                <select class="form-select" id="f-option-certainty">
+                  <option value="not-included">Not reasonably certain</option>
+                  <option value="included">Reasonably certain</option>
+                </select>
+              </div>
+              <div class="form-row s2">
+                <label class="form-label">Rationale</label>
+                <textarea class="form-input form-textarea" id="f-option-rationale" rows="2" style="resize:vertical;min-height:50px;line-height:1.6" placeholder="e.g. Core branch — strong incentive to renew. Included in lease term."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:28px;padding-top:20px;border-top:1.5px solid var(--border);display:flex;align-items:center;justify-content:flex-end;gap:10px">
+            <button class="btn btn-ghost" onclick="App.showPage('rous')">Cancel</button>
+            <button class="btn btn-primary" onclick="Form.save()" style="padding:10px 36px">Save ROU</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end page-add-rou -->
+
+    
+        <!-- PAGE: SCHEDULE VIEW (individual ROU) -->
+    <div class="page-body" id="page-schedule" style="display:none">
+      <div class="back-btn" onclick="App.showPage('rous')">← Back to All ROUs</div>
+      <div id="schedule-content"></div>
+    </div>
+    <!-- PAGE: EXPORT -->
+    <div class="page-body" id="page-export" style="display:none">
+      <div class="card">
+        <div class="card-header"><h3>Export Excel Workbook</h3><span style="font-size:12px;color:var(--text3)">.xlsx · live formulas + formatting</span></div>
+        <div class="card-body">
+          <div class="export-grid">
+            <div class="export-sheet">
+              <div class="es-icon-txt">BD</div>
+              <div>
+                <h5>Branch Details</h5>
+                <p>Separate sheet with lease information for each branch</p>
+              </div>
+            </div>
+            <div class="export-sheet">
+              <div class="es-icon-txt">SS</div>
+              <div>
+                <h5>Summary Schedule</h5>
+                <p>Consolidated ROU assets, liabilities & P&L impact</p>
+              </div>
+            </div>
+            <div class="export-sheet">
+              <div class="es-icon-txt">PL</div>
+              <div>
+                <h5>P&L Impact</h5>
+                <p>Depreciation & interest by financial year</p>
+              </div>
+            </div>
+            <div class="export-sheet">
+              <div class="es-icon-txt">BS</div>
+              <div>
+                <h5>Balance Sheet</h5>
+                <p>Assets, liabilities & security deposits</p>
+              </div>
+            </div>
+            <div class="export-sheet">
+              <div class="es-icon-txt">JE</div>
+              <div>
+                <h5>Journal Entries</h5>
+                <p>Dr/Cr entries for the reporting period</p>
+              </div>
+            </div>
+            <div class="export-sheet">
+              <div class="es-icon-txt">MP</div>
+              <div>
+                <h5>Maturity Profile</h5>
+                <p>Future lease payments by maturity band</p>
+              </div>
+            </div>
+            <div class="export-sheet">
+              <div class="es-icon-txt">DS</div>
+              <div>
+                <h5>Disclosures (Para 52–60)</h5>
+                <p>Weighted IBR, judgements, exempt leases, P&L breakdown</p>
+              </div>
+            </div>
+          </div>
+          <div class="export-cta">
+            <h3>Generate Workbook</h3>
+            <p>Company: <strong id="export-company-name">-</strong> &nbsp;·&nbsp; Period: <strong id="export-period">-</strong> &nbsp;·&nbsp; <span id="export-rou-count">0</span> ROUs</p>
+            <button class="export-big-btn" id="export-btn" onclick="Exporter.run()"><span id="export-btn-text">Generate &amp; Download Excel</span></button>
+            <div class="download-link-box" id="download-link-box">
+              <a id="download-link" href="#" download><span id="download-link-name">Download ready - click here</span></a>
+              <div style="font-size:11px;color:var(--text2);margin-top:8px">If the download didn't start automatically, click the link above.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: REASSESSMENT OVERRIDE -->
+    <div class="page-body" id="page-reassess-override" style="display:none">
+      <div class="card">
+        <div class="card-header">
+          <h3>Reassessment Override</h3>
+          <span style="font-size:12px;color:var(--text3)">Apply audited/signed post-reassessment figures</span>
+        </div>
+        <div class="card-body">
+          <div style="background:#fff4ee;border:1px solid #ffeddb;border-radius:8px;padding:14px;margin-bottom:20px">
+            <div style="display:flex;align-items:start;gap:10px">
+              <span style="font-size:18px">⚠️</span>
+              <div>
+                <div style="font-size:12.5px;font-weight:600;color:var(--orange);margin-bottom:4px">Important</div>
+                <div style="font-size:11.5px;color:var(--text);line-height:1.5">
+                  This feature stores the differential between engine-computed values and your audited post-reassessment figures. 
+                  The differential flows into the Reassessment column in reports. Opening balances remain unchanged.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="g2" style="margin-bottom:20px">
+            <div class="form-row">
+              <label class="form-label">Search & Select Location <span class="req">*</span></label>
+              <input type="text" class="form-input" id="ro-location-search" placeholder="Type to search branches..." style="margin-bottom:8px">
+              <select class="form-select" id="ro-location" onchange="ReassessOverride.onLocationChange()" size="1">
+                <option value="">— Select a location —</option>
+              </select>
+              <div class="form-hint">Search and choose the ROU asset that was reassessed</div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Reassessment Date <span class="req">*</span></label>
+              <input type="date" class="form-input" id="ro-date" onchange="ReassessOverride.computePreValues()">
+              <div class="form-hint">Date when reassessment occurred</div>
+            </div>
+          </div>
+
+          <div style="padding:18px;background:var(--light);border-radius:10px;margin-bottom:20px" id="ro-pre-values" hidden>
+            <h4 style="font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:12px">Pre-Reassessment (Engine Computed)</h4>
+            <div class="g3">
+              <div>
+                <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px">ROU NBV</div>
+                <div style="font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--text)" id="ro-pre-rou">-</div>
+              </div>
+              <div>
+                <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px">Lease Liability</div>
+                <div style="font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--text)" id="ro-pre-liab">-</div>
+              </div>
+              <div>
+                <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px">SD Ind AS</div>
+                <div style="font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--text)" id="ro-pre-sd">-</div>
+              </div>
+            </div>
+            <div class="g3" style="margin-top:12px">
+              <div>
+                <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px">ROU SD</div>
+                <div style="font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--text)" id="ro-pre-rou-sd">-</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="opt-block">
+            <span class="opt-block-lbl">Post-Reassessment Figures (Audited/Signed)</span>
+            <div class="g3">
+              <div class="form-row">
+                <label class="form-label">ROU NBV (Net Block) <span class="req">*</span></label>
+                <input type="number" class="form-input" id="ro-post-rou" step="0.01" placeholder="0.00">
+              </div>
+              <div class="form-row">
+                <label class="form-label">Lease Liability <span class="req">*</span></label>
+                <input type="number" class="form-input" id="ro-post-liab" step="0.01" placeholder="0.00">
+              </div>
+              <div class="form-row">
+                <label class="form-label">Security Deposit (Ind AS) <span class="req">*</span></label>
+                <input type="number" class="form-input" id="ro-post-sd" step="0.01" placeholder="0.00">
+              </div>
+            </div>
+            <div class="g3" style="margin-top:12px">
+              <div class="form-row">
+                <label class="form-label">ROU Security Deposit <span class="req">*</span></label>
+                <input type="number" class="form-input" id="ro-post-rou-sd" step="0.01" placeholder="0.00">
+                <div class="form-hint">Notional ROU SD (discounted value)</div>
+              </div>
+              <div class="form-row">
+                <label class="form-label">SD Gross Amount</label>
+                <input type="number" class="form-input" id="ro-post-sd-gross" step="0.01" placeholder="0.00">
+                <div class="form-hint">Optional: Gross security deposit amount</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions" style="border-top:none;padding-top:0">
+            <button class="btn btn-ghost" onclick="ReassessOverride.reset()">Clear Form</button>
+            <button class="btn btn-primary" onclick="ReassessOverride.save()">Calculate & Save Override</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Existing Overrides List -->
+      <div class="card" style="margin-top:16px">
+        <div class="card-header">
+          <h3>Existing Reassessment Overrides</h3>
+          <span style="font-size:11px;color:var(--text3)" id="ro-count-badge">0 overrides</span>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table id="ro-table">
+              <thead>
+                <tr>
+                  <th>Location</th>
+                  <th>Reassess Date</th>
+                  <th>ROU Δ</th>
+                  <th>Liab Δ</th>
+                  <th>SD Δ</th>
+                  <th>ROU SD Δ</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="ro-tbody">
+                <tr>
+                  <td colspan="7" style="text-align:center;padding:32px;color:var(--text3)">No reassessment overrides yet</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- AUDIT LOG CLEAR CONFIRM (admin-gated) -->
+<div class="modal-overlay" id="modal-audit-clear">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3>Clear Audit Log</h3>
+      <button class="modal-close" onclick="Modal.close('modal-audit-clear')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text);margin-bottom:14px">This action permanently deletes all audit log entries for this client. Enter the admin password to proceed.</p>
+      <div class="form-row">
+        <label class="form-label">Admin Password</label>
+        <input class="form-input" id="audit-clear-password" type="password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')AuditLog.confirmClear()">
+        <div class="form-error" id="audit-clear-err"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('modal-audit-clear')">Cancel</button>
+      <button class="btn btn-danger" onclick="AuditLog.confirmClear()">Clear Log</button>
+    </div>
+  </div>
+</div>
+
+<!-- REASSESSMENT OVERRIDE CONFIRMATION MODAL -->
+<div class="modal-overlay" id="modal-ro-confirm">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Confirm Reassessment Override</h3>
+      <button class="modal-close" onclick="Modal.close('modal-ro-confirm')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:#fff4ee;border:1px solid #ffeddb;border-radius:8px;padding:12px;margin-bottom:16px">
+        <div style="font-size:12px;font-weight:600;color:var(--orange);margin-bottom:6px">Review Differential Amounts</div>
+        <div style="font-size:11px;color:var(--text);line-height:1.5">
+          These differentials will be stored and applied to the Reassessment column in reports.
+          Opening balances will NOT be modified.
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px">LOCATION</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text)" id="ro-confirm-location"></div>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px">REASSESSMENT DATE</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text)" id="ro-confirm-date"></div>
+      </div>
+
+      <table style="width:100%;font-size:12px;margin-bottom:14px">
+        <thead>
+          <tr style="background:var(--light)">
+            <th style="padding:8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.4px">Item</th>
+            <th style="padding:8px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:0.4px">Pre (Engine)</th>
+            <th style="padding:8px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:0.4px">Post (Audited)</th>
+            <th style="padding:8px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:0.4px">Differential</th>
+          </tr>
+        </thead>
+        <tbody id="ro-confirm-tbody" style="font-family:'JetBrains Mono',monospace"></tbody>
+      </table>
+
+      <div id="ro-confirm-gain-loss" style="padding:10px;background:#e3fcef;border:1px solid #a7f3d0;border-radius:6px;display:none">
+        <div style="font-size:11px;font-weight:600;color:#065f46">GAIN/LOSS ON MODIFICATION</div>
+        <div style="font-size:15px;font-weight:700;color:#065f46;font-family:'JetBrains Mono',monospace" id="ro-confirm-gl-amount"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('modal-ro-confirm')">Cancel</button>
+      <button class="btn btn-success" onclick="ReassessOverride.confirmSave()">Save Override</button>
+    </div>
+  </div>
+</div>
+
+    <!-- PAGE: AUDIT LOG -->
+    <div class="page-body" id="page-audit" style="display:none">
+      <div class="card">
+        <div class="card-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <h3>Audit Log</h3>
+            <span style="font-size:12px;color:var(--text3)">All changes to ROUs — creates, edits, deletes, duplicates</span>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="color:var(--red);border-color:var(--red)" onclick="AuditLog.promptClear()">Clear Log</button>
+        </div>
+        <div class="card-body" style="padding:16px">
+          <div id="audit-log-content" style="max-height:70vh;overflow-y:auto"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: BULK IMPORT -->
+    <div class="page-body" id="page-bulk-import" style="display:none">
+      <div class="card">
+        <div class="card-header"><h3>Bulk Import ROUs</h3><span style="font-size:12px;color:var(--text3)">Upload CSV or Excel file</span></div>
+        <div class="card-body">
+          <div style="background:#eff6ff;border:2px dashed var(--accent);border-radius:12px;padding:40px;text-align:center;margin-bottom:20px">
+            
+            <h3 style="font-size:16px;margin-bottom:8px">Drop your file here or click to browse</h3>
+            <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Supports CSV and Excel (.xlsx) files</p>
+            <input type="file" id="bulk-import-file" accept=".csv,.xlsx" style="display:none" onchange="BulkImport.handleFile(event)">
+            <button class="btn btn-accent" onclick="document.getElementById('bulk-import-file').click()">Choose File</button>
+          </div>
+          <div class="card" style="background:var(--light);border:none">
+            <div class="card-header" style="background:transparent;border:none"><h4 style="font-size:13px">Required & Optional Columns</h4></div>
+            <div class="card-body">
+              <p style="font-size:12px;color:var(--text2);line-height:1.8">
+                <strong>Required:</strong> Branch Name, Party Name, Start Date (DD/MM/YYYY),
+                End Date (DD/MM/YYYY), Monthly Rent, IBR %
+                <br>
+                <strong>Optional:</strong> Security Deposit, Address,
+                <strong>Payment Timing</strong> (<em>advance</em> / <em>arrears</em> — defaults to <em>advance</em>),
+                <strong>Initial Direct Costs</strong> (Para 24c),
+                <strong>Lease Incentives</strong> (Para 24b),
+                <strong>Variable Rent</strong> per month (Para 38)
+              </p>
+              <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="BulkImport.downloadTemplate()">Download Template</button>
+            </div>
+          </div>
+          <div id="bulk-import-preview" style="display:none;margin-top:20px">
+            <h4 style="font-size:14px;font-weight:600;margin-bottom:12px">Preview (<span id="bulk-preview-count">0</span> rows)</h4>
+            <div class="table-wrap" style="max-height:300px;overflow-y:auto">
+              <table id="bulk-preview-table">
+                <thead id="bulk-preview-thead"></thead>
+                <tbody id="bulk-preview-tbody"></tbody>
+              </table>
+            </div>
+            <div style="margin-top:16px;display:flex;gap:10px">
+              <button class="btn btn-success" onclick="BulkImport.import()">Import All</button>
+              <button class="btn btn-ghost" onclick="BulkImport.cancel()">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODALS
+══════════════════════════════════════ -->
+
+<!-- ADD CLIENT MODAL -->
+<div class="modal-overlay" id="modal-add-client">
+  <div class="modal" style="width:520px">
+    <div class="modal-header">
+      <h3>Add New Company</h3>
+      <button class="modal-close" onclick="Modal.close('modal-add-client')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-cols" style="gap:12px">
+        <div class="form-row" style="margin-bottom:0">
+          <label class="form-label">Company Name <span class="req">*</span></label>
+          <input class="form-input" id="new-client-name" type="text" placeholder="e.g. EbixCash Travel & Forex Ltd">
+          <div class="form-error" id="new-client-name-err"></div>
+        </div>
+        <div class="form-row" style="margin-bottom:0">
+          <label class="form-label">Short Code</label>
+          <input class="form-input" id="new-client-code" type="text" placeholder="e.g. ECWML (auto-filled)">
+          <div class="form-hint">Used in export file names</div>
+        </div>
+      </div>
+      <div class="form-row" style="margin-top:14px">
+        <label class="form-label">Registered Address <span class="req">*</span></label>
+        <textarea class="form-input form-textarea" id="new-client-address" rows="3" placeholder="e.g. 8th Floor, Manek Plaza, Kalina CST Road, Mumbai – 400 098" style="resize:vertical;min-height:72px;line-height:1.5"></textarea>
+        <div class="form-error" id="new-client-address-err"></div>
+        <div class="form-hint">Appears as header on all exported Excel workpapers</div>
+      </div>
+      <div class="form-cols" style="gap:12px">
+        <div class="form-row" style="margin-bottom:0">
+          <label class="form-label">Default IBR (Annual %)</label>
+          <input class="form-input" id="new-client-ibr" type="number" placeholder="9" step="0.01" min="0" max="100">
+          <div class="form-hint">Override per lease as needed</div>
+        </div>
+        <div class="form-row" style="margin-bottom:0">
+          <label class="form-label">Prepared By</label>
+          <input class="form-input" id="new-client-prepared-by" type="text" placeholder="e.g. Finance Team">
+          <div class="form-hint">Appears on all workpapers</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('modal-add-client')">Cancel</button>
+      <button class="btn btn-primary" onclick="App.saveClient()">Save Company</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="modal-overlay" id="modal-admin-login">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3>Admin Panel Access</h3>
+      <button class="modal-close" onclick="Modal.close('modal-admin-login')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="admin-password-input" type="password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')App.adminLogin()">
+        <div class="form-error" id="admin-login-err"></div>
+        <div class="form-hint" id="admin-firsttime-hint" style="display:none;color:var(--accent);font-weight:500">First use — enter a password to secure the admin panel.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('modal-admin-login')">Cancel</button>
+      <button class="btn btn-primary" onclick="App.adminLogin()">Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL MODAL -->
+<div class="modal-overlay" id="modal-admin-panel">
+  <div class="modal" style="width:780px;max-width:96vw">
+    <div class="modal-header">
+      <h3>Admin Panel</h3>
+      <button class="modal-close" onclick="Modal.close('modal-admin-panel')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:0">
+      <div style="display:flex;min-height:440px">
+        <!-- TAB NAV (left side) -->
+        <div id="admin-tab-nav" style="width:170px;background:#f8fafc;border-right:1px solid var(--border);padding:14px 0;flex-shrink:0">
+          <div class="admin-tab-btn active" data-tab="company" onclick="Admin.switchTab('company')" style="padding:10px 16px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text);border-left:3px solid transparent;transition:all 0.15s">Company</div>
+          <div class="admin-tab-btn" data-tab="defaults" onclick="Admin.switchTab('defaults')" style="padding:10px 16px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text2);border-left:3px solid transparent;transition:all 0.15s">Date &amp; Escalation</div>
+          <div class="admin-tab-btn" data-tab="storage" onclick="Admin.switchTab('storage')" style="padding:10px 16px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text2);border-left:3px solid transparent;transition:all 0.15s">Storage &amp; Backup</div>
+          <div class="admin-tab-btn" data-tab="security" onclick="Admin.switchTab('security')" style="padding:10px 16px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text2);border-left:3px solid transparent;transition:all 0.15s">Security</div>
+          <div class="admin-tab-btn" data-tab="danger" onclick="Admin.switchTab('danger')" style="padding:10px 16px;cursor:pointer;font-size:12.5px;font-weight:600;color:#dc2626;border-left:3px solid transparent;transition:all 0.15s">Danger Zone</div>
+        </div>
+
+        <!-- TAB CONTENT (right side) -->
+        <div style="flex:1;padding:20px 24px;overflow-y:auto;max-height:520px">
+          <!-- TAB: Company -->
+          <div class="admin-tab-pane" data-pane="company">
+            <h4 style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)">Company Details</h4>
+            <div class="form-row">
+              <label class="form-label">Company Name</label>
+              <input class="form-input" id="admin-edit-name" type="text" placeholder="Company name">
+              <div class="form-error" id="admin-edit-name-err"></div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Short Name / Code</label>
+              <input class="form-input" id="admin-edit-code" type="text" placeholder="Short code">
+              <div class="form-error" id="admin-edit-code-err"></div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Registered Address</label>
+              <textarea class="form-input form-textarea" id="admin-edit-address" rows="2" style="resize:vertical;min-height:60px;line-height:1.6" placeholder="Full registered address"></textarea>
+              <div class="form-error" id="admin-edit-address-err"></div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="Admin.updateCompanyDetails()">Update Company Details</button>
+          </div>
+
+          <!-- TAB: Date & Escalation Defaults -->
+          <div class="admin-tab-pane" data-pane="defaults" style="display:none">
+            <h4 style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)">Date &amp; Escalation Defaults</h4>
+            <div class="form-hint" style="margin-bottom:14px;padding:10px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;line-height:1.6;color:#1e3a8a">
+              <strong>This setting controls how ALL ROUs under this company are computed and displayed.</strong>
+              It is a master switch — flipping it instantly changes every schedule view, computation, and export for this company. You can switch back and forth freely; nothing is destroyed. Each ROU's saved data is preserved either way.
+            </div>
+            <div class="form-row">
+              <label class="form-label">Default Mode for New ROUs</label>
+              <select class="form-select" id="admin-default-esc-basis">
+                <option value="month">Default (Month Number) — current logic</option>
+                <option value="period">Calendar Period — date-wise computation logic</option>
+              </select>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+              <div style="border:1px solid var(--border);border-radius:8px;padding:12px;background:#f8fafc">
+                <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">📅 Default (Month Number)</div>
+                <ul style="font-size:11.5px;color:var(--text2);line-height:1.6;margin:0;padding-left:18px">
+                  <li>Schedule = N equal lease-month buckets (start-day to start-day-1)</li>
+                  <li>Row dates = lease commencement + (m-1) months</li>
+                  <li>Custom escalation steps entered as <em>Month 1, 2, 3…</em></li>
+                  <li>No proration — every row gets the full monthly rent</li>
+                  <li>Same depreciation, PV, interest, SD logic as the original engine</li>
+                </ul>
+              </div>
+              <div style="border:1px solid #fde68a;border-radius:8px;padding:12px;background:#fffbeb">
+                <div style="font-size:12px;font-weight:700;color:#78350f;margin-bottom:6px">📆 Calendar Period</div>
+                <ul style="font-size:11.5px;color:#78350f;line-height:1.6;margin:0;padding-left:18px">
+                  <li>Schedule aligns to actual calendar months</li>
+                  <li>Row dates = end-of-month (arrears) or start-of-month (advance)</li>
+                  <li>Partial first/last months pro-rated by days (e.g. 10/30)</li>
+                  <li>Custom escalation steps entered as <em>From-Date → To-Date</em></li>
+                  <li>Security Deposit dates &amp; periods auto-align with rent rows</li>
+                  <li>PV, interest, depreciation, export — all driven by these dates</li>
+                </ul>
+              </div>
+            </div>
+
+            <button class="btn btn-primary btn-sm" style="margin-top:16px" onclick="Admin.updateDateEscalationDefaults()">Save Default for New ROUs</button>
+            <div id="admin-defaults-current" style="margin-top:10px;font-size:11.5px;color:var(--text3)"></div>
+          </div>
+
+          <!-- TAB: Storage & Backup -->
+          <div class="admin-tab-pane" data-pane="storage" style="display:none">
+            <h4 style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)">Storage</h4>
+            <div class="admin-row">
+              <div>
+                <div class="admin-row-label">Cloud Sync</div>
+                <div class="admin-row-sub" id="admin-storage-info">Calculating…</div>
+              </div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600" id="admin-storage-pct">-</div>
+            </div>
+            <div style="background:var(--border);border-radius:4px;height:6px;margin-top:8px;margin-bottom:20px">
+              <div id="admin-storage-bar" style="background:var(--accent);height:6px;border-radius:4px;width:0%;transition:width 0.4s"></div>
+            </div>
+
+            <h4 style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)">Backup &amp; Restore</h4>
+            <div class="admin-row">
+              <div>
+                <div class="admin-row-label">Download Backup</div>
+                <div class="admin-row-sub">Export all data as JSON file</div>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="Admin.backup()">Backup</button>
+            </div>
+            <div class="admin-row">
+              <div>
+                <div class="admin-row-label">Restore from Backup</div>
+                <div class="admin-row-sub">Upload a JSON backup file</div>
+              </div>
+              <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+                Restore
+                <input type="file" accept=".json" id="restore-file-input" style="display:none" onchange="Admin.restore(this)">
+              </label>
+            </div>
+          </div>
+
+          <!-- TAB: Security -->
+          <div class="admin-tab-pane" data-pane="security" style="display:none">
+            <h4 style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)">Change Admin Password</h4>
+            <div class="form-row">
+              <label class="form-label">New Admin Password</label>
+              <input class="form-input" id="admin-new-pass" type="password" placeholder="Enter new password">
+            </div>
+            <div class="form-row">
+              <label class="form-label">Confirm Password</label>
+              <input class="form-input" id="admin-confirm-pass" type="password" placeholder="Repeat new password">
+              <div class="form-error" id="admin-pass-err"></div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="Admin.changePassword()">Update Password</button>
+          </div>
+
+          <!-- TAB: Danger Zone -->
+          <div class="admin-tab-pane" data-pane="danger" style="display:none">
+            <div class="danger-zone" style="margin:0">
+              <h4 style="margin-top:0">Danger Zone</h4>
+              <div class="admin-row">
+                <div>
+                  <div class="admin-row-label">Reset Single Company</div>
+                  <div class="admin-row-sub">Delete all ROUs for one company</div>
+                </div>
+                <button class="btn btn-danger btn-sm" onclick="Admin.resetClient()">Reset Company</button>
+              </div>
+              <div class="admin-row">
+                <div>
+                  <div class="admin-row-label">Delete Current Company</div>
+                  <div class="admin-row-sub">Permanently delete this company and all its ROUs</div>
+                </div>
+                <button class="btn btn-danger btn-sm" onclick="Admin.deleteClient()">Delete Company</button>
+              </div>
+              <div class="admin-row" style="border:none">
+                <div>
+                  <div class="admin-row-label">Reset ALL Data</div>
+                  <div class="admin-row-sub">Permanently delete everything</div>
+                </div>
+                <button class="btn btn-danger btn-sm" onclick="Admin.confirmResetAll()">Reset All</button>
+              </div>
+              <div class="form-row" style="margin-top:12px">
+                <label class="form-label">Type <strong>RESET</strong> to confirm full reset:</label>
+                <input class="form-input" id="reset-confirm-input" type="text" placeholder="Type RESET">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('modal-admin-panel')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE ROU CONFIRM -->
+<div class="modal-overlay" id="modal-delete-rou">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3>Delete ROU</h3>
+      <button class="modal-close" onclick="Modal.close('modal-delete-rou')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--text)">Are you sure you want to delete <strong id="delete-rou-name">this ROU</strong>? This cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('modal-delete-rou')">Cancel</button>
+      <button class="btn btn-danger" onclick="App.confirmDeleteROU()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- DUPLICATE ROU CONFIRM -->
+<div class="modal-overlay" id="modal-duplicate-rou">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3>Duplicate ROU</h3>
+      <button class="modal-close" onclick="Modal.close('modal-duplicate-rou')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--text);line-height:1.6">Duplicate <strong id="duplicate-rou-name">this ROU</strong>?<br><span style="font-size:12px;color:var(--text3)">A full copy will be created with all lease terms, escalations and reassessments preserved.</span></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('modal-duplicate-rou')">Cancel</button>
+      <button class="btn btn-primary" onclick="App.confirmDuplicateROU()">Duplicate</button>
+    </div>
+  </div>
+</div>
+
+<!-- PERIOD SELECTOR MODAL -->
+<div class="modal-overlay" id="modal-period">
+  <div class="modal" style="width:420px">
+    <div class="modal-header">
+      <h3>Set Reporting Period</h3>
+      <button class="modal-close" onclick="Modal.close('modal-period')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-cols">
+        <div class="form-row">
+          <label class="form-label">From Date</label>
+          <input class="form-input" id="period-start-input" type="date">
+        </div>
+        <div class="form-row">
+          <label class="form-label">To Date</label>
+          <input class="form-input" id="period-end-input" type="date">
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;font-weight:600">Quick Select</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px" id="period-quick-btns"></div>
+      </div>
+      <div id="period-range-display" style="display:none;margin-top:14px;background:var(--light);border:1px solid var(--border);border-radius:8px;padding:11px 14px">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Selected Period</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text)" id="period-range-label">-</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('modal-period')">Cancel</button>
+      <button class="btn btn-primary" onclick="App.setPeriod()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+
+
+<!-- Vendor: ExcelJS + JSZip -->
+<script src="js/vendor/exceljs.bundle.js"></script>
+
+<!-- Core -->
+<script src="js/api.js"></script>
+<script src="js/db.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/modal.js"></script>
+<script src="js/app.js"></script>
+<script src="js/admin.js"></script>
+
+<!-- Engine & Forms -->
+<script src="js/engine.js"></script>
+<script src="js/form.js"></script>
+<script src="js/schedule.js"></script>
+
+<!-- Features -->
+<script src="js/exporter.js"></script>
+<script src="js/bulk-import.js"></script>
+<script src="js/audit-log.js"></script>
+<script src="js/reassess-override.js"></script>
+<script src="js/live-preview.js"></script>
+
+<!-- Boot -->
+<script src="js/boot.js"></script>
+</body>
+</html>

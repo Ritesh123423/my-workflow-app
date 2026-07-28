@@ -1,5 +1,12 @@
-const API = 'https://my-workflow-app.onrender.com/api';
-// ↑ Replace this after deploying to Render
+const API = (typeof location !== 'undefined' && location.protocol.startsWith('http'))
+  ? '/api'
+  : 'https://my-workflow-app.onrender.com/api';
+
+function redirectAfterAuth() {
+  const params = new URLSearchParams(window.location.search);
+  const next = params.get('next');
+  window.location.href = next || 'dashboard.html';
+}
 
 function switchTab(tab) {
   document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
@@ -26,7 +33,7 @@ async function handleLogin() {
     if (!res.ok) throw new Error(data.error);
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
-    window.location.href = 'dashboard.html';
+    redirectAfterAuth();
   } catch (err) {
     document.getElementById('login-error').textContent = err.message;
   }
@@ -52,11 +59,10 @@ async function handleRegister() {
     if (!res.ok) throw new Error(data.error);
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
-    window.location.href = 'dashboard.html';
+    redirectAfterAuth();
   } catch (err) {
     document.getElementById('reg-error').textContent = err.message;
   }
 }
 
-// Redirect if already logged in
-if (localStorage.getItem('token')) window.location.href = 'dashboard.html';
+if (localStorage.getItem('token')) redirectAfterAuth();

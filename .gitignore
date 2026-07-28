@@ -21,3 +21,7 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Optional: uncomment to skip the 1.4MB monolith backup
+# archive/ROU_Master_Bot_v6.html
+

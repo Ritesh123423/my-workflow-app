@@ -1,4 +1,6 @@
-const API = 'https://my-workflow-app.onrender.com/api';
+const API = (typeof location !== 'undefined' && location.protocol.startsWith('http'))
+  ? '/api'
+  : 'https://my-workflow-app.onrender.com/api';
 
 function logout() {
   localStorage.clear();
