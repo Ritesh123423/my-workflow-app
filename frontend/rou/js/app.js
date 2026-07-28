@@ -1,3 +1,21 @@
+/* ── Standalone helper: update sidebar + topbar user pill ── */
+function _refreshUserDisplay(user) {
+  if (!user) { try { user = JSON.parse(localStorage.getItem('rou_user')||'null'); } catch(e) {} }
+  if (!user) return;
+  var ROLE_COLORS = { admin:'#e8520a', partner:'#7c3aed', manager:'#1a3f6b', article:'#059669' };
+  var ROLE_LABELS = { admin:'Administrator', partner:'Partner', manager:'Manager', article:'Article' };
+  var color   = ROLE_COLORS[user.role] || '#1a3f6b';
+  var label   = ROLE_LABELS[user.role] || user.role;
+  var initial = (user.name || '?').charAt(0).toUpperCase();
+  // Sidebar
+  var sav = document.getElementById('sidebar-user-avatar'); if (sav) { sav.textContent = initial; sav.style.background = color; }
+  var snm = document.getElementById('sidebar-user-name');   if (snm) snm.textContent = user.name || user.email || 'User';
+  var srl = document.getElementById('sidebar-user-role');   if (srl) srl.textContent = label;
+  // Topbar pill
+  var tav = document.getElementById('topbar-user-avatar');  if (tav) { tav.textContent = initial; tav.style.background = color; }
+  var tnm = document.getElementById('topbar-user-name');    if (tnm) tnm.textContent = user.name || user.email || 'User';
+}
+
 window.App = {
   currentClient: null,
   pendingDeleteId: null,
@@ -76,7 +94,7 @@ window.App = {
     const color = ROLE_COLORS[user.role] || '#1a3f6b';
     const label = ROLE_LABELS[user.role] || user.role;
     const isArticle = user.role === 'article';
-    this._refreshUserDisplay(user);
+    _refreshUserDisplay(user);
 
     // Top bar avatar + name
     const av = document.getElementById('ws-avatar');
@@ -305,7 +323,7 @@ window.App = {
       localStorage.setItem('rou_token', d.token);
       localStorage.setItem('rou_user', JSON.stringify(d.user));
       profileAlert('details','Profile updated!','success');
-      this._refreshUserDisplay(d.user);
+      _refreshUserDisplay(d.user);
       this.renderWorkspaceHome();
       const nd = document.getElementById('profile-name-display'); if (nd) nd.textContent = d.user.name;
       const av = document.getElementById('profile-avatar'); if (av) av.textContent = d.user.name.charAt(0).toUpperCase();
