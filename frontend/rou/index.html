@@ -240,6 +240,8 @@ document.documentElement.style.visibility = 'hidden';
 
     <!-- RIGHT: STATS + QUICK ACTIONS -->
     <div class="ws-right">
+
+      <!-- Stats -->
       <div class="ws-stats-grid" id="ws-stats-grid">
         <div class="ws-stat">
           <div class="ws-stat-val" id="ws-stat-companies">0</div>
@@ -251,33 +253,53 @@ document.documentElement.style.visibility = 'hidden';
         </div>
       </div>
 
-      <div class="ws-quick-card">
-        <div class="ws-section-title" style="margin-bottom:14px">Quick Actions</div>
-        <div class="ws-quick-list">
-          <button class="ws-quick-item" id="ws-quick-add-company" onclick="Modal.openAddClient()">
-            <div class="ws-quick-icon" style="background:rgba(26,63,107,0.1);color:#1a3f6b">🏢</div>
-            <div>
-              <div class="ws-quick-title">New Company</div>
-              <div class="ws-quick-desc">Add a client for Ind AS 116</div>
+      <!-- Account Card -->
+      <div class="ws-quick-card" style="padding:0;overflow:hidden">
+        <!-- User header -->
+        <div style="background:linear-gradient(135deg,#0a1e3d,#162f5a);padding:14px 16px;display:flex;align-items:center;gap:11px">
+          <div id="ws-profile-avatar" style="width:40px;height:40px;border-radius:10px;background:#e8520a;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0">?</div>
+          <div style="min-width:0">
+            <div id="ws-profile-name" style="font-size:13.5px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+            <div id="ws-profile-email" style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+            <div id="ws-profile-role" style="display:inline-flex;margin-top:5px;padding:1px 8px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.85)"></div>
+          </div>
+        </div>
+        <!-- Edit name -->
+        <div style="padding:12px 16px 0">
+          <div id="ws-account-alert" style="display:none;border-radius:7px;padding:7px 10px;font-size:12px;margin-bottom:10px;line-height:1.5"></div>
+          <div style="margin-bottom:10px">
+            <label style="display:block;font-size:9.5px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px">Display Name</label>
+            <div style="display:flex;gap:6px">
+              <input id="ws-name-input" type="text" placeholder="Your name" style="flex:1;padding:7px 10px;font-size:13px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:7px;color:#0f172a;outline:none;font-family:inherit;min-width:0;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
+              <button onclick="App.saveNameInline()" style="padding:7px 12px;background:#0a1e3d;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background 0.15s" onmouseover="this.style.background='#1a3f6b'" onmouseout="this.style.background='#0a1e3d'">Save</button>
             </div>
+          </div>
+        </div>
+        <!-- Change password toggle -->
+        <div style="padding:0 16px 12px">
+          <button onclick="App.togglePwSection()" id="ws-pw-toggle-btn" style="width:100%;padding:7px;background:#f1f5f9;color:#475569;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;text-align:left;display:flex;align-items:center;justify-content:space-between" onmouseover="this.style.background='#e8f0fe'" onmouseout="this.style.background='#f1f5f9'">
+            <span>🔒 Change Password</span>
+            <svg id="ws-pw-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
           </button>
-          <button class="ws-quick-item" onclick="App.openProfileView()">
-            <div class="ws-quick-icon" style="background:rgba(5,150,105,0.1);color:#059669">👤</div>
-            <div>
-              <div class="ws-quick-title">My Profile</div>
-              <div class="ws-quick-desc">Update name or password</div>
+          <div id="ws-pw-section" style="display:none;margin-top:8px">
+            <div id="ws-pw-alert" style="display:none;border-radius:7px;padding:7px 10px;font-size:12px;margin-bottom:8px;line-height:1.5"></div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
+              <input id="ws-pw-current" type="password" placeholder="Current password" style="width:100%;padding:7px 10px;font-size:12.5px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:7px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
+              <input id="ws-pw-new" type="password" placeholder="New password (min. 8)" style="width:100%;padding:7px 10px;font-size:12.5px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:7px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
+              <input id="ws-pw-confirm" type="password" placeholder="Confirm new password" style="width:100%;padding:7px 10px;font-size:12.5px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:7px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
             </div>
-          </button>
-          <a class="ws-quick-item" id="ws-quick-admin" href="admin.html" style="display:none">
-            <div class="ws-quick-icon" style="background:rgba(232,82,10,0.1);color:#e8520a">⚙</div>
-            <div>
-              <div class="ws-quick-title">Admin Panel</div>
-              <div class="ws-quick-desc">Manage team & assignments</div>
-            </div>
-          </a>
+            <button onclick="App.changePasswordInline()" style="width:100%;padding:8px;background:#0a1e3d;color:#fff;border:none;border-radius:7px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s" onmouseover="this.style.background='#162f5a'" onmouseout="this.style.background='#0a1e3d'">Update Password</button>
+          </div>
+        </div>
+        <!-- Actions row -->
+        <div style="padding:0 16px 14px;display:flex;gap:7px">
+          <a id="ws-quick-admin" href="admin.html" style="display:none;flex:1;padding:7px 10px;background:#fff3ee;color:#e8520a;border:1.5px solid rgba(232,82,10,0.2);border-radius:7px;font-size:12px;font-weight:700;text-decoration:none;text-align:center;transition:background 0.15s" onmouseover="this.style.background='#ffede0'" onmouseout="this.style.background='#fff3ee'">⚙ Admin</a>
+          <button id="ws-quick-add-company" onclick="Modal.openAddClient()" style="flex:1;padding:7px 10px;background:#eff6ff;color:#1a3f6b;border:1.5px solid #bfdbfe;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'">+ Company</button>
+          <button onclick="App.signOut()" style="flex:1;padding:7px 10px;background:#fff;color:#dc2626;border:1.5px solid #fecaca;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='#fff'">Sign Out</button>
         </div>
       </div>
 
+      <!-- Role card -->
       <div class="ws-role-card" id="ws-role-card">
         <div class="ws-role-badge" id="ws-role-badge"></div>
         <div class="ws-role-desc" id="ws-role-desc"></div>
@@ -1795,101 +1817,6 @@ function profileAlert(tab, msg, type) {
 </script>
 
 
-<!-- VIEW 3: PROFILE -->
-<div id="view-profile" class="view" style="background:#f0f4f8;font-family:'Poppins',-apple-system,sans-serif">
-
-  <!-- TOPBAR -->
-  <div style="background:#0a1e3d;height:56px;display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,0.22)">
-    <button onclick="App.closeProfileView()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 13px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.14);color:rgba(255,255,255,0.85);border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back
-    </button>
-    <span style="font-size:15px;font-weight:700;color:#fff;flex:1">My Profile</span>
-    <span id="pv-topbar-name" style="font-size:12px;color:rgba(255,255,255,0.4)"></span>
-  </div>
-
-  <!-- BODY — 2 column, fills screen -->
-  <div style="flex:1;display:flex;overflow:hidden">
-
-    <!-- LEFT: Account details + password + sign out -->
-    <div style="width:380px;flex-shrink:0;overflow-y:auto;padding:20px 16px 20px 20px;display:flex;flex-direction:column;gap:14px;border-right:1px solid #e2e8f0;background:#f8fafc;box-sizing:border-box">
-
-      <!-- User card -->
-      <div style="background:#fff;border-radius:13px;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden">
-        <div style="background:linear-gradient(135deg,#0a1e3d 0%,#162f5a 100%);padding:16px 18px;display:flex;align-items:center;gap:12px">
-          <div id="pv-avatar" style="width:46px;height:46px;border-radius:11px;background:#e8520a;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 3px 10px rgba(0,0,0,0.25)">?</div>
-          <div style="min-width:0">
-            <div id="pv-name" style="font-size:14.5px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-            <div id="pv-email" style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-            <div id="pv-role-badge" style="display:inline-flex;margin-top:5px;padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:700;background:rgba(255,255,255,0.13);color:rgba(255,255,255,0.88)"></div>
-          </div>
-        </div>
-        <div style="padding:14px 16px">
-          <div id="pv-details-alert" style="display:none;border-radius:7px;padding:8px 11px;font-size:12px;margin-bottom:11px;line-height:1.5"></div>
-          <div style="margin-bottom:10px">
-            <label style="display:block;font-size:9.5px;font-weight:700;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px">Display Name</label>
-            <input id="pv-name-input" type="text" placeholder="Your full name" style="width:100%;padding:8px 11px;font-size:13px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:13px">
-            <div>
-              <label style="display:block;font-size:9.5px;font-weight:700;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px">Email</label>
-              <input id="pv-email-input" type="email" disabled style="width:100%;padding:8px 11px;font-size:12.5px;background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:8px;color:#94a3b8;cursor:not-allowed;font-family:inherit;box-sizing:border-box">
-            </div>
-            <div>
-              <label style="display:block;font-size:9.5px;font-weight:700;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px">Role</label>
-              <input id="pv-role-input" type="text" disabled style="width:100%;padding:8px 11px;font-size:12.5px;background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:8px;color:#64748b;cursor:not-allowed;font-family:inherit;box-sizing:border-box">
-            </div>
-          </div>
-          <button onclick="App.saveProfileView()" style="width:100%;padding:10px;background:linear-gradient(135deg,#0a1e3d,#1a3f6b);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity 0.15s" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">Save Changes</button>
-        </div>
-      </div>
-
-      <!-- Change password -->
-      <div style="background:#fff;border-radius:13px;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.06);padding:14px 16px">
-        <div style="font-size:12.5px;font-weight:700;color:#0f172a;margin-bottom:12px;display:flex;align-items:center;gap:7px">
-          <span style="font-size:14px">🔒</span> Change Password
-        </div>
-        <div id="pv-pw-alert" style="display:none;border-radius:7px;padding:8px 11px;font-size:12px;margin-bottom:11px;line-height:1.5"></div>
-        <div style="margin-bottom:9px">
-          <label style="display:block;font-size:9.5px;font-weight:700;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px">Current Password</label>
-          <input id="pv-pw-current" type="password" placeholder="Current password" style="width:100%;padding:8px 11px;font-size:13px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px">
-          <div>
-            <label style="display:block;font-size:9.5px;font-weight:700;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px">New Password</label>
-            <input id="pv-pw-new" type="password" placeholder="Min. 8 chars" style="width:100%;padding:8px 11px;font-size:13px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
-          </div>
-          <div>
-            <label style="display:block;font-size:9.5px;font-weight:700;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px">Confirm</label>
-            <input id="pv-pw-confirm" type="password" placeholder="Repeat" style="width:100%;padding:8px 11px;font-size:13px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
-          </div>
-        </div>
-        <button onclick="App.changePasswordView()" style="width:100%;padding:10px;background:#0a1e3d;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s" onmouseover="this.style.background='#162f5a'" onmouseout="this.style.background='#0a1e3d'">Update Password</button>
-      </div>
-
-      <!-- Sign Out -->
-      <button onclick="App.signOut()" style="width:100%;padding:10px;background:#fff;color:#dc2626;border:1.5px solid #fecaca;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:7px;box-sizing:border-box" onmouseover="this.style.background='#fef2f2';this.style.borderColor='#f87171'" onmouseout="this.style.background='#fff';this.style.borderColor='#fecaca'">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg> Sign Out
-      </button>
-
-    </div>
-
-    <!-- RIGHT: Companies — fills remaining space, scrolls independently -->
-    <div style="flex:1;overflow-y:auto;padding:20px 20px 20px 16px;box-sizing:border-box">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-        <div>
-          <div style="font-size:15px;font-weight:800;color:#0f172a;letter-spacing:-0.2px">My Companies</div>
-          <div style="font-size:12px;color:#94a3b8;margin-top:2px">Click any company to open it instantly</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span id="pv-co-count" style="font-size:11px;font-weight:600;color:#64748b;background:#e2e8f0;padding:3px 10px;border-radius:20px"></span>
-          <button id="pv-add-company-btn" onclick="App.closeProfileView();setTimeout(()=>Modal.openAddClient(),200)" style="display:none;padding:7px 14px;background:#0a1e3d;color:#fff;border:none;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s;white-space:nowrap" onmouseover="this.style.background='#1a3f6b'" onmouseout="this.style.background='#0a1e3d'">+ Add Company</button>
-        </div>
-      </div>
-      <div id="pv-companies-list"></div>
-    </div>
-
-  </div>
-</div>
 
 </body>
 </html>
