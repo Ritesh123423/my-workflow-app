@@ -4,30 +4,28 @@ const path = require('path');
 const pool = require('./db');
 require('dotenv').config();
 
-if (!process.env.JWT_SECRET) {
-  console.error('FATAL: JWT_SECRET environment variable is not set!');
-  process.exit(1);
-}
-if (!process.env.DATABASE_URL) {
-  console.error('FATAL: DATABASE_URL environment variable is not set!');
-  process.exit(1);
-}
+if (!process.env.JWT_SECRET) { console.error('FATAL: JWT_SECRET not set'); process.exit(1); }
+if (!process.env.DATABASE_URL) { console.error('FATAL: DATABASE_URL not set'); process.exit(1); }
 
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '15mb' }));
-app.use(express.static(path.join(__dirname, '../frontend')));
 
-app.get('/master', (req, res) => res.redirect('/rou/'));
-app.get('/rou', (req, res) => res.redirect('/rou/'));
+// Serve frontend/rou as the root
+app.use(express.static(path.join(__dirname, '../frontend/rou')));
 
+// Auth redirect helpers
+app.get('/', (req, res) => res.redirect('/'));
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, '../frontend/rou/admin.html')));
+
+// API routes
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/audits', require('./routes/audit'));
 app.use('/api/team', require('./routes/team'));
 app.use('/api/rou', require('./routes/rou'));
 
-app.get('/api/health', (req, res) => res.json({ status: 'OK', service: 'master-audit-workflow' }));
+app.get('/api/health', (req, res) => res.json({ status: 'OK', service: 'KG Somani ROU Platform' }));
 
+// DB init
 const initDB = async () => {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
@@ -35,21 +33,9 @@ const initDB = async () => {
       name VARCHAR(100) NOT NULL,
       email VARCHAR(100) UNIQUE NOT NULL,
       password VARCHAR(255) NOT NULL,
-      role VARCHAR(50) DEFAULT 'auditor',
+      role VARCHAR(50) DEFAULT 'article',
+      status VARCHAR(20) DEFAULT 'active',
       created_at TIMESTAMP DEFAULT NOW()
-    );
-
-    CREATE TABLE IF NOT EXISTS audits (
-      id SERIAL PRIMARY KEY,
-      title VARCHAR(255) NOT NULL,
-      description TEXT,
-      department VARCHAR(100),
-      status VARCHAR(50) DEFAULT 'pending',
-      priority VARCHAR(50) DEFAULT 'medium',
-      assigned_to INT REFERENCES users(id) ON DELETE SET NULL,
-      created_by INT REFERENCES users(id) ON DELETE SET NULL,
-      created_at TIMESTAMP DEFAULT NOW(),
-      updated_at TIMESTAMP DEFAULT NOW()
     );
 
     CREATE TABLE IF NOT EXISTS rou_clients (
@@ -62,7 +48,6 @@ const initDB = async () => {
       prepared_by VARCHAR(255) DEFAULT '',
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
-
     CREATE INDEX IF NOT EXISTS idx_rou_clients_user ON rou_clients(user_id);
 
     CREATE TABLE IF NOT EXISTS rou_leases (
@@ -73,7 +58,6 @@ const initDB = async () => {
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
-
     CREATE INDEX IF NOT EXISTS idx_rou_leases_client ON rou_leases(client_id);
     CREATE INDEX IF NOT EXISTS idx_rou_leases_user ON rou_leases(user_id);
 
@@ -84,7 +68,6 @@ const initDB = async () => {
       payload JSONB NOT NULL DEFAULT '{}'::jsonb,
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
-
     CREATE INDEX IF NOT EXISTS idx_rou_audit_client ON rou_audit_logs(client_id);
 
     CREATE TABLE IF NOT EXISTS rou_overrides (
@@ -95,7 +78,6 @@ const initDB = async () => {
       payload JSONB NOT NULL DEFAULT '{}'::jsonb,
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
-
     CREATE INDEX IF NOT EXISTS idx_rou_overrides_client ON rou_overrides(client_id);
 
     CREATE TABLE IF NOT EXISTS rou_settings (
@@ -105,14 +87,18 @@ const initDB = async () => {
       last_client TEXT,
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
+
+    -- Add status column if upgrading from old schema
+    DO $$ BEGIN
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='status') THEN
+        ALTER TABLE users ADD COLUMN status VARCHAR(20) DEFAULT 'active';
+      END IF;
+    END $$;
   `);
-  console.log('✓ Database tables ready (AuditFlow + Master ROU).');
+  console.log('✓ Database ready.');
 };
 
-initDB().catch(err => {
-  console.error('FATAL: Cannot initialize database:', err.message);
-  process.exit(1);
-});
+initDB().catch(err => { console.error('FATAL DB init:', err.message); process.exit(1); });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Master Audit Workflow API on port ${PORT}`));
+app.listen(PORT, () => console.log(`KG Somani ROU Platform running on port ${PORT}`));
