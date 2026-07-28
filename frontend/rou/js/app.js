@@ -1,3 +1,14 @@
+/* ── Inline alert helper ── */
+function _inlineAlert(el, msg, type) {
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = type === 'success' ? '#f0fdf4' : '#fef2f2';
+  el.style.border     = '1.5px solid ' + (type === 'success' ? '#bbf7d0' : '#fecaca');
+  el.style.color      = type === 'success' ? '#065f46' : '#991b1b';
+  if (type === 'success') setTimeout(() => { el.style.display = 'none'; }, 3000);
+}
+
 /* ── Alert helper for profile view ── */
 function _pvAlert(el, msg, type) {
   if (!el) return;
@@ -324,185 +335,105 @@ window.App = {
   ══════════════════════════════════════════════════ */
 
   /* Which view was active before opening profile */
-  _profileFrom: null,
 
   openProfileView() {
-    this._profileFrom = document.getElementById('view-app').classList.contains('active') ? 'app'
-                      : document.getElementById('view-home').classList.contains('active') ? 'home'
-                      : 'home';
-    // Use .active class (controlled by .view CSS) — no inline style needed
-    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-    const pv = document.getElementById('view-profile');
-    if (pv) pv.classList.add('active');
-    this._populateProfileView();
+    // Profile is now embedded in the workspace home — just go there
+    this.goHome();
   },
 
   closeProfileView() {
-    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-    if (this._profileFrom === 'app' && this.currentClient) {
-      this.enterApp();
-    } else {
-      const vh = document.getElementById('view-home');
-      if (vh) vh.classList.add('active');
-      this.renderWorkspaceHome();
-    }
-    this._profileFrom = null;
+    this.goHome();
   },
 
-  _populateProfileView() {
-    let user = API.user();
-    if (!user) {
-      // Fallback: parse token directly
-      try { const t=localStorage.getItem('rou_token'); if(t){ const p=JSON.parse(atob(t.split('.')[1])); user={id:p.id,name:p.name,email:p.email,role:p.role}; localStorage.setItem('rou_user',JSON.stringify(user)); } } catch(e){}
-    }
+
+
+  
+
+
+
+  /* ── ACCOUNT CARD IN WS-HOME ─────────────────────────────────────── */
+  _populateAccountCard(user) {
     if (!user) return;
     const ROLE_COLORS = { admin:'#e8520a', partner:'#7c3aed', manager:'#1a3f6b', article:'#059669' };
     const ROLE_LABELS = { admin:'Administrator', partner:'Partner', manager:'Manager', article:'Article' };
     const color = ROLE_COLORS[user.role] || '#1a3f6b';
 
-    // Header
-    const av = document.getElementById('pv-avatar');
+    const av = document.getElementById('ws-profile-avatar');
     if (av) { av.textContent = (user.name||'?').charAt(0).toUpperCase(); av.style.background = color; }
-    const nn = document.getElementById('pv-name');        if (nn) nn.textContent = user.name || '';
-    const en = document.getElementById('pv-email');       if (en) en.textContent = user.email || '';
-    const rb = document.getElementById('pv-role-badge');  if (rb) rb.textContent = ROLE_LABELS[user.role] || user.role;
-    const tb = document.getElementById('pv-topbar-name'); if (tb) tb.textContent = user.name || '';
+    const nn = document.getElementById('ws-profile-name');  if (nn) nn.textContent = user.name || '';
+    const en = document.getElementById('ws-profile-email'); if (en) en.textContent = user.email || '';
+    const rb = document.getElementById('ws-profile-role');  if (rb) { rb.textContent = ROLE_LABELS[user.role]||user.role; }
 
-    // Inputs
-    const ni = document.getElementById('pv-name-input');  if (ni) ni.value = user.name || '';
-    const ei = document.getElementById('pv-email-input'); if (ei) ei.value = user.email || '';
-    const ri = document.getElementById('pv-role-input');  if (ri) ri.value = ROLE_LABELS[user.role] || user.role;
+    const ni = document.getElementById('ws-name-input'); if (ni) ni.value = user.name || '';
 
-    // Show Add Company button for non-articles
-    const addBtn = document.getElementById('pv-add-company-btn');
-    if (addBtn) addBtn.style.display = (user.role !== 'article') ? 'inline-flex' : 'none';
-    if (addBtn && user.role !== 'article') { addBtn.style.display = 'inline-flex'; }
+    // Show/hide add company + admin buttons based on role
+    const addBtn   = document.getElementById('ws-quick-add-company');
+    const adminBtn = document.getElementById('ws-quick-admin');
+    if (addBtn)   addBtn.style.display   = user.role === 'article' ? 'none' : 'flex';
+    if (adminBtn) adminBtn.style.display = user.role === 'admin'   ? 'flex' : 'none';
 
-    // Clear pw + alerts
-    ['pv-pw-current','pv-pw-new','pv-pw-confirm'].forEach(id => {
+    // Clear pw fields and close section
+    ['ws-pw-current','ws-pw-new','ws-pw-confirm'].forEach(id => {
       const el = document.getElementById(id); if (el) el.value = '';
     });
-    ['pv-details-alert','pv-pw-alert'].forEach(id => {
+    const pws = document.getElementById('ws-pw-section');
+    if (pws) pws.style.display = 'none';
+    const ch = document.getElementById('ws-pw-chevron');
+    if (ch) ch.style.transform = '';
+    ['ws-account-alert','ws-pw-alert'].forEach(id => {
       const el = document.getElementById(id); if (el) el.style.display = 'none';
     });
-
-    this._renderProfileCompanies();
   },
 
-  _renderProfileCompanies() {
-    const list  = document.getElementById('pv-companies-list');
-    const count = document.getElementById('pv-co-count');
-    if (!list) return;
-    const clients = DB.get('clients') || [];
-    if (count) count.textContent = clients.length + ' compan' + (clients.length === 1 ? 'y' : 'ies');
-
-    if (!clients.length) {
-      const user = API.user();
-      const isArt = user && user.role === 'article';
-      list.innerHTML = `<div style="text-align:center;padding:48px 20px;color:#94a3b8">
-        <div style="font-size:36px;margin-bottom:12px">${isArt ? '⏳' : '🏢'}</div>
-        <div style="font-size:13.5px;font-weight:600;color:#475569;margin-bottom:6px">${isArt ? 'No companies assigned yet' : 'No companies yet'}</div>
-        <div style="font-size:12px;line-height:1.6">${isArt ? 'Ask your manager or admin to assign you to a client company.' : 'Use "+ Add Company" above to create your first company.'}</div>
-      </div>`;
-      return;
-    }
-
-    const COLORS = ['#0a1e3d','#1a3f6b','#e8520a','#059669','#7c3aed','#d97706','#0891b2','#be123c'];
-    const current = this.currentClient;
-
-    list.innerHTML = clients.map((c, i) => {
-      const rous   = (DB.get('rous_' + c.id) || []).length;
-      const col    = COLORS[i % COLORS.length];
-      const init   = (c.name||'?').replace(/[^A-Za-z0-9 ]/g,'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase() || '?';
-      const active = current && current.id === c.id;
-      return `<div onclick="App._openCompanyFromProfile('${c.id}')" style="
-          display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:11px;
-          border:1.5px solid ${active ? '#e8520a' : '#e2e8f0'};
-          background:${active ? '#fff8f5' : '#fafbfc'};
-          margin-bottom:8px;cursor:pointer;transition:all 0.15s;
-          box-shadow:${active ? '0 0 0 3px rgba(232,82,10,0.08)' : 'none'}"
-        onmouseover="this.style.borderColor='${active ? '#e8520a' : '#0a1e3d'}';this.style.background='${active ? '#fff8f5' : '#f0f4f8'}'"
-        onmouseout="this.style.borderColor='${active ? '#e8520a' : '#e2e8f0'}';this.style.background='${active ? '#fff8f5' : '#fafbfc'}'">
-        <div style="width:42px;height:42px;border-radius:10px;background:${col};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;letter-spacing:-0.5px">${init}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:13.5px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name}</div>
-          <div style="font-size:11.5px;color:#94a3b8;margin-top:2px;display:flex;align-items:center;gap:6px">
-            <span>${c.code||'—'}</span>
-            <span style="width:3px;height:3px;border-radius:50%;background:#cbd5e1;display:inline-block"></span>
-            <span>${rous} ROU${rous!==1?'s':''}</span>
-          </div>
-        </div>
-        ${active
-          ? `<span style="flex-shrink:0;font-size:11px;font-weight:700;color:#e8520a;background:#fff3ee;padding:3px 10px;border-radius:20px;border:1px solid rgba(232,82,10,0.2);white-space:nowrap">● Active</span>`
-          : `<div style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#1a3f6b;background:#eff6ff;padding:5px 12px;border-radius:8px;border:1px solid #bfdbfe;white-space:nowrap">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></div>`
-        }
-      </div>`;
-    }).join('');
+  togglePwSection() {
+    const sec = document.getElementById('ws-pw-section');
+    const ch  = document.getElementById('ws-pw-chevron');
+    if (!sec) return;
+    const open = sec.style.display === 'none' || sec.style.display === '';
+    sec.style.display = open ? 'block' : 'none';
+    if (ch) ch.style.transform = open ? 'rotate(180deg)' : '';
   },
 
-    _openCompanyFromProfile(id) {
-    const clients = DB.get('clients') || [];
-    const client  = clients.find(c => c.id === id);
-    if (!client) { toast('Company not found', 'error'); return; }
-
-    // 1. Hide profile view
-    const pv = document.getElementById('view-profile');
-    if (pv) { pv.style.display = 'none'; pv.classList.remove('active'); }
-
-    // 2. Hide all views cleanly
-    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-
-    // 3. Set client and use enterApp() which initialises EVERYTHING
-    //    (sidebar name, sub, topbar period, showPage dashboard)
-    this.currentClient = client;
-    DB.set('last_client', id);
-    this.enterApp();
-    toast('Opened: ' + client.name, 'success');
-  },
-
-  async saveProfileView() {
-    const nameInput = document.getElementById('pv-name-input');
-    const alertEl   = document.getElementById('pv-details-alert');
-    const name = nameInput?.value.trim();
-    if (!name) { _pvAlert(alertEl,'Name cannot be empty.','error'); return; }
+  async saveNameInline() {
+    const input   = document.getElementById('ws-name-input');
+    const alertEl = document.getElementById('ws-account-alert');
+    const name    = input?.value.trim();
+    if (!name) { _inlineAlert(alertEl, 'Name cannot be empty.', 'error'); return; }
     try {
       const r = await fetch('/api/auth/profile', {
         method:'PUT', headers:{'Content-Type':'application/json','Authorization':'Bearer '+API.token()},
         body: JSON.stringify({ name })
       });
       const d = await r.json();
-      if (!r.ok) { _pvAlert(alertEl, d.error||'Update failed.','error'); return; }
+      if (!r.ok) { _inlineAlert(alertEl, d.error||'Update failed.', 'error'); return; }
       localStorage.setItem('rou_token', d.token);
       localStorage.setItem('rou_user', JSON.stringify(d.user));
-      _pvAlert(alertEl,'Name updated successfully!','success');
+      _inlineAlert(alertEl, '✓ Name updated!', 'success');
       _refreshUserDisplay(d.user);
-      // Update profile view header
-      const pn = document.getElementById('pv-name'); if (pn) pn.textContent = d.user.name;
-      const av = document.getElementById('pv-avatar'); if (av) av.textContent = d.user.name.charAt(0).toUpperCase();
-      const tb = document.getElementById('pv-topbar-name'); if (tb) tb.textContent = d.user.name;
-    } catch(e) { _pvAlert(alertEl,'Network error. Try again.','error'); }
+      this._populateAccountCard(d.user);
+    } catch(e) { _inlineAlert(alertEl, 'Network error.', 'error'); }
   },
 
-  async changePasswordView() {
-    const cur  = document.getElementById('pv-pw-current')?.value;
-    const nw   = document.getElementById('pv-pw-new')?.value;
-    const conf = document.getElementById('pv-pw-confirm')?.value;
-    const alertEl = document.getElementById('pv-pw-alert');
-    if (!cur||!nw||!conf) { _pvAlert(alertEl,'All three fields are required.','error'); return; }
-    if (nw.length < 8)    { _pvAlert(alertEl,'New password must be at least 8 characters.','error'); return; }
-    if (nw !== conf)       { _pvAlert(alertEl,'New passwords do not match.','error'); return; }
+  async changePasswordInline() {
+    const cur     = document.getElementById('ws-pw-current')?.value;
+    const nw      = document.getElementById('ws-pw-new')?.value;
+    const conf    = document.getElementById('ws-pw-confirm')?.value;
+    const alertEl = document.getElementById('ws-pw-alert');
+    if (!cur||!nw||!conf) { _inlineAlert(alertEl, 'All three fields required.', 'error'); return; }
+    if (nw.length < 8)    { _inlineAlert(alertEl, 'New password must be at least 8 characters.', 'error'); return; }
+    if (nw !== conf)       { _inlineAlert(alertEl, 'Passwords do not match.', 'error'); return; }
     try {
       const r = await fetch('/api/auth/change-password', {
         method:'PUT', headers:{'Content-Type':'application/json','Authorization':'Bearer '+API.token()},
         body: JSON.stringify({ currentPassword:cur, newPassword:nw })
       });
       const d = await r.json();
-      if (!r.ok) { _pvAlert(alertEl, d.error||'Failed.','error'); return; }
-      _pvAlert(alertEl,'Password changed successfully! Please remember your new password.','success');
-      ['pv-pw-current','pv-pw-new','pv-pw-confirm'].forEach(id => {
+      if (!r.ok) { _inlineAlert(alertEl, d.error||'Failed.', 'error'); return; }
+      _inlineAlert(alertEl, '✓ Password changed!', 'success');
+      ['ws-pw-current','ws-pw-new','ws-pw-confirm'].forEach(id => {
         const el = document.getElementById(id); if (el) el.value = '';
       });
-    } catch(e) { _pvAlert(alertEl,'Network error. Try again.','error'); }
+    } catch(e) { _inlineAlert(alertEl, 'Network error.', 'error'); }
   },
 
   /* ── ADMIN LOGIN (ROU admin panel inside app) ────────────── */
