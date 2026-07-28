@@ -1795,114 +1795,96 @@ function profileAlert(tab, msg, type) {
 </script>
 
 
-<!-- ══════════════════════════════════════
-     VIEW 3: PROFILE
-══════════════════════════════════════ -->
-<div id="view-profile" class="view" style="background:#f0f4f8;min-height:100vh;display:none;flex-direction:column;font-family:'Poppins',-apple-system,sans-serif">
+<!-- VIEW 3: PROFILE -->
+<div id="view-profile" style="display:none;min-height:100vh;background:#f0f4f8;flex-direction:column;font-family:'Poppins',-apple-system,sans-serif">
 
-  <!-- TOP NAV -->
-  <div style="background:#0a1e3d;height:58px;display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,0.25)">
-    <button onclick="App.closeProfileView()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+  <!-- TOPBAR -->
+  <div style="background:#0a1e3d;height:56px;display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,0.22)">
+    <button onclick="App.closeProfileView()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 13px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.14);color:rgba(255,255,255,0.85);border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back
     </button>
-    <span style="font-size:15px;font-weight:700;color:#fff;flex:1;letter-spacing:-0.2px">My Profile</span>
+    <span style="font-size:15px;font-weight:700;color:#fff;flex:1">My Profile</span>
     <span id="pv-topbar-name" style="font-size:12px;color:rgba(255,255,255,0.4)"></span>
   </div>
 
-  <!-- BODY -->
-  <div style="flex:1;overflow-y:auto;padding:28px 24px">
-    <div style="max-width:960px;margin:0 auto;display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start">
+  <!-- SCROLLABLE BODY -->
+  <div style="flex:1;overflow-y:auto;padding:20px 16px 32px;box-sizing:border-box">
+    <div style="max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px">
 
-      <!-- LEFT: Account + Password -->
-      <div style="display:flex;flex-direction:column;gap:16px">
-
-        <!-- Account card -->
-        <div style="background:#fff;border-radius:14px;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow:hidden">
-          <!-- Card header gradient -->
-          <div style="background:linear-gradient(135deg,#0a1e3d 0%,#162f5a 100%);padding:20px 20px 18px">
-            <div style="display:flex;align-items:center;gap:13px">
-              <div id="pv-avatar" style="width:50px;height:50px;border-radius:12px;background:#e8520a;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.3)">?</div>
-              <div style="min-width:0">
-                <div id="pv-name" style="font-size:15px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-                <div id="pv-email" style="font-size:11.5px;color:rgba(255,255,255,0.5);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-                <div id="pv-role-badge" style="display:inline-flex;margin-top:6px;padding:2px 10px;border-radius:20px;font-size:10.5px;font-weight:700;background:rgba(255,255,255,0.14);color:rgba(255,255,255,0.9)"></div>
-              </div>
-            </div>
-          </div>
-          <!-- Edit fields -->
-          <div style="padding:18px 20px 20px">
-            <div id="pv-details-alert" style="display:none;border-radius:8px;padding:10px 13px;font-size:12.5px;margin-bottom:14px;line-height:1.5"></div>
-            <div style="margin-bottom:14px">
-              <label style="display:block;font-size:10.5px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Display Name</label>
-              <input id="pv-name-input" type="text" placeholder="Your full name" style="width:100%;padding:10px 12px;font-size:13.5px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b';this.style.boxShadow='0 0 0 3px rgba(26,63,107,0.08)'" onblur="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'">
-            </div>
-            <div style="margin-bottom:14px">
-              <label style="display:block;font-size:10.5px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Email Address</label>
-              <input id="pv-email-input" type="email" disabled style="width:100%;padding:10px 12px;font-size:13.5px;background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:8px;color:#94a3b8;cursor:not-allowed;font-family:inherit;box-sizing:border-box">
-              <div style="font-size:11px;color:#94a3b8;margin-top:4px">Email cannot be changed. Contact admin if needed.</div>
-            </div>
-            <div style="margin-bottom:18px">
-              <label style="display:block;font-size:10.5px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Role</label>
-              <input id="pv-role-input" type="text" disabled style="width:100%;padding:10px 12px;font-size:13.5px;background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:8px;color:#64748b;cursor:not-allowed;font-family:inherit;box-sizing:border-box">
-              <div style="font-size:11px;color:#94a3b8;margin-top:4px">Roles are assigned by the Administrator.</div>
-            </div>
-            <button onclick="App.saveProfileView()" style="width:100%;padding:11px;background:linear-gradient(135deg,#0a1e3d,#1a3f6b);color:#fff;border:none;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.1px;transition:opacity 0.15s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Save Changes</button>
-          </div>
-        </div>
-
-        <!-- Change password card -->
-        <div style="background:#fff;border-radius:14px;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,0.06);padding:18px 20px">
-          <div style="font-size:13.5px;font-weight:700;color:#0f172a;margin-bottom:16px;display:flex;align-items:center;gap:8px">
-            <div style="width:28px;height:28px;border-radius:7px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:14px">🔒</div>
-            Change Password
-          </div>
-          <div id="pv-pw-alert" style="display:none;border-radius:8px;padding:10px 13px;font-size:12.5px;margin-bottom:14px;line-height:1.5"></div>
-          <div style="margin-bottom:12px">
-            <label style="display:block;font-size:10.5px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Current Password</label>
-            <input id="pv-pw-current" type="password" placeholder="Enter current password" style="width:100%;padding:10px 12px;font-size:13.5px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
-          </div>
-          <div style="margin-bottom:12px">
-            <label style="display:block;font-size:10.5px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">New Password</label>
-            <input id="pv-pw-new" type="password" placeholder="Min. 8 characters" style="width:100%;padding:10px 12px;font-size:13.5px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
-          </div>
-          <div style="margin-bottom:18px">
-            <label style="display:block;font-size:10.5px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Confirm New Password</label>
-            <input id="pv-pw-confirm" type="password" placeholder="Repeat new password" style="width:100%;padding:10px 12px;font-size:13.5px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
-          </div>
-          <button onclick="App.changePasswordView()" style="width:100%;padding:11px;background:#0a1e3d;color:#fff;border:none;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s" onmouseover="this.style.background='#162f5a'" onmouseout="this.style.background='#0a1e3d'">Update Password</button>
-        </div>
-
-        <!-- Sign Out -->
-        <button onclick="App.signOut()" style="width:100%;padding:11px;background:#fff;color:#dc2626;border:1.5px solid #fecaca;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='#fff'">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-          Sign Out
-        </button>
-
-      </div><!-- end left col -->
-
-      <!-- RIGHT: Companies -->
+      <!-- USER CARD -->
       <div style="background:#fff;border-radius:14px;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow:hidden">
+        <div style="background:linear-gradient(135deg,#0a1e3d 0%,#162f5a 100%);padding:18px 18px 16px;display:flex;align-items:center;gap:13px">
+          <div id="pv-avatar" style="width:48px;height:48px;border-radius:12px;background:#e8520a;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.25)">?</div>
+          <div style="min-width:0">
+            <div id="pv-name" style="font-size:15px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+            <div id="pv-email" style="font-size:11.5px;color:rgba(255,255,255,0.5);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+            <div id="pv-role-badge" style="display:inline-flex;margin-top:6px;padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:700;background:rgba(255,255,255,0.13);color:rgba(255,255,255,0.88)"></div>
+          </div>
+        </div>
+        <div style="padding:16px 18px">
+          <div id="pv-details-alert" style="display:none;border-radius:8px;padding:9px 12px;font-size:12.5px;margin-bottom:12px;line-height:1.5"></div>
+          <div style="margin-bottom:11px">
+            <label style="display:block;font-size:10px;font-weight:700;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px">Display Name</label>
+            <input id="pv-name-input" type="text" placeholder="Your full name" style="width:100%;padding:9px 12px;font-size:13.5px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px">Email</label>
+              <input id="pv-email-input" type="email" disabled style="width:100%;padding:9px 12px;font-size:13px;background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:8px;color:#94a3b8;cursor:not-allowed;font-family:inherit;box-sizing:border-box">
+            </div>
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px">Role</label>
+              <input id="pv-role-input" type="text" disabled style="width:100%;padding:9px 12px;font-size:13px;background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:8px;color:#64748b;cursor:not-allowed;font-family:inherit;box-sizing:border-box">
+            </div>
+          </div>
+          <button onclick="App.saveProfileView()" style="width:100%;padding:10px;background:linear-gradient(135deg,#0a1e3d,#1a3f6b);color:#fff;border:none;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity 0.15s" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">Save Changes</button>
+        </div>
+      </div>
 
-        <!-- Companies header -->
-        <div style="padding:16px 20px 14px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <!-- CHANGE PASSWORD -->
+      <div style="background:#fff;border-radius:14px;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,0.06);padding:16px 18px">
+        <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:13px;display:flex;align-items:center;gap:8px">
+          <div style="width:26px;height:26px;border-radius:7px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:13px">🔒</div>
+          Change Password
+        </div>
+        <div id="pv-pw-alert" style="display:none;border-radius:8px;padding:9px 12px;font-size:12.5px;margin-bottom:12px;line-height:1.5"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:13px">
           <div>
-            <div style="font-size:14px;font-weight:700;color:#0f172a">My Companies</div>
-            <div style="font-size:12px;color:#94a3b8;margin-top:2px">Click any company to open it</div>
+            <label style="display:block;font-size:10px;font-weight:700;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px">Current</label>
+            <input id="pv-pw-current" type="password" placeholder="Current password" style="width:100%;padding:9px 12px;font-size:13px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
+          </div>
+          <div>
+            <label style="display:block;font-size:10px;font-weight:700;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px">New</label>
+            <input id="pv-pw-new" type="password" placeholder="Min. 8 chars" style="width:100%;padding:9px 12px;font-size:13px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
+          </div>
+          <div>
+            <label style="display:block;font-size:10px;font-weight:700;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px">Confirm</label>
+            <input id="pv-pw-confirm" type="password" placeholder="Repeat" style="width:100%;padding:9px 12px;font-size:13px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
+          </div>
+        </div>
+        <button onclick="App.changePasswordView()" style="width:100%;padding:10px;background:#0a1e3d;color:#fff;border:none;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s" onmouseover="this.style.background='#162f5a'" onmouseout="this.style.background='#0a1e3d'">Update Password</button>
+      </div>
+
+      <!-- MY COMPANIES -->
+      <div style="background:#fff;border-radius:14px;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow:hidden">
+        <div style="padding:14px 18px 12px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#0f172a">My Companies</div>
+            <div style="font-size:11.5px;color:#94a3b8;margin-top:1px">Click to open</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <span id="pv-co-count" style="font-size:11.5px;font-weight:600;color:#64748b;background:#f1f5f9;padding:3px 10px;border-radius:20px">0 companies</span>
-            <button id="pv-add-company-btn" onclick="App.closeProfileView();setTimeout(()=>Modal.openAddClient(),150)" style="display:none;padding:6px 13px;background:#0a1e3d;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.15s;align-items:center;gap:5px" onmouseover="this.style.background='#1a3f6b'" onmouseout="this.style.background='#0a1e3d'">
-              + Add Company
-            </button>
+            <span id="pv-co-count" style="font-size:11px;font-weight:600;color:#64748b;background:#f1f5f9;padding:2px 9px;border-radius:20px"></span>
+            <button id="pv-add-company-btn" onclick="App.closeProfileView();setTimeout(()=>Modal.openAddClient(),200)" style="display:none;padding:6px 12px;background:#0a1e3d;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s;white-space:nowrap" onmouseover="this.style.background='#1a3f6b'" onmouseout="this.style.background='#0a1e3d'">+ Add</button>
           </div>
         </div>
+        <div id="pv-companies-list" style="padding:10px 10px 6px"></div>
+      </div>
 
-        <!-- Companies list -->
-        <div id="pv-companies-list" style="padding:12px;min-height:180px;max-height:calc(100vh - 280px);overflow-y:auto">
-          <div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px">Loading…</div>
-        </div>
-
-      </div><!-- end right col -->
+      <!-- SIGN OUT -->
+      <button onclick="App.signOut()" style="width:100%;padding:11px;background:#fff;color:#dc2626;border:1.5px solid #fecaca;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:8px;box-sizing:border-box" onmouseover="this.style.background='#fef2f2';this.style.borderColor='#f87171'" onmouseout="this.style.background='#fff';this.style.borderColor='#fecaca'">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Sign Out
+      </button>
 
     </div>
   </div>
