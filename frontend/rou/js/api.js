@@ -1,6 +1,6 @@
 /**
- * API client for Master Audit Workflow (Render / local Node backend).
- * Uses same-origin `/api` in production; falls back to localStorage token auth.
+ * API client — KG Somani ROU Platform
+ * Token key: rou_token (aligned with login/register pages)
  */
 window.API = {
   base: (() => {
@@ -11,18 +11,31 @@ window.API = {
   })(),
 
   token() {
-    return localStorage.getItem('token') || '';
+    return localStorage.getItem('rou_token') || '';
   },
 
   user() {
-    try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; }
+    try { return JSON.parse(localStorage.getItem('rou_user') || 'null'); } catch { return null; }
   },
 
-  requireAuth(redirectTo) {
-    if (this.token()) return true;
-    const next = encodeURIComponent(redirectTo || (location.pathname + location.search));
-    location.href = '../login.html?next=' + next;
-    return false;
+  requireAuth() {
+    const token = this.token();
+    if (!token) { window.location.replace('login.html'); return false; }
+    try {
+      const p = JSON.parse(atob(token.split('.')[1]));
+      if (p.exp * 1000 < Date.now()) {
+        localStorage.removeItem('rou_token');
+        localStorage.removeItem('rou_user');
+        window.location.replace('login.html');
+        return false;
+      }
+    } catch(e) {
+      localStorage.removeItem('rou_token');
+      localStorage.removeItem('rou_user');
+      window.location.replace('login.html');
+      return false;
+    }
+    return true;
   },
 
   async request(method, path, body) {
@@ -38,10 +51,9 @@ window.API = {
     });
 
     if (res.status === 401 || res.status === 403) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      const next = encodeURIComponent(location.pathname + location.search);
-      location.href = '../login.html?next=' + next;
+      localStorage.removeItem('rou_token');
+      localStorage.removeItem('rou_user');
+      window.location.replace('login.html');
       throw new Error('Session expired. Please sign in again.');
     }
 
@@ -53,8 +65,8 @@ window.API = {
     return data;
   },
 
-  get(path) { return this.request('GET', path); },
-  put(path, body) { return this.request('PUT', path, body); },
+  get(path)        { return this.request('GET', path); },
+  put(path, body)  { return this.request('PUT', path, body); },
   post(path, body) { return this.request('POST', path, body); },
-  del(path) { return this.request('DELETE', path); }
+  del(path)        { return this.request('DELETE', path); }
 };
