@@ -1,3 +1,14 @@
+/* ── Standalone alert helper for profile page ── */
+function _pageAlert(el, msg, type) {
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = type === 'success' ? '#f0fdf4' : '#fef2f2';
+  el.style.border     = '1.5px solid ' + (type === 'success' ? '#bbf7d0' : '#fecaca');
+  el.style.color      = type === 'success' ? '#065f46' : '#991b1b';
+  if (type === 'success') setTimeout(function() { el.style.display = 'none'; }, 3000);
+}
+
 /* ── Standalone helper: update sidebar + topbar user pill ── */
 function _refreshUserDisplay(user) {
   if (!user) { try { user = JSON.parse(localStorage.getItem('rou_user')||'null'); } catch(e) {} }
@@ -226,7 +237,7 @@ window.App = {
   },
 
   showPage(page) {
-    ['dashboard','rous','add-rou','schedule','export','audit','bulk-import','reassess-override'].forEach(p => {
+    ['dashboard','rous','add-rou','schedule','export','audit','bulk-import','reassess-override','profile'].forEach(p => {
       const el = document.getElementById('page-' + p);
       if (el) el.style.display = 'none';
     });
@@ -235,7 +246,7 @@ window.App = {
     document.querySelectorAll('.nav-item').forEach(el => {
       el.classList.toggle('active', el.dataset.page === page);
     });
-    const titles = { dashboard:'Dashboard', rous:'All ROUs', 'add-rou':'Add ROU', schedule:'Schedule', export:'Export to Excel', audit:'Audit Log', 'bulk-import':'Bulk Import', 'reassess-override':'Reassessment Override' };
+    const titles = { dashboard:'Dashboard', rous:'All ROUs', 'add-rou':'Add ROU', schedule:'Schedule', export:'Export to Excel', audit:'Audit Log', 'bulk-import':'Bulk Import', 'reassess-override':'Reassessment Override', profile:'My Profile' };
     const tb = document.getElementById('topbar-title');
     if (tb) tb.textContent = titles[page] || page;
     if (page === 'dashboard') this.renderDashboard();
@@ -244,6 +255,7 @@ window.App = {
     if (page === 'export')    this.prepareExport();
     if (page === 'audit')     AuditLog.render();
     if (page === 'reassess-override') ReassessOverride.render();
+    if (page === 'profile')   this.renderProfilePage();
     document.querySelector('.main-content')?.scrollTo(0,0);
   },
 
@@ -350,6 +362,150 @@ window.App = {
         const el = document.getElementById(id); if (el) el.value = '';
       });
     } catch (e) { profileAlert('password','Network error. Try again.','error'); }
+  },
+
+
+  /* ── PROFILE PAGE ──────────────────────────────────────────────────────── */
+  renderProfilePage() {
+    const user = API.user();
+    if (!user) return;
+    const ROLE_COLORS = { admin:'#e8520a', partner:'#7c3aed', manager:'#1a3f6b', article:'#059669' };
+    const ROLE_LABELS = { admin:'Administrator', partner:'Partner', manager:'Manager', article:'Article' };
+    const color = ROLE_COLORS[user.role] || '#1a3f6b';
+
+    // Avatar + header
+    const av = document.getElementById('profile-page-avatar');
+    if (av) { av.textContent = (user.name||'?').charAt(0).toUpperCase(); av.style.background = color; }
+    const pn = document.getElementById('profile-page-name');   if (pn) pn.textContent = user.name || '';
+    const pe = document.getElementById('profile-page-email');  if (pe) pe.textContent = user.email || '';
+    const rb = document.getElementById('profile-page-role-badge');
+    if (rb) {
+      rb.textContent = ROLE_LABELS[user.role] || user.role;
+      rb.style.cssText = `background:${color}18;color:${color};display:inline-flex;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-top:5px`;
+    }
+    // Inputs
+    const ni = document.getElementById('profile-page-name-input');   if (ni) ni.value = user.name || '';
+    const ei = document.getElementById('profile-page-email-input');  if (ei) ei.value = user.email || '';
+    const ri = document.getElementById('profile-page-role-input');   if (ri) ri.value = ROLE_LABELS[user.role] || user.role;
+    // Clear pw fields + alerts
+    ['profile-page-pw-current','profile-page-pw-new','profile-page-pw-confirm'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    ['profile-page-alert','profile-pw-page-alert'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.style.display = 'none';
+    });
+
+    // Companies list
+    this.renderProfileCompanies();
+  },
+
+  renderProfileCompanies() {
+    const list  = document.getElementById('profile-companies-list');
+    const count = document.getElementById('profile-companies-count');
+    if (!list) return;
+    const clients = DB.get('clients') || [];
+    if (count) count.textContent = clients.length + ' compan' + (clients.length === 1 ? 'y' : 'ies');
+
+    if (!clients.length) {
+      const user = API.user();
+      const isArt = user && user.role === 'article';
+      list.innerHTML = `<div style="text-align:center;padding:36px 20px;color:var(--text3)">
+        <div style="font-size:28px;margin-bottom:10px">${isArt ? '⏳' : '🏢'}</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px">${isArt ? 'No companies assigned' : 'No companies yet'}</div>
+        <div style="font-size:12px">${isArt ? 'Ask your manager or admin to assign you to a company.' : 'Go back to the workspace to add your first company.'}</div>
+      </div>`;
+      return;
+    }
+
+    const COLORS = ['#0f2a47','#1a3f6b','#e8520a','#059669','#7c3aed','#d97706','#0891b2','#be123c'];
+    const current = this.currentClient;
+
+    list.innerHTML = clients.map((c, i) => {
+      const rous    = (DB.get('rous_' + c.id) || []).length;
+      const col     = COLORS[i % COLORS.length];
+      const init    = (c.name||'?').replace(/[^A-Za-z0-9 ]/g,'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase() || '?';
+      const active  = current && current.id === c.id;
+      return `<div onclick="App.switchToCompany('${c.id}')" style="
+          display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;
+          border:1.5px solid ${active ? 'var(--accent)' : 'var(--border)'};
+          background:${active ? '#fff3ee' : '#fff'};margin-bottom:8px;transition:all 0.15s;
+        " onmouseover="if(!${active}) this.style.borderColor='#94a3b8'" onmouseout="if(!${active}) this.style.borderColor='var(--border)'">
+        <div style="width:38px;height:38px;border-radius:9px;background:${col};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0">${init}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13.5px;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name}</div>
+          <div style="font-size:11.5px;color:var(--text3);margin-top:2px">${c.code || '—'} · ${rous} ROU${rous!==1?'s':''}</div>
+        </div>
+        ${active
+          ? '<span style="font-size:11px;font-weight:700;color:var(--accent);background:#fff3ee;padding:3px 9px;border-radius:20px;border:1px solid rgba(232,82,10,0.25);flex-shrink:0">Current</span>'
+          : '<svg style="flex-shrink:0;color:#cbd5e1" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>'
+        }
+      </div>`;
+    }).join('');
+  },
+
+  switchToCompany(id) {
+    const clients = DB.get('clients') || [];
+    const client  = clients.find(c => c.id === id);
+    if (!client) { toast('Company not found', 'error'); return; }
+    this.currentClient = client;
+    DB.set('last_client', id);
+    // Update sidebar active company label
+    const sn = document.getElementById('sidebar-client-name'); if (sn) sn.textContent = client.name;
+    const rous = DB.get('rous_' + client.id) || [];
+    const ss = document.getElementById('sidebar-client-sub'); if (ss) ss.textContent = `${rous.length} ROU${rous.length!==1?'s':''}`;
+    // Navigate to dashboard
+    this.showPage('dashboard');
+    toast('Switched to ' + client.name, 'success');
+  },
+
+  /* ── PROFILE SAVE (works from both page fields and modal fields) ──────── */
+  async saveProfile() {
+    // Try page fields first, fall back to modal fields
+    const nameInput = document.getElementById('profile-page-name-input') ||
+                      document.getElementById('profile-name-input');
+    const alertEl   = document.getElementById('profile-page-alert') ||
+                      document.getElementById('profile-details-alert');
+    const name = nameInput?.value.trim();
+    if (!name) { _pageAlert(alertEl, 'Name cannot be empty.', 'error'); return; }
+    try {
+      const r = await fetch('/api/auth/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+API.token() },
+        body: JSON.stringify({ name })
+      });
+      const d = await r.json();
+      if (!r.ok) { _pageAlert(alertEl, d.error||'Update failed.', 'error'); return; }
+      localStorage.setItem('rou_token', d.token);
+      localStorage.setItem('rou_user', JSON.stringify(d.user));
+      _pageAlert(alertEl, 'Name updated successfully!', 'success');
+      _refreshUserDisplay(d.user);
+      // Update page header live
+      const pn = document.getElementById('profile-page-name'); if (pn) pn.textContent = d.user.name;
+      const av = document.getElementById('profile-page-avatar'); if (av) av.textContent = d.user.name.charAt(0).toUpperCase();
+    } catch(e) { _pageAlert(alertEl, 'Network error. Try again.', 'error'); }
+  },
+
+  /* ── CHANGE PASSWORD (works from both page fields and modal fields) ────── */
+  async changePassword() {
+    const curEl   = document.getElementById('profile-page-pw-current')  || document.getElementById('profile-pw-current');
+    const newEl   = document.getElementById('profile-page-pw-new')      || document.getElementById('profile-pw-new');
+    const confEl  = document.getElementById('profile-page-pw-confirm')  || document.getElementById('profile-pw-confirm');
+    const alertEl = document.getElementById('profile-pw-page-alert')    || document.getElementById('profile-pw-alert');
+    const cur = curEl?.value, nw = newEl?.value, conf = confEl?.value;
+    if (!cur||!nw||!conf) { _pageAlert(alertEl, 'All fields are required.', 'error'); return; }
+    if (nw.length < 8)    { _pageAlert(alertEl, 'New password must be at least 8 characters.', 'error'); return; }
+    if (nw !== conf)       { _pageAlert(alertEl, 'New passwords do not match.', 'error'); return; }
+    try {
+      const r = await fetch('/api/auth/change-password', {
+        method: 'PUT',
+        headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+API.token() },
+        body: JSON.stringify({ currentPassword:cur, newPassword:nw })
+      });
+      const d = await r.json();
+      if (!r.ok) { _pageAlert(alertEl, d.error||'Failed.', 'error'); return; }
+      _pageAlert(alertEl, 'Password changed successfully!', 'success');
+      [curEl, newEl, confEl].forEach(el => { if (el) el.value = ''; });
+    } catch(e) { _pageAlert(alertEl, 'Network error. Try again.', 'error'); }
   },
 
   /* ── ADMIN LOGIN (ROU admin panel inside app) ────────────── */
