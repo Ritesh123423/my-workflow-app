@@ -10,7 +10,7 @@ app.use(express.static('../frontend'));
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/audits', require('./routes/audits'));
+app.use('/api/audits', require('./routes/audit'));
 app.use('/api/team', require('./routes/team'));
 
 // Health check
