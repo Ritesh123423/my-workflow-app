@@ -10,22 +10,15 @@ if (!process.env.DATABASE_URL) { console.error('FATAL: DATABASE_URL not set'); p
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '15mb' }));
-
-// Serve frontend/rou as the root
 app.use(express.static(path.join(__dirname, '../frontend/rou')));
-
-// Auth redirect helpers
-app.get('/', (req, res) => res.redirect('/'));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, '../frontend/rou/admin.html')));
 
-// API routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/team', require('./routes/team'));
 app.use('/api/rou', require('./routes/rou'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'OK', service: 'KG Somani ROU Platform' }));
 
-// DB init
 const initDB = async () => {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
@@ -38,6 +31,13 @@ const initDB = async () => {
       created_at TIMESTAMP DEFAULT NOW()
     );
 
+    -- Idempotent column additions
+    DO $$ BEGIN
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='status') THEN
+        ALTER TABLE users ADD COLUMN status VARCHAR(20) DEFAULT 'active';
+      END IF;
+    END $$;
+
     CREATE TABLE IF NOT EXISTS rou_clients (
       id TEXT PRIMARY KEY,
       user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -49,6 +49,18 @@ const initDB = async () => {
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
     CREATE INDEX IF NOT EXISTS idx_rou_clients_user ON rou_clients(user_id);
+
+    -- Client assignments: which users can access which clients
+    CREATE TABLE IF NOT EXISTS client_assignments (
+      id SERIAL PRIMARY KEY,
+      client_id TEXT NOT NULL REFERENCES rou_clients(id) ON DELETE CASCADE,
+      user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      assigned_by INT REFERENCES users(id) ON DELETE SET NULL,
+      assigned_at TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(client_id, user_id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_ca_client ON client_assignments(client_id);
+    CREATE INDEX IF NOT EXISTS idx_ca_user ON client_assignments(user_id);
 
     CREATE TABLE IF NOT EXISTS rou_leases (
       id TEXT PRIMARY KEY,
@@ -87,18 +99,11 @@ const initDB = async () => {
       last_client TEXT,
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
-
-    -- Add status column if upgrading from old schema
-    DO $$ BEGIN
-      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='status') THEN
-        ALTER TABLE users ADD COLUMN status VARCHAR(20) DEFAULT 'active';
-      END IF;
-    END $$;
   `);
-  console.log('✓ Database ready.');
+  console.log('✓ Database ready (with client_assignments).');
 };
 
 initDB().catch(err => { console.error('FATAL DB init:', err.message); process.exit(1); });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`KG Somani ROU Platform running on port ${PORT}`));
+app.listen(PORT, () => console.log(`KG Somani ROU Platform on port ${PORT}`));
