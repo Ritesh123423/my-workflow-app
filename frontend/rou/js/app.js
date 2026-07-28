@@ -229,14 +229,9 @@ window.App = {
   },
 
   enterApp() {
-    // Hide every view first
-    ['view-home', 'view-profile'].forEach(vid => {
-      const el = document.getElementById(vid);
-      if (el) { el.classList.remove('active'); el.style.display = ''; }
-    });
-    // Show view-app
+    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
     const va = document.getElementById('view-app');
-    if (va) { va.classList.add('active'); va.style.display = ''; }
+    if (va) va.classList.add('active');
 
     // Sidebar
     const sn = document.getElementById('sidebar-client-name');
@@ -258,7 +253,7 @@ window.App = {
   },
 
   goHome() {
-    document.getElementById('view-app').classList.remove('active');
+    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
     document.getElementById('view-home').classList.add('active');
     DB.remove('last_client');
     this.currentClient = null;
@@ -335,32 +330,20 @@ window.App = {
     this._profileFrom = document.getElementById('view-app').classList.contains('active') ? 'app'
                       : document.getElementById('view-home').classList.contains('active') ? 'home'
                       : 'home';
-    // Hide all views
-    ['view-home','view-app','view-profile'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) { el.classList.remove('active'); el.style.display = 'none'; }
-    });
+    // Use .active class (controlled by .view CSS) — no inline style needed
+    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
     const pv = document.getElementById('view-profile');
-    if (pv) { pv.style.display = 'flex'; pv.classList.add('active'); }
+    if (pv) pv.classList.add('active');
     this._populateProfileView();
   },
 
   closeProfileView() {
-    // Hide profile
-    const pv = document.getElementById('view-profile');
-    if (pv) { pv.style.display = 'none'; pv.classList.remove('active'); }
-
+    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
     if (this._profileFrom === 'app' && this.currentClient) {
-      // Return to company workspace — use enterApp so everything re-initialises
       this.enterApp();
     } else {
-      // Return to workspace home
-      ['view-app', 'view-profile'].forEach(vid => {
-        const el = document.getElementById(vid);
-        if (el) { el.classList.remove('active'); el.style.display = ''; }
-      });
       const vh = document.getElementById('view-home');
-      if (vh) { vh.classList.add('active'); vh.style.display = ''; }
+      if (vh) vh.classList.add('active');
       this.renderWorkspaceHome();
     }
     this._profileFrom = null;
@@ -467,10 +450,7 @@ window.App = {
     if (pv) { pv.style.display = 'none'; pv.classList.remove('active'); }
 
     // 2. Hide all views cleanly
-    ['view-home', 'view-app', 'view-profile'].forEach(vid => {
-      const el = document.getElementById(vid);
-      if (el) { el.classList.remove('active'); el.style.display = ''; }
-    });
+    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
 
     // 3. Set client and use enterApp() which initialises EVERYTHING
     //    (sidebar name, sub, topbar period, showPage dashboard)
