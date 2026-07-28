@@ -229,13 +229,31 @@ window.App = {
   },
 
   enterApp() {
-    document.getElementById('view-home').classList.remove('active');
-    document.getElementById('view-app').classList.add('active');
-    document.getElementById('sidebar-client-name').textContent = this.currentClient.name;
+    // Hide every view first
+    ['view-home', 'view-profile'].forEach(vid => {
+      const el = document.getElementById(vid);
+      if (el) { el.classList.remove('active'); el.style.display = ''; }
+    });
+    // Show view-app
+    const va = document.getElementById('view-app');
+    if (va) { va.classList.add('active'); va.style.display = ''; }
+
+    // Sidebar
+    const sn = document.getElementById('sidebar-client-name');
+    if (sn) sn.textContent = this.currentClient.name;
     const rous = DB.get('rous_' + this.currentClient.id) || [];
-    document.getElementById('sidebar-client-sub').textContent = `${rous.length} ROU${rous.length!==1?'s':''}`;
+    const ss = document.getElementById('sidebar-client-sub');
+    if (ss) ss.textContent = `${rous.length} ROU${rous.length!==1?'s':''}`;
+
+    // Topbar period
     const s = DB.get('settings') || {};
-    document.getElementById('topbar-period').textContent = s.periodShort || (s.period ? Utils.fmtDate(s.period) : 'Set Period');
+    const tp = document.getElementById('topbar-period');
+    if (tp) tp.textContent = s.periodShort || (s.period ? Utils.fmtDate(s.period) : 'Set Period');
+
+    // Update sidebar user pill
+    _refreshUserDisplay(API.user());
+
+    // Render dashboard
     this.showPage('dashboard');
   },
 
@@ -328,12 +346,21 @@ window.App = {
   },
 
   closeProfileView() {
+    // Hide profile
     const pv = document.getElementById('view-profile');
     if (pv) { pv.style.display = 'none'; pv.classList.remove('active'); }
+
     if (this._profileFrom === 'app' && this.currentClient) {
-      document.getElementById('view-app').classList.add('active');
+      // Return to company workspace — use enterApp so everything re-initialises
+      this.enterApp();
     } else {
-      document.getElementById('view-home').classList.add('active');
+      // Return to workspace home
+      ['view-app', 'view-profile'].forEach(vid => {
+        const el = document.getElementById(vid);
+        if (el) { el.classList.remove('active'); el.style.display = ''; }
+      });
+      const vh = document.getElementById('view-home');
+      if (vh) { vh.classList.add('active'); vh.style.display = ''; }
       this.renderWorkspaceHome();
     }
     this._profileFrom = null;
@@ -433,19 +460,23 @@ window.App = {
     _openCompanyFromProfile(id) {
     const clients = DB.get('clients') || [];
     const client  = clients.find(c => c.id === id);
-    if (!client) { toast('Company not found','error'); return; }
-    // Close profile view
+    if (!client) { toast('Company not found', 'error'); return; }
+
+    // 1. Hide profile view
     const pv = document.getElementById('view-profile');
     if (pv) { pv.style.display = 'none'; pv.classList.remove('active'); }
-    // Enter the company
+
+    // 2. Hide all views cleanly
+    ['view-home', 'view-app', 'view-profile'].forEach(vid => {
+      const el = document.getElementById(vid);
+      if (el) { el.classList.remove('active'); el.style.display = ''; }
+    });
+
+    // 3. Set client and use enterApp() which initialises EVERYTHING
+    //    (sidebar name, sub, topbar period, showPage dashboard)
     this.currentClient = client;
     DB.set('last_client', id);
-    document.getElementById('view-home')?.classList.remove('active');
-    document.getElementById('view-app').classList.add('active');
-    const sn = document.getElementById('sidebar-client-name'); if (sn) sn.textContent = client.name;
-    const rous = DB.get('rous_' + client.id) || [];
-    const ss = document.getElementById('sidebar-client-sub'); if (ss) ss.textContent = `${rous.length} ROU${rous.length!==1?'s':''}`;
-    this.showPage('dashboard');
+    this.enterApp();
     toast('Opened: ' + client.name, 'success');
   },
 
