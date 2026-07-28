@@ -3,47 +3,120 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../db');
+const authMiddleware = require('../middleware/auth');
 
-// Register
-router.post('/register', async (req, res) => {
-  const { name, email, password, role } = req.body;
-  if (!name || !email || !password) return res.status(400).json({ error: 'All fields required.' });
+// Hardcoded admin credentials (env-based, never stored in DB)
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@kgsomani.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'KGSAdmin@2024';
+
+// Roles that require admin approval to register
+const APPROVAL_REQUIRED_ROLES = ['manager', 'partner'];
+
+// ── LOGIN ────────────────────────────────────────────────────
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ error: 'Email and password are required.' });
+
+  // Hardcoded admin check
+  if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+    if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Invalid admin credentials.' });
+    const token = jwt.sign({ id: 0, role: 'admin', name: 'Administrator', email: ADMIN_EMAIL }, process.env.JWT_SECRET, { expiresIn: '8h' });
+    return res.json({ token, user: { id: 0, name: 'Administrator', email: ADMIN_EMAIL, role: 'admin' } });
+  }
 
   try {
-    const existing = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-    if (existing.rows.length > 0) return res.status(409).json({ error: 'Email already registered.' });
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email.toLowerCase()]);
+    if (!result.rows.length) return res.status(404).json({ error: 'No account found with this email.' });
 
-    const hashed = await bcrypt.hash(password, 10);
+    const user = result.rows[0];
+    if (user.status === 'pending') return res.status(403).json({ error: 'Your account is pending admin approval. Please contact your administrator.' });
+    if (user.status === 'suspended') return res.status(403).json({ error: 'Your account has been suspended. Contact admin.' });
+
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) return res.status(401).json({ error: 'Incorrect password.' });
+
+    const token = jwt.sign({ id: user.id, role: user.role, name: user.name, email: user.email }, process.env.JWT_SECRET, { expiresIn: '8h' });
+    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Server error. Please try again.' });
+  }
+});
+
+// ── REGISTER ─────────────────────────────────────────────────
+router.post('/register', async (req, res) => {
+  const { name, email, password, role = 'article', adminToken } = req.body;
+  if (!name || !email || !password) return res.status(400).json({ error: 'Name, email and password are required.' });
+  if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+
+  const cleanRole = ['article', 'manager', 'partner'].includes(role) ? role : 'article';
+
+  // Manager/Partner registration requires a valid admin token
+  if (APPROVAL_REQUIRED_ROLES.includes(cleanRole)) {
+    if (!adminToken) return res.status(403).json({ error: 'Admin approval token required to register as Manager or Partner.' });
+    try {
+      const decoded = jwt.verify(adminToken, process.env.JWT_SECRET);
+      if (decoded.role !== 'admin') return res.status(403).json({ error: 'Invalid admin token.' });
+    } catch {
+      return res.status(403).json({ error: 'Invalid or expired admin approval token.' });
+    }
+  }
+
+  try {
+    const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email.toLowerCase()]);
+    if (existing.rows.length) return res.status(409).json({ error: 'An account with this email already exists.' });
+
+    const hashed = await bcrypt.hash(password, 12);
+    // Article joins immediately active; Manager/Partner too (admin gave token)
+    const status = 'active';
+
     const result = await pool.query(
-      'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role',
-      [name, email, hashed, role || 'auditor']
+      'INSERT INTO users (name, email, password, role, status) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, role, status',
+      [name.trim(), email.toLowerCase(), hashed, cleanRole, status]
     );
-
-    const token = jwt.sign({ id: result.rows[0].id, role: result.rows[0].role }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.status(201).json({ token, user: result.rows[0] });
+    const user = result.rows[0];
+    const token = jwt.sign({ id: user.id, role: user.role, name: user.name, email: user.email }, process.env.JWT_SECRET, { expiresIn: '8h' });
+    res.status(201).json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
   } catch (err) {
     console.error('Register error:', err);
+    res.status(500).json({ error: 'Server error. Please try again.' });
+  }
+});
+
+// ── GET ADMIN TOKEN (admin-only, for granting manager/partner registration) ──
+router.post('/admin-approval-token', authMiddleware, authMiddleware.requireAdmin, (req, res) => {
+  // Short-lived token for sharing with manager/partner registrants
+  const token = jwt.sign({ id: 0, role: 'admin', purpose: 'registration_approval' }, process.env.JWT_SECRET, { expiresIn: '24h' });
+  res.json({ token, expiresIn: '24h' });
+});
+
+// ── ME ───────────────────────────────────────────────────────
+router.get('/me', authMiddleware, async (req, res) => {
+  if (req.user.id === 0) return res.json({ id: 0, name: 'Administrator', email: ADMIN_EMAIL, role: 'admin' });
+  try {
+    const result = await pool.query('SELECT id, name, email, role, status, created_at FROM users WHERE id = $1', [req.user.id]);
+    if (!result.rows.length) return res.status(404).json({ error: 'User not found.' });
+    res.json(result.rows[0]);
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Login
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'All fields required.' });
-
+// ── CHANGE OWN PASSWORD ──────────────────────────────────────
+router.put('/change-password', authMiddleware, async (req, res) => {
+  if (req.user.id === 0) return res.status(400).json({ error: 'Admin password is managed via environment variables.' });
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) return res.status(400).json({ error: 'Both current and new password required.' });
+  if (newPassword.length < 8) return res.status(400).json({ error: 'New password must be at least 8 characters.' });
   try {
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found.' });
-
-    const user = result.rows[0];
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(401).json({ error: 'Invalid password.' });
-
-    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+    const result = await pool.query('SELECT password FROM users WHERE id = $1', [req.user.id]);
+    if (!result.rows.length) return res.status(404).json({ error: 'User not found.' });
+    const valid = await bcrypt.compare(currentPassword, result.rows[0].password);
+    if (!valid) return res.status(401).json({ error: 'Current password is incorrect.' });
+    const hashed = await bcrypt.hash(newPassword, 12);
+    await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashed, req.user.id]);
+    res.json({ ok: true });
   } catch (err) {
-    console.error('Login error:', err);
     res.status(500).json({ error: err.message });
   }
 });
