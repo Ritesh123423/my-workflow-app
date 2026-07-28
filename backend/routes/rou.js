@@ -261,7 +261,7 @@ router.post('/clients/:clientId/assignments', auth.requireAdmin, async (req, res
     if (!userId) return res.status(400).json({ error: 'userId required' });
     await pool.query(
       `INSERT INTO client_assignments (client_id, user_id, assigned_by) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
-      [req.params.clientId, userId, req.user.id]
+      [req.params.clientId, userId, req.user.id === 0 ? null : req.user.id]
     );
     res.json({ ok: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
