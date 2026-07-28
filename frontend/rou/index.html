@@ -1382,5 +1382,25 @@
 
 <!-- Boot -->
 <script src="js/boot.js"></script>
+
+<!-- ── AUTH GUARD + USER BAR ───────────────────────── -->
+<script>
+(function() {
+  var token = localStorage.getItem('rou_token');
+  if (!token) { window.location.href = 'login.html'; return; }
+  try {
+    var p = JSON.parse(atob(token.split('.')[1]));
+    if (p.exp * 1000 < Date.now()) { localStorage.clear(); window.location.href = 'login.html'; return; }
+    // Display user info in home user bar
+    var bar = document.getElementById('home-user-bar');
+    if (bar) {
+      var roleColor = { admin:'#e8520a', partner:'#7c3aed', manager:'#1a3a5c', article:'#16a34a' };
+      bar.innerHTML = '<span style="font-size:12px;color:#64748b">Signed in as <strong style="color:' + (roleColor[p.role]||'#1e293b') + '">' + (p.name||p.email) + '</strong> (' + (p.role||'article') + ')</span>' +
+        (p.role === 'admin' ? ' &nbsp;<a href="admin.html" style="font-size:12px;color:#e8520a;font-weight:600">Admin Panel</a>' : '') +
+        ' &nbsp;<a href="login.html" onclick="localStorage.clear()" style="font-size:12px;color:#94a3b8">Sign out</a>';
+    }
+  } catch(e) { localStorage.clear(); window.location.href = 'login.html'; }
+})();
+</script>
 </body>
 </html>
