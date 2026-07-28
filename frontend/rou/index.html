@@ -1690,5 +1690,67 @@ document.documentElement.style.visibility = 'hidden';
 
 
 
+
+<!-- ── PROFILE + WORKSPACE HELPERS ──────────────────────────── -->
+<script>
+/* Profile tab switcher */
+function switchProfileTab(tab) {
+  var tabs    = ['details','password'];
+  var tabIds  = { details:'ptab-details', password:'ptab-password' };
+  var paneIds = { details:'profile-tab-details', password:'profile-tab-password' };
+  tabs.forEach(function(t) {
+    var tabEl  = document.getElementById(tabIds[t]);
+    var paneEl = document.getElementById(paneIds[t]);
+    var active = t === tab;
+    if (tabEl) {
+      tabEl.style.color       = active ? '#1a3f6b' : '#94a3b8';
+      tabEl.style.borderBottomColor = active ? '#1a3f6b' : 'transparent';
+    }
+    if (paneEl) paneEl.style.display = active ? '' : 'none';
+  });
+}
+
+/* Profile alert helper */
+function profileAlert(tab, msg, type) {
+  var id = tab === 'password' ? 'profile-pw-alert' : 'profile-details-alert';
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = type === 'success' ? '#f0fdf4' : '#fef2f2';
+  el.style.border     = '1.5px solid ' + (type === 'success' ? '#bbf7d0' : '#fecaca');
+  el.style.color      = type === 'success' ? '#065f46' : '#991b1b';
+  if (type === 'success') {
+    setTimeout(function() { el.style.display = 'none'; }, 3000);
+  }
+}
+
+/* Period quick buttons */
+(function() {
+  var wrap = document.getElementById('period-quick-btns');
+  if (!wrap) return;
+  var yr = new Date().getFullYear();
+  for (var y = yr - 1; y <= yr + 1; y++) {
+    (function(year) {
+      var btn = document.createElement('button');
+      btn.className = 'btn btn-ghost btn-sm';
+      btn.textContent = 'FY ' + year + '-' + String(year+1).slice(2);
+      btn.style.fontSize = '12px';
+      btn.onclick = function() {
+        var si = document.getElementById('period-start-input');
+        var ei = document.getElementById('period-end-input');
+        if (si) si.value = year + '-04-01';
+        if (ei) ei.value = (year+1) + '-03-31';
+        var lbl = document.getElementById('period-range-label');
+        var wrap2 = document.getElementById('period-range-display');
+        if (lbl) lbl.textContent = '01 Apr ' + year + ' – 31 Mar ' + (year+1);
+        if (wrap2) wrap2.style.display = '';
+      };
+      wrap.appendChild(btn);
+    })(y);
+  }
+})();
+</script>
+
 </body>
 </html>
