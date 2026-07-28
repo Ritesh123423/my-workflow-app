@@ -2,27 +2,9 @@
 <html lang="en">
 <head>
 <script>
-// ── ANTI-FLICKER AUTH GUARD ──
-(function() {
-  document.documentElement.style.visibility = 'hidden';
-  var token = localStorage.getItem('rou_token');
-  var ok = false;
-  if (!token) { window.location.replace('login.html'); return; }
-  try {
-    var p = JSON.parse(atob(token.split('.')[1]));
-    if (p.exp * 1000 < Date.now()) {
-      localStorage.removeItem('rou_token');
-      localStorage.removeItem('rou_user');
-      window.location.replace('login.html'); return;
-    }
-    if (p.role === 'admin') { window.location.replace('admin.html'); return; }
-    ok = true;
-  } catch(e) {
-    localStorage.removeItem('rou_token');
-    window.location.replace('login.html'); return;
-  }
-  if (ok) document.documentElement.style.visibility = '';
-})();
+// Hide page immediately — boot.js reveals it after auth check + hydration
+// (prevents flash of login redirect)
+document.documentElement.style.visibility = 'hidden';
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1408,34 +1390,5 @@
 
 
 
-<!-- ── USER BAR INIT ── -->
-<script>
-(function() {
-  var token = localStorage.getItem('rou_token');
-  if (!token) return;
-  try {
-    var p = JSON.parse(atob(token.split('.')[1]));
-    var bar = document.getElementById('home-user-bar');
-    if (!bar) return;
-    var roleColors = { admin:'#e8520a', partner:'#7c3aed', manager:'#1a3f6b', article:'#059669' };
-    var roleLabels = { admin:'Administrator', partner:'Partner', manager:'Manager', article:'Article' };
-    var color = roleColors[p.role] || '#1e293b';
-    bar.innerHTML =
-      '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 0;border-top:1px solid #e2e8f0;margin-top:8px">' +
-        '<div style="display:flex;align-items:center;gap:9px">' +
-          '<div style="width:32px;height:32px;border-radius:8px;background:' + color + ';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">' + (p.name||'?').charAt(0).toUpperCase() + '</div>' +
-          '<div>' +
-            '<div style="font-size:12.5px;font-weight:600;color:#1e293b;line-height:1.2">' + (p.name||p.email) + '</div>' +
-            '<div style="font-size:11px;color:' + color + ';font-weight:600;margin-top:1px">' + (roleLabels[p.role]||p.role) + '</div>' +
-          '</div>' +
-        '</div>' +
-        '<div style="display:flex;gap:7px;align-items:center">' +
-          (p.role === 'admin' ? '<a href="admin.html" style="font-size:11.5px;font-weight:600;color:#e8520a;text-decoration:none;padding:5px 11px;background:#fff3ee;border-radius:6px;border:1px solid rgba(232,82,10,0.25)">⚙ Admin</a>' : '') +
-          '<a href="login.html" onclick="localStorage.clear()" style="font-size:11.5px;color:#94a3b8;text-decoration:none;padding:5px 11px;background:#f1f5f9;border-radius:6px;border:1px solid #e2e8f0">Sign out</a>' +
-        '</div>' +
-      '</div>';
-  } catch(e) {}
-})();
-</script>
 </body>
 </html>
