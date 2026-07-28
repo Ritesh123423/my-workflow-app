@@ -340,7 +340,11 @@ window.App = {
   },
 
   _populateProfileView() {
-    const user = API.user();
+    let user = API.user();
+    if (!user) {
+      // Fallback: parse token directly
+      try { const t=localStorage.getItem('rou_token'); if(t){ const p=JSON.parse(atob(t.split('.')[1])); user={id:p.id,name:p.name,email:p.email,role:p.role}; localStorage.setItem('rou_user',JSON.stringify(user)); } } catch(e){}
+    }
     if (!user) return;
     const ROLE_COLORS = { admin:'#e8520a', partner:'#7c3aed', manager:'#1a3f6b', article:'#059669' };
     const ROLE_LABELS = { admin:'Administrator', partner:'Partner', manager:'Manager', article:'Article' };
@@ -362,6 +366,7 @@ window.App = {
     // Show Add Company button for non-articles
     const addBtn = document.getElementById('pv-add-company-btn');
     if (addBtn) addBtn.style.display = (user.role !== 'article') ? 'inline-flex' : 'none';
+    if (addBtn && user.role !== 'article') { addBtn.style.display = 'inline-flex'; }
 
     // Clear pw + alerts
     ['pv-pw-current','pv-pw-new','pv-pw-confirm'].forEach(id => {
