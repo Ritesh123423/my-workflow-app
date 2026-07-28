@@ -15,163 +15,208 @@ document.documentElement.style.visibility = 'hidden';
 <link rel="stylesheet" href="css/styles.css">
 
 <style>
-/* ════════════════════════════════
-   WORKSPACE HOME — NEW DESIGN
-════════════════════════════════ */
-#view-home {
-  background: #f1f5f9 !important;
-  align-items: stretch !important;
-  justify-content: stretch !important;
-  flex-direction: column !important;
-  min-height: 100vh;
-}
+/* ══════════════════════════════════════
+   WORKSPACE HOME — PROFESSIONAL DESIGN
+══════════════════════════════════════ */
 
+/* Layout */
+#view-home { background:#f0f4f8; }
 .ws-topbar {
-  background: #0f2a47;
-  padding: 0 32px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  background:#0a1e3d;
+  height:62px; padding:0 28px;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-shrink:0;
+  box-shadow:0 1px 0 rgba(255,255,255,0.05), 0 4px 20px rgba(0,0,0,0.3);
 }
-.ws-brand { display: flex; align-items: center; gap: 12px; }
+.ws-brand { display:flex; align-items:center; gap:13px; }
 .ws-brand-icon {
-  width: 36px; height: 36px; background: #e8520a; border-radius: 9px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 800; color: #fff; flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(232,82,10,0.4);
+  width:38px; height:38px; background:#e8520a; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:800; color:#fff;
+  box-shadow:0 4px 12px rgba(232,82,10,0.45);
+  letter-spacing:-0.5px;
 }
-.ws-brand-name { font-size: 14px; font-weight: 700; color: #fff; line-height: 1.2; }
-.ws-brand-sub { font-size: 10.5px; color: rgba(255,255,255,0.45); margin-top: 1px; }
-.ws-topbar-right { display: flex; align-items: center; gap: 12px; }
+.ws-brand-name { font-size:15px; font-weight:700; color:#fff; letter-spacing:-0.2px; }
+.ws-brand-sub  { font-size:10.5px; color:rgba(255,255,255,0.4); margin-top:1px; letter-spacing:0.2px; }
+
+/* Topbar user pill */
 .ws-user-pill {
-  display: flex; align-items: center; gap: 10px; cursor: pointer;
-  padding: 6px 12px 6px 6px; border-radius: 10px;
-  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
-  transition: background 0.15s;
+  display:flex; align-items:center; gap:10px; cursor:pointer;
+  padding:6px 12px 6px 6px; border-radius:10px;
+  border:1px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.07);
+  transition:background 0.15s;
 }
-.ws-user-pill:hover { background: rgba(255,255,255,0.14); }
+.ws-user-pill:hover { background:rgba(255,255,255,0.13); }
 .ws-user-avatar {
-  width: 32px; height: 32px; border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0;
+  width:32px; height:32px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:800; color:#fff;
+  background:#e8520a; flex-shrink:0;
 }
-.ws-user-info { min-width: 0; }
-.ws-user-name { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; }
-.ws-user-role { font-size: 10.5px; color: rgba(255,255,255,0.5); margin-top: 1px; }
+.ws-user-name { font-size:13px; font-weight:600; color:#fff; white-space:nowrap; }
+.ws-user-role { font-size:10.5px; color:rgba(255,255,255,0.45); margin-top:1px; }
 
+/* Body */
 .ws-body {
-  flex: 1; display: flex; gap: 24px;
-  padding: 28px 32px; max-width: 1200px; width: 100%; margin: 0 auto;
-  box-sizing: border-box;
+  display:flex; gap:0; flex:1; overflow:hidden; height:calc(100vh - 62px);
 }
-.ws-left { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
-.ws-right { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
 
-.ws-greeting { }
-.ws-greeting-text { font-size: 13px; font-weight: 500; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-.ws-greeting-name { font-size: 26px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; margin-bottom: 4px; }
-.ws-greeting-sub { font-size: 13.5px; color: #64748b; }
+/* LEFT */
+.ws-left {
+  flex:1; min-width:0; display:flex; flex-direction:column;
+  padding:28px 24px 28px 28px; gap:0; overflow-y:auto;
+}
 
+/* Greeting */
+.ws-greeting { margin-bottom:24px; }
+.ws-greeting-text { font-size:12px; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:5px; }
+.ws-greeting-name { font-size:28px; font-weight:800; color:#0f172a; letter-spacing:-0.8px; line-height:1.1; margin-bottom:5px; }
+.ws-greeting-sub  { font-size:13.5px; color:#64748b; }
+
+/* Companies card */
 .ws-companies-card {
-  background: #fff; border-radius: 14px; border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04);
-  overflow: hidden; flex: 1;
+  background:#fff; border-radius:14px;
+  border:1px solid #e2e8f0;
+  box-shadow:0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
+  overflow:hidden; flex:1; display:flex; flex-direction:column;
+  min-height:0;
 }
 .ws-companies-header {
-  padding: 16px 20px; border-bottom: 1px solid #f1f5f9;
-  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding:16px 20px;
+  border-bottom:1px solid #f1f5f9;
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-shrink:0;
 }
-.ws-section-title { font-size: 13px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.4px; }
-.ws-search-wrap { position: relative; }
+.ws-section-title { font-size:11px; font-weight:700; color:#0f172a; text-transform:uppercase; letter-spacing:0.7px; }
+.ws-search-wrap { position:relative; }
 .ws-search {
-  padding: 7px 12px; font-size: 13px; background: #f8fafc;
-  border: 1.5px solid #e2e8f0; border-radius: 8px; color: #0f172a;
-  outline: none; font-family: inherit; width: 180px; transition: border-color 0.15s;
+  padding:7px 12px; font-size:13px;
+  background:#f8fafc; border:1.5px solid #e2e8f0;
+  border-radius:8px; color:#0f172a; outline:none;
+  font-family:inherit; width:190px; transition:border-color 0.15s;
 }
-.ws-search:focus { border-color: #1a3f6b; }
+.ws-search:focus { border-color:#0a1e3d; }
 .ws-add-btn {
-  display: flex; align-items: center; gap: 6px;
-  padding: 7px 14px; background: #0f2a47; color: #fff;
-  border: none; border-radius: 8px; font-size: 12.5px; font-weight: 600;
-  cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap;
+  display:flex; align-items:center; gap:6px;
+  padding:7px 14px; background:#0a1e3d; color:#fff;
+  border:none; border-radius:8px; font-size:12.5px; font-weight:600;
+  cursor:pointer; font-family:inherit; transition:all 0.15s; white-space:nowrap;
 }
-.ws-add-btn:hover { background: #1a3f6b; transform: translateY(-1px); }
-.ws-add-btn.disabled { background: #94a3b8; cursor: not-allowed; transform: none !important; opacity: 0.7; }
+.ws-add-btn:hover { background:#162f5a; transform:translateY(-1px); box-shadow:0 4px 12px rgba(10,30,61,0.3); }
+.ws-add-btn.disabled { background:#94a3b8; cursor:not-allowed; transform:none !important; box-shadow:none; }
 
-.ws-companies-list { padding: 12px; display: flex; flex-direction: column; gap: 8px; min-height: 200px; }
+.ws-companies-list { padding:12px; display:flex; flex-direction:column; gap:6px; overflow-y:auto; flex:1; }
 
 .ws-company-item {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 16px; border-radius: 10px; border: 1.5px solid #e2e8f0;
-  cursor: pointer; transition: all 0.15s; background: #fff;
+  display:flex; align-items:center; gap:13px;
+  padding:13px 16px; border-radius:10px;
+  border:1.5px solid #e2e8f0; cursor:pointer;
+  transition:all 0.15s; background:#fff;
 }
-.ws-company-item:hover { border-color: #0f2a47; background: #f8fafc; transform: translateX(2px); }
-.ws-company-item:active { transform: translateX(0); }
+.ws-company-item:hover { border-color:#0a1e3d; background:#f8fafc; transform:translateX(2px); box-shadow:0 2px 8px rgba(10,30,61,0.08); }
 .ws-company-logo {
-  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 800; color: #fff;
+  width:40px; height:40px; border-radius:10px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:800; color:#fff; letter-spacing:-0.5px;
 }
-.ws-company-info { flex: 1; min-width: 0; }
-.ws-company-name { font-size: 14px; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ws-company-meta { font-size: 11.5px; color: #94a3b8; margin-top: 2px; }
-.ws-company-rous { font-size: 12px; font-weight: 600; color: #475569; }
-.ws-company-arrow { color: #cbd5e1; transition: color 0.15s; }
-.ws-company-item:hover .ws-company-arrow { color: #0f2a47; }
+.ws-company-name { font-size:13.5px; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ws-company-meta { font-size:11.5px; color:#94a3b8; margin-top:2px; }
+.ws-company-rous { font-size:12px; font-weight:600; color:#475569; flex-shrink:0; }
+.ws-company-arrow { color:#cbd5e1; transition:color 0.15s; flex-shrink:0; }
+.ws-company-item:hover .ws-company-arrow { color:#0a1e3d; }
 
-.ws-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 20px; text-align: center; }
-.ws-empty-icon { font-size: 36px; margin-bottom: 12px; }
-.ws-empty-title { font-size: 14px; font-weight: 700; color: #475569; margin-bottom: 4px; }
-.ws-empty-desc { font-size: 12.5px; color: #94a3b8; }
+.ws-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:52px 20px; text-align:center; }
+.ws-empty-icon { margin-bottom:14px; }
+.ws-empty-title { font-size:14px; font-weight:700; color:#475569; margin-bottom:5px; }
+.ws-empty-desc  { font-size:12.5px; color:#94a3b8; line-height:1.6; }
 
 /* RIGHT PANEL */
-.ws-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.ws-stat {
-  background: #fff; border-radius: 12px; padding: 18px 16px;
-  border: 1px solid #e2e8f0; text-align: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+.ws-right {
+  width:320px; flex-shrink:0;
+  border-left:1px solid #e2e8f0;
+  background:#fff;
+  display:flex; flex-direction:column;
+  overflow-y:auto;
 }
-.ws-stat-val { font-size: 28px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; }
-.ws-stat-label { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 4px; }
 
-.ws-quick-card {
-  background: #fff; border-radius: 12px; padding: 18px;
-  border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+/* Account section */
+.ws-account-header {
+  background:linear-gradient(160deg, #0a1e3d 0%, #162f5a 100%);
+  padding:20px 20px 18px;
+  flex-shrink:0;
 }
-.ws-quick-list { display: flex; flex-direction: column; gap: 6px; }
-.ws-quick-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 12px; border-radius: 9px; cursor: pointer;
-  border: none; background: transparent; font-family: inherit; text-decoration: none;
-  transition: background 0.12s; text-align: left; width: 100%;
+.ws-account-av {
+  width:48px; height:48px; border-radius:12px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; font-weight:800; color:#fff;
+  box-shadow:0 4px 16px rgba(0,0,0,0.25);
 }
-.ws-quick-item:hover { background: #f8fafc; }
-.ws-quick-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-.ws-quick-title { font-size: 13px; font-weight: 600; color: #0f172a; }
-.ws-quick-desc { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+.ws-account-name  { font-size:15px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-0.2px; }
+.ws-account-email { font-size:11px; color:rgba(255,255,255,0.5); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ws-account-rolebadge {
+  display:inline-flex; margin-top:7px; padding:2px 10px;
+  border-radius:20px; font-size:10px; font-weight:700;
+  background:rgba(255,255,255,0.13); color:rgba(255,255,255,0.9);
+  letter-spacing:0.3px;
+}
 
-.ws-role-card {
-  background: #fff; border-radius: 12px; padding: 16px;
-  border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-}
-.ws-role-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 8px; }
-.ws-role-desc { font-size: 12px; color: #64748b; line-height: 1.6; }
+/* Right panel sections */
+.ws-panel-section { padding:16px 18px; border-bottom:1px solid #f1f5f9; }
+.ws-panel-section:last-child { border-bottom:none; }
+.ws-panel-label { font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:10px; }
 
-.ws-signout-btn {
-  position: fixed; bottom: 20px; right: 24px;
-  padding: 8px 16px; font-size: 12.5px; font-weight: 600;
-  background: transparent; border: 1.5px solid #e2e8f0;
-  border-radius: 8px; color: #94a3b8; cursor: pointer; font-family: inherit;
-  transition: all 0.15s;
+/* Inline input */
+.ws-inline-input {
+  width:100%; padding:8px 11px; font-size:13px;
+  background:#f8fafc; border:1.5px solid #e2e8f0;
+  border-radius:8px; color:#0f172a; outline:none; font-family:inherit;
+  box-sizing:border-box; transition:border-color 0.15s, box-shadow 0.15s;
 }
-.ws-signout-btn:hover { background: #fef2f2; border-color: #fecaca; color: #dc2626; }
+.ws-inline-input:focus { border-color:#0a1e3d; box-shadow:0 0 0 3px rgba(10,30,61,0.08); }
+.ws-inline-input:disabled { background:#f1f5f9; color:#94a3b8; cursor:not-allowed; }
 
-/* PROFILE MODAL STYLES */
-.profile-tab { transition: color 0.15s, border-color 0.15s; }
-.form-hint { font-size: 11.5px; color: #94a3b8; margin-top: 5px; line-height: 1.5; }
+/* Inline alert */
+.ws-inline-alert { display:none; border-radius:7px; padding:8px 11px; font-size:12px; margin-bottom:10px; line-height:1.5; }
+
+/* Buttons */
+.ws-btn-primary {
+  padding:9px 14px; background:#0a1e3d; color:#fff;
+  border:none; border-radius:8px; font-size:12.5px; font-weight:700;
+  cursor:pointer; font-family:inherit; transition:all 0.15s; white-space:nowrap;
+}
+.ws-btn-primary:hover { background:#162f5a; }
+.ws-btn-outline {
+  padding:9px 14px; background:#fff; color:#475569;
+  border:1.5px solid #e2e8f0; border-radius:8px; font-size:12.5px; font-weight:600;
+  cursor:pointer; font-family:inherit; transition:all 0.15s; white-space:nowrap;
+}
+.ws-btn-outline:hover { background:#f8fafc; border-color:#94a3b8; }
+.ws-btn-danger {
+  padding:9px 14px; background:#fff; color:#dc2626;
+  border:1.5px solid #fecaca; border-radius:8px; font-size:12.5px; font-weight:700;
+  cursor:pointer; font-family:inherit; transition:all 0.15s; white-space:nowrap;
+}
+.ws-btn-danger:hover { background:#fef2f2; border-color:#f87171; }
+
+/* Stat pills */
+.ws-stat-row { display:flex; gap:8px; }
+.ws-stat-pill {
+  flex:1; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;
+  padding:12px 14px; text-align:center;
+}
+.ws-stat-pill-val { font-size:22px; font-weight:800; color:#0f172a; letter-spacing:-0.5px; line-height:1; }
+.ws-stat-pill-lbl { font-size:10.5px; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:0.4px; margin-top:4px; }
+
+/* Pw collapse */
+.ws-pw-collapse { display:none; margin-top:10px; display:flex; flex-direction:column; gap:7px; }
+
+/* Role card */
+.ws-role-card { padding:14px 18px; border-top:1px solid #f1f5f9; }
+.ws-role-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; margin-bottom:7px; }
+.ws-role-desc  { font-size:12px; color:#64748b; line-height:1.6; }
+
+/* Sign out button fixed at bottom */
+.ws-signout-area { padding:14px 18px; border-top:1px solid #f1f5f9; margin-top:auto; flex-shrink:0; }
 </style>
 
 </head>
@@ -182,133 +227,136 @@ document.documentElement.style.visibility = 'hidden';
 ══════════════════════════════════════ -->
 <div id="view-home" class="view active">
 
-  <!-- TOP NAV BAR -->
+  <!-- TOP NAV -->
   <div class="ws-topbar">
     <div class="ws-brand">
       <div class="ws-brand-icon">ROU</div>
       <div>
-        <div class="ws-brand-name">K G Somani & Co LLP</div>
-        <div class="ws-brand-sub">Ind AS 116 · ROU Platform</div>
+        <div class="ws-brand-name">K G Somani &amp; Co LLP</div>
+        <div class="ws-brand-sub">Ind AS 116 &middot; ROU Platform</div>
       </div>
     </div>
     <div class="ws-topbar-right">
       <div class="ws-user-pill" id="ws-user-pill" onclick="App.openProfileView()">
-        <div class="ws-user-avatar" id="ws-avatar">?</div>
+        <div class="ws-user-avatar" id="ws-avatar"></div>
         <div class="ws-user-info">
-          <div class="ws-user-name" id="ws-user-name">Loading…</div>
-          <div class="ws-user-role" id="ws-user-role">—</div>
+          <div class="ws-user-name" id="ws-user-name">Loading&hellip;</div>
+          <div class="ws-user-role" id="ws-user-role">&mdash;</div>
         </div>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:#94a3b8;flex-shrink:0"><path d="M6 9l6 6 6-6"/></svg>
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:rgba(255,255,255,0.4);flex-shrink:0"><path d="M6 9l6 6 6-6"/></svg>
       </div>
     </div>
   </div>
 
-  <!-- MAIN WORKSPACE CONTENT -->
+  <!-- BODY -->
   <div class="ws-body">
 
-    <!-- LEFT: GREETING + COMPANIES -->
+    <!-- LEFT: greeting + companies -->
     <div class="ws-left">
       <div class="ws-greeting" id="ws-greeting">
         <div class="ws-greeting-text">Good morning</div>
-        <div class="ws-greeting-name" id="ws-greeting-name">—</div>
-        <div class="ws-greeting-sub" id="ws-greeting-sub">Select a company to start working</div>
+        <div class="ws-greeting-name" id="ws-greeting-name">&mdash;</div>
+        <div class="ws-greeting-sub" id="ws-greeting-sub">Select a company below to start working</div>
       </div>
 
-      <!-- COMPANY SEARCH + LIST -->
       <div class="ws-companies-card">
         <div class="ws-companies-header">
-          <div class="ws-section-title">Companies</div>
+          <div class="ws-section-title">Client Companies</div>
           <div style="display:flex;gap:8px;align-items:center">
-            <div class="ws-search-wrap">
-              <input class="ws-search" id="ws-company-search" type="text" placeholder="Search companies…" oninput="App.filterCompanies()">
-            </div>
-            <button class="ws-add-btn" id="ws-add-company-btn" onclick="Modal.openAddClient()" title="Add New Company">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-              Add
+            <input class="ws-search" id="ws-company-search" type="text" placeholder="Search&hellip;" oninput="App.filterCompanies()">
+            <button class="ws-add-btn" id="ws-add-company-btn" onclick="Modal.openAddClient()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              Add Company
             </button>
           </div>
         </div>
         <div class="ws-companies-list" id="ws-companies-list">
           <div class="ws-empty">
-            <div class="ws-empty-icon">🏢</div>
+            <div class="ws-empty-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+            </div>
             <div class="ws-empty-title">No companies yet</div>
-            <div class="ws-empty-desc" id="ws-empty-desc">Add your first company to get started</div>
+            <div class="ws-empty-desc" id="ws-empty-desc">Add your first client company to begin</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: STATS + QUICK ACTIONS -->
+    <!-- RIGHT PANEL -->
     <div class="ws-right">
 
-      <!-- Stats -->
-      <div class="ws-stats-grid" id="ws-stats-grid">
-        <div class="ws-stat">
-          <div class="ws-stat-val" id="ws-stat-companies">0</div>
-          <div class="ws-stat-label">Companies</div>
-        </div>
-        <div class="ws-stat">
-          <div class="ws-stat-val" id="ws-stat-rous">0</div>
-          <div class="ws-stat-label">Total ROUs</div>
-        </div>
-      </div>
-
-      <!-- Account Card -->
-      <div class="ws-quick-card" style="padding:0;overflow:hidden">
-        <!-- User header -->
-        <div style="background:linear-gradient(135deg,#0a1e3d,#162f5a);padding:14px 16px;display:flex;align-items:center;gap:11px">
-          <div id="ws-profile-avatar" style="width:40px;height:40px;border-radius:10px;background:#e8520a;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0">?</div>
+      <!-- Account header -->
+      <div class="ws-account-header">
+        <div style="display:flex;align-items:center;gap:13px;margin-bottom:14px">
+          <div class="ws-account-av" id="ws-profile-avatar"></div>
           <div style="min-width:0">
-            <div id="ws-profile-name" style="font-size:13.5px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-            <div id="ws-profile-email" style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-            <div id="ws-profile-role" style="display:inline-flex;margin-top:5px;padding:1px 8px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.85)"></div>
+            <div class="ws-account-name"  id="ws-profile-name"></div>
+            <div class="ws-account-email" id="ws-profile-email"></div>
+            <div class="ws-account-rolebadge" id="ws-profile-role"></div>
           </div>
         </div>
-        <!-- Edit name -->
-        <div style="padding:12px 16px 0">
-          <div id="ws-account-alert" style="display:none;border-radius:7px;padding:7px 10px;font-size:12px;margin-bottom:10px;line-height:1.5"></div>
-          <div style="margin-bottom:10px">
-            <label style="display:block;font-size:9.5px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px">Display Name</label>
-            <div style="display:flex;gap:6px">
-              <input id="ws-name-input" type="text" placeholder="Your name" style="flex:1;padding:7px 10px;font-size:13px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:7px;color:#0f172a;outline:none;font-family:inherit;min-width:0;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
-              <button onclick="App.saveNameInline()" style="padding:7px 12px;background:#0a1e3d;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background 0.15s" onmouseover="this.style.background='#1a3f6b'" onmouseout="this.style.background='#0a1e3d'">Save</button>
-            </div>
+        <!-- Stats -->
+        <div class="ws-stat-row">
+          <div class="ws-stat-pill">
+            <div class="ws-stat-pill-val" id="ws-stat-companies">0</div>
+            <div class="ws-stat-pill-lbl">Companies</div>
           </div>
-        </div>
-        <!-- Change password toggle -->
-        <div style="padding:0 16px 12px">
-          <button onclick="App.togglePwSection()" id="ws-pw-toggle-btn" style="width:100%;padding:7px;background:#f1f5f9;color:#475569;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;text-align:left;display:flex;align-items:center;justify-content:space-between" onmouseover="this.style.background='#e8f0fe'" onmouseout="this.style.background='#f1f5f9'">
-            <span>🔒 Change Password</span>
-            <svg id="ws-pw-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
-          </button>
-          <div id="ws-pw-section" style="display:none;margin-top:8px">
-            <div id="ws-pw-alert" style="display:none;border-radius:7px;padding:7px 10px;font-size:12px;margin-bottom:8px;line-height:1.5"></div>
-            <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
-              <input id="ws-pw-current" type="password" placeholder="Current password" style="width:100%;padding:7px 10px;font-size:12.5px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:7px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
-              <input id="ws-pw-new" type="password" placeholder="New password (min. 8)" style="width:100%;padding:7px 10px;font-size:12.5px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:7px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
-              <input id="ws-pw-confirm" type="password" placeholder="Confirm new password" style="width:100%;padding:7px 10px;font-size:12.5px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:7px;color:#0f172a;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#1a3f6b'" onblur="this.style.borderColor='#e2e8f0'">
-            </div>
-            <button onclick="App.changePasswordInline()" style="width:100%;padding:8px;background:#0a1e3d;color:#fff;border:none;border-radius:7px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s" onmouseover="this.style.background='#162f5a'" onmouseout="this.style.background='#0a1e3d'">Update Password</button>
+          <div class="ws-stat-pill">
+            <div class="ws-stat-pill-val" id="ws-stat-rous">0</div>
+            <div class="ws-stat-pill-lbl">Total ROUs</div>
           </div>
-        </div>
-        <!-- Actions row -->
-        <div style="padding:0 16px 14px;display:flex;gap:7px">
-          <a id="ws-quick-admin" href="admin.html" style="display:none;flex:1;padding:7px 10px;background:#fff3ee;color:#e8520a;border:1.5px solid rgba(232,82,10,0.2);border-radius:7px;font-size:12px;font-weight:700;text-decoration:none;text-align:center;transition:background 0.15s" onmouseover="this.style.background='#ffede0'" onmouseout="this.style.background='#fff3ee'">⚙ Admin</a>
-          <button id="ws-quick-add-company" onclick="Modal.openAddClient()" style="flex:1;padding:7px 10px;background:#eff6ff;color:#1a3f6b;border:1.5px solid #bfdbfe;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'">+ Company</button>
-          <button onclick="App.signOut()" style="flex:1;padding:7px 10px;background:#fff;color:#dc2626;border:1.5px solid #fecaca;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='#fff'">Sign Out</button>
         </div>
       </div>
 
-      <!-- Role card -->
+      <!-- Edit name -->
+      <div class="ws-panel-section">
+        <div class="ws-panel-label">Display Name</div>
+        <div class="ws-inline-alert" id="ws-account-alert"></div>
+        <div style="display:flex;gap:7px">
+          <input id="ws-name-input" class="ws-inline-input" type="text" placeholder="Your full name">
+          <button class="ws-btn-primary" onclick="App.saveNameInline()">Save</button>
+        </div>
+      </div>
+
+      <!-- Change password -->
+      <div class="ws-panel-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="App.togglePwSection()">
+          <div class="ws-panel-label" style="margin-bottom:0">Change Password</div>
+          <svg id="ws-pw-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" style="transition:transform 0.2s"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <div id="ws-pw-section" style="display:none;margin-top:12px">
+          <div class="ws-inline-alert" id="ws-pw-alert"></div>
+          <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px">
+            <input id="ws-pw-current"  class="ws-inline-input" type="password" placeholder="Current password">
+            <input id="ws-pw-new"      class="ws-inline-input" type="password" placeholder="New password (min. 8 characters)">
+            <input id="ws-pw-confirm"  class="ws-inline-input" type="password" placeholder="Confirm new password">
+          </div>
+          <button class="ws-btn-primary" style="width:100%" onclick="App.changePasswordInline()">Update Password</button>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="ws-panel-section">
+        <div class="ws-panel-label">Actions</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <a id="ws-quick-admin" href="admin.html" style="display:none;width:100%;padding:9px 14px;background:#fff8f5;color:#e8520a;border:1.5px solid rgba(232,82,10,0.2);border-radius:8px;font-size:12.5px;font-weight:700;text-decoration:none;text-align:center;box-sizing:border-box;transition:background 0.15s" onmouseover="this.style.background='#fff3ee'" onmouseout="this.style.background='#fff8f5'">Admin Panel</a>
+          <button id="ws-quick-add-company-btn" onclick="Modal.openAddClient()" style="width:100%;padding:9px 14px;background:#f0f6ff;color:#1a3f6b;border:1.5px solid #bfdbfe;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#f0f6ff'">Add New Company</button>
+        </div>
+      </div>
+
+      <!-- Role info -->
       <div class="ws-role-card" id="ws-role-card">
         <div class="ws-role-badge" id="ws-role-badge"></div>
-        <div class="ws-role-desc" id="ws-role-desc"></div>
+        <div class="ws-role-desc"  id="ws-role-desc"></div>
       </div>
-    </div>
-  </div>
 
-  <!-- SIGN OUT -->
-  <button class="ws-signout-btn" onclick="App.signOut()">Sign out</button>
+      <!-- Sign out -->
+      <div class="ws-signout-area">
+        <button class="ws-btn-danger" style="width:100%" onclick="App.signOut()">Sign Out</button>
+      </div>
+
+    </div><!-- end ws-right -->
+  </div><!-- end ws-body -->
 </div>
 
 <!-- ══════════════════════════════════════
