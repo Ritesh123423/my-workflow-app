@@ -55,6 +55,12 @@ window.App = {
   pendingDuplicateId: null,
   uiBindingsReady: false,
 
+  /* Which page are we on? 'home' or 'app' (set via <body data-page>) */
+  _page() {
+    return (document.body && document.body.getAttribute('data-page')) || 'app';
+  },
+
+
   /* ── INIT ─────────────────────────────────────────────────── */
   bindUiActions() {
     if (this.uiBindingsReady) return;
@@ -87,14 +93,19 @@ window.App = {
       });
     }
 
-    // Render new workspace home
-    this.renderWorkspaceHome();
-
-    // Auto-open last client if valid
-    const lastId = DB.get('last_client');
-    if (lastId) {
-      const found = (DB.get('clients') || []).find(c => c.id === lastId);
-      if (found) { this.currentClient = found; this.enterApp(); return; }
+    if (this._page() === 'home') {
+      // HOME PAGE — render workspace/profile dashboard only. Never enter app here.
+      this.renderWorkspaceHome();
+    } else {
+      // APP PAGE — a company MUST be selected. Otherwise go back to home.
+      const lastId = DB.get('last_client');
+      const found  = lastId && (DB.get('clients') || []).find(c => c.id === lastId);
+      if (!found) {
+        window.location.replace('home.html');
+        return;
+      }
+      this.currentClient = found;
+      this.enterApp();
     }
 
     // Auto-save interval
@@ -310,8 +321,13 @@ window.App = {
   openClientById(id) {
     const client = (DB.get('clients')||[]).find(c => c.id === id);
     if (!client) { toast('Company not found','error'); return; }
-    this.currentClient = client;
     DB.set('last_client', id);
+    if (this._page() === 'home') {
+      // Persist selection then navigate to the company workspace page
+      DB.flush().finally(() => { window.location.href = 'index.html'; });
+      return;
+    }
+    this.currentClient = client;
     this.enterApp();
   },
 
@@ -345,34 +361,46 @@ window.App = {
     // Update sidebar user pill
     _refreshUserDisplay(API.user());
 
-    // Render dashboard
-    this.showPage('dashboard');
+    // Render dashboard (or a target page requested from the home shortcuts)
+    let target = 'dashboard';
+    try {
+      const t = sessionStorage.getItem('rou_target_page');
+      if (t) { target = t; sessionStorage.removeItem('rou_target_page'); }
+    } catch(e) {}
+    this.showPage(target);
   },
 
   goHome() {
-    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-    document.getElementById('view-home').classList.add('active');
+    // Clear the active company and return to the profile/home page
     DB.remove('last_client');
     this.currentClient = null;
+    if (this._page() === 'app') {
+      DB.flush().finally(() => { window.location.href = 'home.html'; });
+      return;
+    }
+    // Already on home page — just re-render
     this.renderWorkspaceHome();
   },
 
-  /* Navigate to a page inside the app */
+  /* Navigate to a page inside the app (from the home sidebar shortcuts) */
   navToAppPage(page) {
-    if (this.currentClient) {
-      this.enterApp();
+    // On the app page and a client is loaded — just switch page
+    if (this._page() === 'app' && this.currentClient) {
       this.showPage(page);
       return;
     }
     const clients = DB.get('clients') || [];
-    if (!clients.length) {
-      Modal.openAddClient();
+    if (!clients.length) { Modal.openAddClient(); return; }
+    const lastId = DB.get('last_client');
+    const found  = (lastId && clients.find(c => c.id === lastId)) || clients[0];
+    DB.set('last_client', found.id);
+    // Remember which page to open once the workspace loads
+    try { sessionStorage.setItem('rou_target_page', page); } catch(e) {}
+    if (this._page() === 'home') {
+      DB.flush().finally(() => { window.location.href = 'index.html'; });
       return;
     }
-    const lastId = DB.get('last_client');
-    const found  = lastId && clients.find(c => c.id === lastId);
-    this.currentClient = found || clients[0];
-    DB.set('last_client', this.currentClient.id);
+    this.currentClient = found;
     this.enterApp();
     this.showPage(page);
   },
@@ -423,11 +451,16 @@ window.App = {
     clients.push(client);
     DB.set('clients', clients);
     DB.set('rous_' + client.id, []);
+    DB.set('last_client', client.id);
     Modal.close('modal-add-client');
-    this.renderWorkspaceHome();
+    toast('Client "' + client.name + '" added!', 'success');
+    if (this._page() === 'home') {
+      // Go to the new company's workspace
+      DB.flush().finally(() => { window.location.href = 'index.html'; });
+      return;
+    }
     this.currentClient = client;
     this.enterApp();
-    toast('Client "' + client.name + '" added!', 'success');
   },
 
   /* ── PROFILE ─────────────────────────────────────────────── */
@@ -729,6 +762,7 @@ window.App = {
 document.addEventListener('click', function() {
   document.getElementById('ws-dropdown')?.classList.remove('open');
 });
+
 
 
 
