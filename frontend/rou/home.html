@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+// Hide page immediately — boot.js reveals it after auth check + hydration
+// (prevents flash of login redirect)
+document.documentElement.style.visibility = 'hidden';
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workspace | Ind AS 116 ROU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23e8520a'/><text x='16' y='21' font-family='Arial,sans-serif' font-size='11' font-weight='bold' fill='white' text-anchor='middle'>ROU</text></svg>">
+<link rel="stylesheet" href="css/styles.css">
+
+<style>
+/* ═══════════════════════════════════════════════════════
+   ENTERPRISE HOME DASHBOARD
+═══════════════════════════════════════════════════════ */
+#view-home {
+  background:#f1f5f9 !important;
+  align-items:stretch !important;
+  justify-content:flex-start !important;
+}
+#view-home.active {
+  display:flex !important;
+  flex-direction:column !important;
+  height:100vh !important;
+  overflow:hidden !important;
+}
+#view-home:not(.active) {
+  display:none !important;
+}
+
+/* TOP NAV */
+.ent-topnav {
+  background:#0a1e3d; height:56px; padding:0 24px;
+  display:flex; align-items:center; gap:16px; flex-shrink:0;
+  box-shadow:0 1px 0 rgba(255,255,255,0.04),0 2px 16px rgba(0,0,0,0.2);
+  position:relative; z-index:50;
+}
+.ent-brand { display:flex; align-items:center; gap:10px; flex-shrink:0; min-width:220px; }
+.ent-brand-icon {
+  width:32px; height:32px; background:#e8520a; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:800; color:#fff; letter-spacing:-0.5px;
+  box-shadow:0 2px 8px rgba(232,82,10,0.4); flex-shrink:0;
+}
+.ent-brand-name { font-size:13.5px; font-weight:700; color:#fff; letter-spacing:-0.2px; }
+.ent-brand-sub  { font-size:9.5px; color:rgba(255,255,255,0.35); margin-top:1px; }
+.ent-search-wrap {
+  flex:1; max-width:480px; display:flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);
+  border-radius:8px; padding:0 12px; height:34px;
+}
+.ent-search { flex:1; background:none; border:none; outline:none; color:#fff; font-size:13px; font-family:inherit; }
+.ent-search::placeholder { color:rgba(255,255,255,0.35); }
+.ent-search-kbd { font-size:10.5px; color:rgba(255,255,255,0.25); background:rgba(255,255,255,0.08); padding:2px 6px; border-radius:4px; white-space:nowrap; }
+.ent-topnav-right { display:flex; align-items:center; gap:6px; margin-left:auto; position:relative; }
+.ent-icon-btn {
+  width:32px; height:32px; border-radius:7px; border:none; cursor:pointer;
+  background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.65);
+  display:flex; align-items:center; justify-content:center; transition:background 0.15s;
+}
+.ent-icon-btn:hover { background:rgba(255,255,255,0.14); color:#fff; }
+.ent-divider-v { width:1px; height:20px; background:rgba(255,255,255,0.1); margin:0 4px; }
+.ent-user-pill {
+  display:flex; align-items:center; gap:8px; cursor:pointer;
+  padding:4px 10px 4px 4px; border-radius:8px;
+  border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.07);
+  transition:background 0.15s; user-select:none; margin-left:4px;
+}
+.ent-user-pill:hover { background:rgba(255,255,255,0.13); }
+.ent-user-av {
+  width:28px; height:28px; border-radius:6px; font-size:11px; font-weight:800; color:#fff;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.ent-user-name { font-size:12px; font-weight:600; color:#fff; white-space:nowrap; }
+.ent-user-role { font-size:9.5px; color:rgba(255,255,255,0.4); margin-top:1px; }
+
+/* Dropdown — reuse existing .ws-dropdown styles */
+.ws-dropdown {
+  position:absolute; top:calc(100% + 8px); right:0;
+  background:#fff; border-radius:11px; border:1px solid #e2e8f0;
+  box-shadow:0 4px 6px rgba(0,0,0,0.05),0 10px 40px rgba(0,0,0,0.12);
+  min-width:220px; overflow:hidden; display:none; z-index:200;
+  animation:ddIn 0.15s ease;
+}
+@keyframes ddIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
+.ws-dropdown.open { display:block; }
+.ws-dd-header { padding:14px 16px 12px; background:#f8fafc; border-bottom:1px solid #f1f5f9; }
+.ws-dd-name  { font-size:13.5px; font-weight:700; color:#0f172a; }
+.ws-dd-email { font-size:11.5px; color:#94a3b8; margin-top:2px; }
+.ws-dd-item {
+  display:flex; align-items:center; gap:10px; padding:10px 16px;
+  font-size:13px; font-weight:500; color:#475569; cursor:pointer;
+  transition:background 0.12s; text-decoration:none; border:none; background:none;
+  font-family:inherit; width:100%; text-align:left;
+}
+.ws-dd-item:hover { background:#f8fafc; color:#0f172a; }
+.ws-dd-item svg { color:#94a3b8; flex-shrink:0; }
+.ws-dd-sep { height:1px; background:#f1f5f9; margin:3px 0; }
+.ws-dd-item.danger { color:#dc2626; }
+.ws-dd-item.danger:hover { background:#fef2f2; }
+.ws-dd-item.danger svg { color:#dc2626; }
+
+/* BODY */
+.ent-body { display:flex; flex:1; overflow:hidden; height:calc(100vh - 56px); min-height:0; }
+
+/* SIDEBAR */
+.ent-sidebar {
+  width:220px; flex-shrink:0; background:#fff; border-right:1px solid #e2e8f0;
+  display:flex; flex-direction:column; overflow-y:auto; height:100%;
+}
+.ent-nav { padding:16px 10px; flex:1; }
+.ent-nav-section-label {
+  font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase;
+  letter-spacing:0.7px; padding:0 10px; margin-bottom:4px;
+}
+.ent-nav-item {
+  display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:8px;
+  font-size:13px; font-weight:500; color:#475569; cursor:pointer; text-decoration:none;
+  transition:all 0.12s; margin-bottom:2px; position:relative;
+}
+.ent-nav-item:hover { background:#f8fafc; color:#0f172a; }
+.ent-nav-item.active { background:#eff6ff; color:#1d4ed8; font-weight:600; }
+.ent-nav-item svg { flex-shrink:0; opacity:0.7; }
+.ent-nav-item.active svg { opacity:1; }
+.ent-nav-badge {
+  margin-left:auto; font-size:10px; font-weight:700; background:#f1f5f9;
+  color:#64748b; padding:1px 6px; border-radius:10px;
+}
+.ent-sidebar-profile {
+  padding:12px 14px; border-top:1px solid #f1f5f9;
+  display:flex; align-items:center; gap:9px;
+}
+.ent-sb-av {
+  width:32px; height:32px; border-radius:8px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:800; color:#fff;
+}
+.ent-sb-name { font-size:12.5px; font-weight:600; color:#0f172a; }
+.ent-sb-role { font-size:10.5px; color:#94a3b8; margin-top:1px; }
+
+/* MAIN */
+.ent-main { flex:1; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:20px; min-width:0; min-height:0; }
+
+/* HERO */
+.ent-hero {
+  background:#fff; border-radius:14px; border:1px solid #e2e8f0;
+  padding:24px 28px; display:flex; align-items:center; justify-content:space-between; gap:24px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);
+}
+.ent-hero-left { min-width:0; }
+.ent-greeting-label { font-size:11px; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
+.ent-greeting-name  { font-size:28px; font-weight:800; color:#0f172a; letter-spacing:-0.8px; line-height:1.15; margin-bottom:5px; }
+.ent-greeting-sub   { font-size:13px; color:#64748b; }
+.ent-hero-card {
+  display:flex; align-items:center; gap:16px; flex-shrink:0;
+  background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px 20px;
+}
+.ent-hc-av {
+  width:48px; height:48px; border-radius:12px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; font-weight:800; color:#fff;
+  box-shadow:0 3px 12px rgba(0,0,0,0.15);
+}
+.ent-hc-name  { font-size:15px; font-weight:700; color:#0f172a; }
+.ent-hc-email { font-size:12px; color:#64748b; margin-top:2px; }
+.ent-hc-badge { display:inline-flex; padding:2px 10px; border-radius:20px; font-size:10.5px; font-weight:700; background:rgba(10,30,61,0.08); color:#0a1e3d; }
+.ent-hc-verified {
+  display:inline-flex; align-items:center; gap:4px; padding:2px 8px;
+  border-radius:20px; font-size:10.5px; font-weight:600;
+  background:#dcfce7; color:#16a34a;
+}
+.ent-hc-meta { border-left:1px solid #e2e8f0; padding-left:16px; display:flex; flex-direction:column; gap:6px; }
+.ent-hc-meta-row { display:flex; flex-direction:column; gap:1px; }
+.ent-hc-meta-label { font-size:10px; color:#94a3b8; text-transform:uppercase; letter-spacing:0.4px; }
+.ent-hc-meta-val   { font-size:12.5px; font-weight:600; color:#0f172a; }
+.ent-edit-btn {
+  display:inline-flex; align-items:center; gap:6px; padding:7px 14px;
+  background:#0a1e3d; color:#fff; border:none; border-radius:8px;
+  font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;
+  transition:all 0.15s; white-space:nowrap; flex-shrink:0;
+}
+.ent-edit-btn:hover { background:#162f5a; box-shadow:0 4px 12px rgba(10,30,61,0.25); }
+
+/* KPI ROW */
+.ent-kpi-row { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; }
+.ent-kpi-card {
+  background:#fff; border-radius:12px; border:1px solid #e2e8f0;
+  padding:16px; box-shadow:0 1px 3px rgba(0,0,0,0.04); transition:box-shadow 0.15s;
+}
+.ent-kpi-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.08); }
+.ent-kpi-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
+.ent-kpi-val   { font-size:24px; font-weight:800; color:#0f172a; letter-spacing:-0.5px; line-height:1; margin-bottom:3px; }
+.ent-kpi-label { font-size:11.5px; color:#64748b; font-weight:500; margin-bottom:4px; }
+.ent-kpi-trend { font-size:10.5px; color:#94a3b8; }
+.ent-kpi-progress { height:3px; background:#f1f5f9; border-radius:2px; margin-top:6px; }
+.ent-kpi-progress-bar { height:100%; background:#1d4ed8; border-radius:2px; transition:width 0.4s; }
+
+/* 3-COLUMN GRID */
+.ent-grid3 { display:grid; grid-template-columns:1fr 1fr 340px; gap:16px; align-items:start; }
+
+/* CARDS */
+.ent-card {
+  background:#fff; border-radius:12px; border:1px solid #e2e8f0;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04); overflow:hidden;
+}
+.ent-col-large { display:flex; flex-direction:column; }
+.ent-card-header {
+  padding:14px 18px; border-bottom:1px solid #f1f5f9;
+  display:flex; align-items:center; justify-content:space-between; gap:10px; flex-shrink:0;
+}
+.ent-card-title { font-size:13px; font-weight:700; color:#0f172a; }
+.ent-card-footer {
+  padding:10px 18px; border-top:1px solid #f1f5f9;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.ent-card-search {
+  padding:6px 10px; font-size:12.5px; background:#f8fafc; border:1.5px solid #e2e8f0;
+  border-radius:7px; color:#0f172a; outline:none; font-family:inherit; width:160px; transition:border-color 0.15s;
+}
+.ent-card-search:focus { border-color:#0a1e3d; }
+.ent-primary-btn {
+  display:inline-flex; align-items:center; gap:5px; padding:6px 13px;
+  background:#0a1e3d; color:#fff; border:none; border-radius:7px;
+  font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;
+  transition:all 0.15s; white-space:nowrap;
+}
+.ent-primary-btn:hover { background:#162f5a; }
+.ent-text-btn { font-size:12px; font-weight:600; color:#1d4ed8; background:none; border:none; cursor:pointer; font-family:inherit; padding:0; }
+.ent-text-btn:hover { text-decoration:underline; }
+
+/* Companies list — reuse existing styles */
+.ws-companies-list { padding:10px; display:flex; flex-direction:column; gap:6px; overflow-y:auto; min-height:180px; max-height:340px; }
+.ws-company-item {
+  display:flex; align-items:center; gap:13px; padding:12px 14px;
+  border-radius:9px; border:1.5px solid #e8edf3; cursor:pointer;
+  transition:all 0.15s; background:#fff;
+}
+.ws-company-item:hover { border-color:#0a1e3d; background:#f7f9fc; transform:translateX(2px); box-shadow:0 2px 10px rgba(10,30,61,0.08); }
+.ws-company-logo { width:38px; height:38px; border-radius:9px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#fff; letter-spacing:-0.5px; }
+.ws-company-name { font-size:13px; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+.ws-company-meta { font-size:11px; color:#94a3b8; display:flex; align-items:center; gap:5px; }
+.ws-company-dot  { width:3px; height:3px; border-radius:50%; background:#cbd5e1; display:inline-block; }
+.ws-company-rous { font-size:11.5px; font-weight:600; color:#475569; white-space:nowrap; flex-shrink:0; }
+.ws-company-arrow { color:#cbd5e1; transition:color 0.15s; flex-shrink:0; }
+.ws-company-item:hover .ws-company-arrow { color:#0a1e3d; }
+.ws-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; text-align:center; }
+.ws-empty-icon  { color:#cbd5e1; margin-bottom:12px; }
+.ws-empty-title { font-size:13.5px; font-weight:700; color:#475569; margin-bottom:4px; }
+.ws-empty-desc  { font-size:12px; color:#94a3b8; line-height:1.6; max-width:260px; }
+
+/* ACTIVITY */
+.ent-activity-list { padding:8px 14px; display:flex; flex-direction:column; gap:2px; }
+.ent-activity-item { display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid #f8fafc; }
+.ent-activity-item:last-child { border-bottom:none; }
+.ent-act-icon { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+.ent-act-body { flex:1; min-width:0; }
+.ent-act-title { font-size:12.5px; font-weight:600; color:#0f172a; }
+.ent-act-sub   { font-size:11px; color:#94a3b8; margin-top:2px; line-height:1.4; }
+.ent-act-time  { font-size:10.5px; color:#94a3b8; white-space:nowrap; flex-shrink:0; padding-top:2px; }
+
+/* QUICK ACTIONS */
+.ent-quick-actions { padding:10px 14px; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.ent-qa-btn {
+  display:flex; align-items:center; gap:9px; padding:10px 11px; border-radius:9px;
+  border:1.5px solid #e2e8f0; background:#fff; cursor:pointer; font-family:inherit;
+  transition:all 0.15s; text-align:left; text-decoration:none;
+}
+.ent-qa-btn:hover { border-color:#0a1e3d; background:#f7f9fc; }
+.ent-qa-icon { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ent-qa-title { font-size:12px; font-weight:600; color:#0f172a; }
+.ent-qa-sub   { font-size:10.5px; color:#94a3b8; margin-top:1px; }
+
+/* PLATFORM INFO */
+.ent-info-list { padding:8px 14px; }
+.ent-info-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid #f8fafc; }
+.ent-info-row:last-child { border-bottom:none; }
+.ent-info-icon { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ent-info-label { font-size:10.5px; color:#94a3b8; margin-bottom:1px; }
+.ent-info-val   { font-size:12.5px; font-weight:600; color:#0f172a; }
+
+/* SECURITY */
+.ent-security-list { padding:6px 14px; }
+.ent-sec-item {
+  display:flex; align-items:center; gap:10px; padding:10px 0;
+  border-bottom:1px solid #f8fafc; background:none; border-left:none; border-right:none; border-top:none;
+  cursor:pointer; font-family:inherit; width:100;
+}
+.ent-sec-item:last-child { border-bottom:none; }
+.ent-toggle-off { font-size:10px; font-weight:700; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:10px; }
+
+/* Role card */
+.ws-role-badge { display:inline-flex; padding:3px 12px; border-radius:20px; font-size:11px; font-weight:700; }
+.ws-role-desc  { font-size:12px; color:#64748b; line-height:1.6; margin-top:6px; }
+
+/* FOOTER */
+.ent-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 0 4px; border-top:1px solid #e2e8f0;
+  font-size:11.5px; color:#94a3b8;
+}
+.ent-footer-links { display:flex; gap:16px; align-items:center; }
+.ent-footer-links a { color:#64748b; text-decoration:none; font-size:11.5px; }
+.ent-footer-links a:hover { color:#0a1e3d; }
+
+/* CW modal */
+.pw-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:300; padding:20px; backdrop-filter:blur(4px); }
+.pw-modal-overlay.open { display:flex; }
+.pw-modal { background:#fff; border-radius:14px; width:100%; max-width:420px; box-shadow:0 20px 60px rgba(0,0,0,0.2); animation:mIn .18s ease; }
+@keyframes mIn { from{opacity:0;transform:scale(.97) translateY(8px)} to{opacity:1;transform:none} }
+.pw-modal-hdr { padding:18px 22px 14px; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between; }
+.pw-modal-hdr h3 { font-size:15px; font-weight:700; color:#0f172a; }
+.pw-modal-close { background:none; border:none; cursor:pointer; color:#94a3b8; width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:6px; font-size:18px; }
+.pw-modal-close:hover { background:#f1f5f9; }
+.pw-modal-body { padding:18px 22px; }
+.pw-modal-ftr  { padding:12px 22px 18px; display:flex; justify-content:flex-end; gap:8px; border-top:1px solid #e2e8f0; }
+.pw-field { margin-bottom:12px; }
+.pw-field label { display:block; font-size:11px; font-weight:700; color:#64748b; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.4px; }
+.pw-field input { width:100%; padding:9px 12px; font-size:13.5px; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:8px; color:#0f172a; outline:none; font-family:inherit; box-sizing:border-box; transition:border-color 0.15s; }
+.pw-field input:focus { border-color:#0a1e3d; box-shadow:0 0 0 3px rgba(10,30,61,0.07); }
+.pw-alert { display:none; border-radius:8px; padding:9px 12px; font-size:12.5px; margin-bottom:12px; line-height:1.5; }
+</style>
+
+</head>
+
+<body data-page="home">
+
+<div id="view-home" class="view active">
+
+  <!-- TOP NAV -->
+  <div class="ent-topnav">
+    <div class="ent-brand">
+      <div class="ent-brand-icon">ROU</div>
+      <div>
+        <div class="ent-brand-name">K G Somani &amp; Co LLP</div>
+        <div class="ent-brand-sub">Ind AS 116 &middot; ROU Platform</div>
+      </div>
+    </div>
+    <div class="ent-search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" class="ent-search" placeholder="Search companies, ROUs, leases&hellip;" />
+      <span class="ent-search-kbd">⌘ K</span>
+    </div>
+    <div class="ent-topnav-right">
+      <button class="ent-icon-btn" title="Notifications">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </button>
+      <button class="ent-icon-btn" title="Help">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      </button>
+      <div class="ent-divider-v"></div>
+      <!-- User pill -->
+      <div class="ent-user-pill" id="ws-user-pill" onclick="App.toggleUserDropdown(event)">
+        <div class="ent-user-av" id="ws-avatar"></div>
+        <div class="ent-user-info">
+          <div class="ent-user-name" id="ws-user-name">Loading&hellip;</div>
+          <div class="ent-user-role" id="ws-user-role">&mdash;</div>
+        </div>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <!-- Dropdown -->
+      <div class="ws-dropdown" id="ws-dropdown">
+        <div class="ws-dd-header">
+          <div class="ws-dd-name" id="dd-name"></div>
+          <div class="ws-dd-email" id="dd-email"></div>
+        </div>
+        <button class="ws-dd-item" onclick="App.openChangePwModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Change Password
+        </button>
+        <div class="ws-dd-sep"></div>
+        <button class="ws-dd-item danger" onclick="App.signOut()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD BODY -->
+  <div class="ent-body">
+
+    <!-- SIDEBAR -->
+    <div class="ent-sidebar">
+      <nav class="ent-nav">
+        <div class="ent-nav-section-label">Main</div>
+        <a class="ent-nav-item active" href="#" onclick="App.goHome(); return false;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </a>
+        <a class="ent-nav-item" href="#" onclick="App.goHome(); return false;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Client Companies
+          <span class="ent-nav-badge" id="nav-badge-companies">0</span>
+        </a>
+        <a class="ent-nav-item" href="#" onclick="App.navToAppPage('rous'); return false;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          ROU Assets
+          <span class="ent-nav-badge" id="nav-badge-rous">0</span>
+        </a>
+        <a class="ent-nav-item" href="#" onclick="App.navToAppPage('rous'); return false;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Leases
+        </a>
+        <a class="ent-nav-item" href="#" onclick="App.navToAppPage('export'); return false;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+          Reports
+        </a>
+        <div class="ent-nav-section-label" style="margin-top:16px">Account</div>
+        <a class="ent-nav-item" href="#" onclick="Modal.open('modal-profile'); return false;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profile
+        </a>
+        <a class="ent-nav-item" id="ws-action-admin-nav" href="admin.html" style="display:none">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M12 14a8 8 0 00-8 8"/><path d="M19.5 16c0 1.4-.6 2.7-1.5 3.6m3-3.6a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/></svg>
+          Admin Panel
+        </a>
+        <a class="ent-nav-item" href="#" onclick="App.openChangePwModal(); return false;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Settings
+        </a>
+      </nav>
+
+      <!-- Profile completion at bottom -->
+      <div class="ent-sidebar-profile">
+        <div class="ent-sb-av" id="ws-sb-avatar"></div>
+        <div class="ent-sb-info">
+          <div class="ent-sb-name" id="ws-sb-name">—</div>
+          <div class="ent-sb-role" id="ws-sb-role">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="ent-main">
+
+      <!-- HERO SECTION -->
+      <div class="ent-hero">
+        <div class="ent-hero-left">
+          <div class="ent-greeting-label">Good morning,</div>
+          <div class="ent-greeting-name" id="ws-greeting-name">&mdash;</div>
+          <div class="ent-greeting-sub">Manage your profile, companies and platform settings.</div>
+        </div>
+        <div class="ent-hero-card">
+          <div class="ent-hc-av" id="ws-profile-avatar"></div>
+          <div class="ent-hc-info">
+            <div class="ent-hc-name" id="ws-profile-name"></div>
+            <div class="ent-hc-email" id="ws-profile-email"></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap">
+              <span class="ent-hc-badge" id="ws-profile-role"></span>
+              <span class="ent-hc-verified">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Verified
+              </span>
+            </div>
+          </div>
+          <div class="ent-hc-meta">
+            <div class="ent-hc-meta-row"><span class="ent-hc-meta-label">Department</span><span class="ent-hc-meta-val">Audit &amp; Assurance</span></div>
+            <div class="ent-hc-meta-row"><span class="ent-hc-meta-label">Standard</span><span class="ent-hc-meta-val">Ind AS 116</span></div>
+          </div>
+          <button class="ent-edit-btn" onclick="Modal.open('modal-profile')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit Profile
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI ROW -->
+      <div class="ent-kpi-row">
+        <div class="ent-kpi-card">
+          <div class="ent-kpi-icon" style="background:#eff6ff">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          </div>
+          <div class="ent-kpi-val" id="kpi-companies">0</div>
+          <div class="ent-kpi-label">Client Companies</div>
+          <div class="ent-kpi-trend">+0 this month</div>
+        </div>
+        <div class="ent-kpi-card">
+          <div class="ent-kpi-icon" style="background:#f0fdf4">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="ent-kpi-val" id="kpi-rous">0</div>
+          <div class="ent-kpi-label">Total ROUs</div>
+          <div class="ent-kpi-trend">+0 this month</div>
+        </div>
+        <div class="ent-kpi-card">
+          <div class="ent-kpi-icon" style="background:#fefce8">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ca8a04" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="ent-kpi-val" id="kpi-active">0</div>
+          <div class="ent-kpi-label">Active Leases</div>
+          <div class="ent-kpi-trend">+0 this month</div>
+        </div>
+        <div class="ent-kpi-card">
+          <div class="ent-kpi-icon" style="background:#fdf4ff">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="ent-kpi-val" id="kpi-completion">100%</div>
+          <div class="ent-kpi-label">Profile Completion</div>
+          <div class="ent-kpi-progress"><div class="ent-kpi-progress-bar" id="kpi-completion-bar" style="width:100%"></div></div>
+        </div>
+        <div class="ent-kpi-card">
+          <div class="ent-kpi-icon" style="background:#fff7ed">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="ent-kpi-val" id="kpi-login">—</div>
+          <div class="ent-kpi-label">Last Login</div>
+          <div class="ent-kpi-trend">Today</div>
+        </div>
+      </div>
+
+      <!-- 3-COLUMN SECTION -->
+      <div class="ent-grid3">
+
+        <!-- COL 1: Client Companies -->
+        <div class="ent-card ent-col-large">
+          <div class="ent-card-header">
+            <div class="ent-card-title">Client Companies</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input class="ent-card-search" id="ws-company-search" type="text" placeholder="Search companies&hellip;" oninput="App.filterCompanies()">
+              <button class="ent-primary-btn" id="ws-add-company-btn" onclick="Modal.openAddClient()">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                Add Company
+              </button>
+            </div>
+          </div>
+          <div class="ws-companies-list" id="ws-companies-list">
+            <div class="ws-empty">
+              <div class="ws-empty-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+              </div>
+              <div class="ws-empty-title">No companies yet</div>
+              <div class="ws-empty-desc" id="ws-empty-desc">Add your first client company to get started with Ind AS 116 lease accounting</div>
+            </div>
+          </div>
+          <div class="ent-card-footer">
+            <span id="ws-companies-count" style="font-size:12px;color:#94a3b8">Showing 0 companies</span>
+            <button class="ent-text-btn" onclick="App.goHome()">View All Companies →</button>
+          </div>
+        </div>
+
+        <!-- COL 2: Recent Activity -->
+        <div class="ent-card">
+          <div class="ent-card-header">
+            <div class="ent-card-title">Recent Activity</div>
+            <button class="ent-text-btn" onclick="App.navToAppPage('audit')">View All</button>
+          </div>
+          <div class="ent-activity-list" id="ent-activity-list">
+            <div class="ent-activity-item">
+              <div class="ent-act-icon" style="background:#eff6ff">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <div class="ent-act-body">
+                <div class="ent-act-title">Profile updated</div>
+                <div class="ent-act-sub">Profile information was updated successfully</div>
+              </div>
+              <div class="ent-act-time" id="ent-act-time-1">—</div>
+            </div>
+            <div class="ent-activity-item">
+              <div class="ent-act-icon" style="background:#f0fdf4">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+              </div>
+              <div class="ent-act-body">
+                <div class="ent-act-title">Logged in</div>
+                <div class="ent-act-sub">Successful login from Chrome on Windows</div>
+              </div>
+              <div class="ent-act-time" id="ent-act-time-2">—</div>
+            </div>
+            <div class="ent-activity-item">
+              <div class="ent-act-icon" style="background:#fff7ed">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              </div>
+              <div class="ent-act-body">
+                <div class="ent-act-title">Password changed</div>
+                <div class="ent-act-sub">Password was changed successfully</div>
+              </div>
+              <div class="ent-act-time">Yesterday</div>
+            </div>
+          </div>
+
+          <div class="ent-card-header" style="margin-top:16px;border-top:1px solid #f1f5f9;padding-top:16px">
+            <div class="ent-card-title">Quick Actions</div>
+          </div>
+          <div class="ent-quick-actions">
+            <button class="ent-qa-btn" id="ws-action-add" onclick="Modal.openAddClient()">
+              <div class="ent-qa-icon" style="background:#eff6ff">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </div>
+              <div>
+                <div class="ent-qa-title">Add Client</div>
+                <div class="ent-qa-sub">New engagement</div>
+              </div>
+            </button>
+            <a class="ent-qa-btn" id="ws-action-admin" href="admin.html" style="display:none;text-decoration:none">
+              <div class="ent-qa-icon" style="background:#fff7ed">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M12 14a8 8 0 00-8 8"/></svg>
+              </div>
+              <div>
+                <div class="ent-qa-title">Admin Panel</div>
+                <div class="ent-qa-sub">Manage team</div>
+              </div>
+            </a>
+            <button class="ent-qa-btn" onclick="App.openChangePwModal()">
+              <div class="ent-qa-icon" style="background:#f0fdf4">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              </div>
+              <div>
+                <div class="ent-qa-title">Change Password</div>
+                <div class="ent-qa-sub">Security settings</div>
+              </div>
+            </button>
+            <button class="ent-qa-btn" onclick="App.navToAppPage('export')">
+              <div class="ent-qa-icon" style="background:#fdf4ff">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+              </div>
+              <div>
+                <div class="ent-qa-title">Export Data</div>
+                <div class="ent-qa-sub">Download reports</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- COL 3: Platform Overview + Security -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div class="ent-card">
+            <div class="ent-card-header">
+              <div class="ent-card-title">Platform Overview</div>
+            </div>
+            <div class="ent-info-list">
+              <div class="ent-info-row">
+                <div class="ent-info-icon" style="background:#f0f6ff">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a3f6b" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div>
+                  <div class="ent-info-label">FY Period</div>
+                  <div class="ent-info-val" id="ws-info-period">Not set</div>
+                </div>
+              </div>
+              <div class="ent-info-row">
+                <div class="ent-info-icon" style="background:#f0fdf4">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <div>
+                  <div class="ent-info-label">Ind AS Standard</div>
+                  <div class="ent-info-val">Ind AS 116 &mdash; Right of Use</div>
+                </div>
+              </div>
+              <div class="ent-info-row">
+                <div class="ent-info-icon" style="background:#fef3c7">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                </div>
+                <div>
+                  <div class="ent-info-label">Your Role</div>
+                  <div class="ent-info-val" id="ws-info-role">—</div>
+                </div>
+              </div>
+              <div class="ent-info-row">
+                <div class="ent-info-icon" style="background:#fdf4ff">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M12 8v8"/></svg>
+                </div>
+                <div>
+                  <div class="ent-info-label">Account Type</div>
+                  <div class="ent-info-val">Professional Plan</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ent-card">
+            <div class="ent-card-header">
+              <div class="ent-card-title">Security &amp; Preferences</div>
+            </div>
+            <div class="ent-security-list">
+              <button class="ent-sec-item" onclick="App.openChangePwModal()">
+                <div class="ent-info-icon" style="background:#f0fdf4">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                </div>
+                <div style="flex:1;text-align:left">
+                  <div class="ent-info-val">Change Password</div>
+                  <div class="ent-info-label">Update your account password</div>
+                </div>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+              <div class="ent-sec-item">
+                <div class="ent-info-icon" style="background:#fef3c7">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div style="flex:1">
+                  <div class="ent-info-val">Two-Factor Auth</div>
+                  <div class="ent-info-label">Add an extra layer of security</div>
+                </div>
+                <div class="ent-toggle-off">Off</div>
+              </div>
+              <div class="ent-sec-item">
+                <div class="ent-info-icon" style="background:#eff6ff">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+                </div>
+                <div style="flex:1">
+                  <div class="ent-info-val">Notifications</div>
+                  <div class="ent-info-label">Manage your notifications</div>
+                </div>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Role card -->
+          <div class="ent-card" id="ws-role-card">
+            <div class="ws-role-badge" id="ws-role-badge"></div>
+            <div class="ws-role-desc" id="ws-role-desc" style="font-size:12px;color:#64748b;line-height:1.6;margin-top:6px"></div>
+          </div>
+        </div>
+
+      </div><!-- end ent-grid3 -->
+
+      <!-- FOOTER -->
+      <div class="ent-footer">
+        <span>&copy; 2026 K G Somani &amp; Co LLP. All rights reserved.</span>
+        <div class="ent-footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Documentation</a>
+          <span style="color:#cbd5e1">Ind AS 116 ROU Platform v2.5.0</span>
+        </div>
+      </div>
+
+    </div><!-- end ent-main -->
+  </div><!-- end ent-body -->
+</div>
+
+
+<!-- ══════════════════════════════════════
+     MODALS
+══════════════════════════════════════ -->
+
+<!-- ADD CLIENT MODAL -->
+<div class="modal-overlay" id="modal-add-client">
+  <div class="modal" style="width:520px">
+    <div class="modal-header">
+      <h3>Add New Company</h3>
+      <button class="modal-close" onclick="Modal.close('modal-add-client')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-cols" style="gap:12px">
+        <div class="form-row" style="margin-bottom:0">
+          <label class="form-label">Company Name <span class="req">*</span></label>
+          <input class="form-input" id="new-client-name" type="text" placeholder="e.g. EbixCash Travel & Forex Ltd">
+          <div class="form-error" id="new-client-name-err"></div>
+        </div>
+        <div class="form-row" style="margin-bottom:0">
+          <label class="form-label">Short Code</label>
+          <input class="form-input" id="new-client-code" type="text" placeholder="e.g. ECWML (auto-filled)">
+          <div class="form-hint">Used in export file names</div>
+        </div>
+      </div>
+      <div class="form-row" style="margin-top:14px">
+        <label class="form-label">Registered Address <span class="req">*</span></label>
+        <textarea class="form-input form-textarea" id="new-client-address" rows="3" placeholder="e.g. 8th Floor, Manek Plaza, Kalina CST Road, Mumbai – 400 098" style="resize:vertical;min-height:72px;line-height:1.5"></textarea>
+        <div class="form-error" id="new-client-address-err"></div>
+        <div class="form-hint">Appears as header on all exported Excel workpapers</div>
+      </div>
+      <div class="form-cols" style="gap:12px">
+        <div class="form-row" style="margin-bottom:0">
+          <label class="form-label">Default IBR (Annual %)</label>
+          <input class="form-input" id="new-client-ibr" type="number" placeholder="9" step="0.01" min="0" max="100">
+          <div class="form-hint">Override per lease as needed</div>
+        </div>
+        <div class="form-row" style="margin-bottom:0">
+          <label class="form-label">Prepared By</label>
+          <input class="form-input" id="new-client-prepared-by" type="text" placeholder="e.g. Finance Team">
+          <div class="form-hint">Appears on all workpapers</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('modal-add-client')">Cancel</button>
+      <button class="btn btn-primary" onclick="App.saveClient()">Save Company</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="modal-overlay" id="modal-admin-login">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3>Admin Panel Access</h3>
+      <button class="modal-close" onclick="Modal.close('modal-admin-login')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="admin-password-input" type="password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')App.adminLogin()">
+        <div class="form-error" id="admin-login-err"></div>
+        <div class="form-hint" id="admin-firsttime-hint" style="display:none;color:var(--accent);font-weight:500">First use — enter a password to secure the admin panel.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('modal-admin-login')">Cancel</button>
+      <button class="btn btn-primary" onclick="App.adminLogin()">Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL MODAL -->
+<div class="modal-overlay" id="modal-admin-panel">
+  <div class="modal" style="width:780px;max-width:96vw">
+    <div class="modal-header">
+      <h3>Admin Panel</h3>
+      <button class="modal-close" onclick="Modal.close('modal-admin-panel')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:0">
+      <div style="display:flex;min-height:440px">
+        <!-- TAB NAV (left side) -->
+        <div id="admin-tab-nav" style="width:170px;background:#f8fafc;border-right:1px solid var(--border);padding:14px 0;flex-shrink:0">
+          <div class="admin-tab-btn active" data-tab="company" onclick="Admin.switchTab('company')" style="padding:10px 16px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text);border-left:3px solid transparent;transition:all 0.15s">Company</div>
+          <div class="admin-tab-btn" data-tab="defaults" onclick="Admin.switchTab('defaults')" style="padding:10px 16px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text2);border-left:3px solid transparent;transition:all 0.15s">Date &amp; Escalation</div>
+          <div class="admin-tab-btn" data-tab="storage" onclick="Admin.switchTab('storage')" style="padding:10px 16px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text2);border-left:3px solid transparent;transition:all 0.15s">Storage &amp; Backup</div>
+          <div class="admin-tab-btn" data-tab="security" onclick="Admin.switchTab('security')" style="padding:10px 16px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text2);border-left:3px solid transparent;transition:all 0.15s">Security</div>
+          <div class="admin-tab-btn" data-tab="danger" onclick="Admin.switchTab('danger')" style="padding:10px 16px;cursor:pointer;font-size:12.5px;font-weight:600;color:#dc2626;border-left:3px solid transparent;transition:all 0.15s">Danger Zone</div>
+        </div>
+
+        <!-- TAB CONTENT (right side) -->
+        <div style="flex:1;padding:20px 24px;overflow-y:auto;max-height:520px">
+          <!-- TAB: Company -->
+          <div class="admin-tab-pane" data-pane="company">
+            <h4 style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)">Company Details</h4>
+            <div class="form-row">
+              <label class="form-label">Company Name</label>
+              <input class="form-input" id="admin-edit-name" type="text" placeholder="Company name">
+              <div class="form-error" id="admin-edit-name-err"></div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Short Name / Code</label>
+              <input class="form-input" id="admin-edit-code" type="text" placeholder="Short code">
+              <div class="form-error" id="admin-edit-code-err"></div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Registered Address</label>
+              <textarea class="form-input form-textarea" id="admin-edit-address" rows="2" style="resize:vertical;min-height:60px;line-height:1.6" placeholder="Full registered address"></textarea>
+              <div class="form-error" id="admin-edit-address-err"></div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="Admin.updateCompanyDetails()">Update Company Details</button>
+          </div>
+
+          <!-- TAB: Date & Escalation Defaults -->
+          <div class="admin-tab-pane" data-pane="defaults" style="display:none">
+            <h4 style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)">Date &amp; Escalation Defaults</h4>
+            <div class="form-hint" style="margin-bottom:14px;padding:10px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;line-height:1.6;color:#1e3a8a">
+              <strong>This setting controls how ALL ROUs under this company are computed and displayed.</strong>
+              It is a master switch — flipping it instantly changes every schedule view, computation, and export for this company. You can switch back and forth freely; nothing is destroyed. Each ROU's saved data is preserved either way.
+            </div>
+            <div class="form-row">
+              <label class="form-label">Default Mode for New ROUs</label>
+              <select class="form-select" id="admin-default-esc-basis">
+                <option value="month">Default (Month Number) — current logic</option>
+                <option value="period">Calendar Period — date-wise computation logic</option>
+              </select>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+              <div style="border:1px solid var(--border);border-radius:8px;padding:12px;background:#f8fafc">
+                <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">📅 Default (Month Number)</div>
+                <ul style="font-size:11.5px;color:var(--text2);line-height:1.6;margin:0;padding-left:18px">
+                  <li>Schedule = N equal lease-month buckets (start-day to start-day-1)</li>
+                  <li>Row dates = lease commencement + (m-1) months</li>
+                  <li>Custom escalation steps entered as <em>Month 1, 2, 3…</em></li>
+                  <li>No proration — every row gets the full monthly rent</li>
+                  <li>Same depreciation, PV, interest, SD logic as the original engine</li>
+                </ul>
+              </div>
+              <div style="border:1px solid #fde68a;border-radius:8px;padding:12px;background:#fffbeb">
+                <div style="font-size:12px;font-weight:700;color:#78350f;margin-bottom:6px">📆 Calendar Period</div>
+                <ul style="font-size:11.5px;color:#78350f;line-height:1.6;margin:0;padding-left:18px">
+                  <li>Schedule aligns to actual calendar months</li>
+                  <li>Row dates = end-of-month (arrears) or start-of-month (advance)</li>
+                  <li>Partial first/last months pro-rated by days (e.g. 10/30)</li>
+                  <li>Custom escalation steps entered as <em>From-Date → To-Date</em></li>
+                  <li>Security Deposit dates &amp; periods auto-align with rent rows</li>
+                  <li>PV, interest, depreciation, export — all driven by these dates</li>
+                </ul>
+              </div>
+            </div>
+
+            <button class="btn btn-primary btn-sm" style="margin-top:16px" onclick="Admin.updateDateEscalationDefaults()">Save Default for New ROUs</button>
+            <div id="admin-defaults-current" style="margin-top:10px;font-size:11.5px;color:var(--text3)"></div>
+          </div>
+
+          <!-- TAB: Storage & Backup -->
+          <div class="admin-tab-pane" data-pane="storage" style="display:none">
+            <h4 style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)">Storage</h4>
+            <div class="admin-row">
+              <div>
+                <div class="admin-row-label">Cloud Sync</div>
+                <div class="admin-row-sub" id="admin-storage-info">Calculating…</div>
+              </div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600" id="admin-storage-pct">-</div>
+            </div>
+            <div style="background:var(--border);border-radius:4px;height:6px;margin-top:8px;margin-bottom:20px">
+              <div id="admin-storage-bar" style="background:var(--accent);height:6px;border-radius:4px;width:0%;transition:width 0.4s"></div>
+            </div>
+
+            <h4 style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)">Backup &amp; Restore</h4>
+            <div class="admin-row">
+              <div>
+                <div class="admin-row-label">Download Backup</div>
+                <div class="admin-row-sub">Export all data as JSON file</div>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="Admin.backup()">Backup</button>
+            </div>
+            <div class="admin-row">
+              <div>
+                <div class="admin-row-label">Restore from Backup</div>
+                <div class="admin-row-sub">Upload a JSON backup file</div>
+              </div>
+              <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+                Restore
+                <input type="file" accept=".json" id="restore-file-input" style="display:none" onchange="Admin.restore(this)">
+              </label>
+            </div>
+          </div>
+
+          <!-- TAB: Security -->
+          <div class="admin-tab-pane" data-pane="security" style="display:none">
+            <h4 style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)">Change Admin Password</h4>
+            <div class="form-row">
+              <label class="form-label">New Admin Password</label>
+              <input class="form-input" id="admin-new-pass" type="password" placeholder="Enter new password">
+            </div>
+            <div class="form-row">
+              <label class="form-label">Confirm Password</label>
+              <input class="form-input" id="admin-confirm-pass" type="password" placeholder="Repeat new password">
+              <div class="form-error" id="admin-pass-err"></div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="Admin.changePassword()">Update Password</button>
+          </div>
+
+          <!-- TAB: Danger Zone -->
+          <div class="admin-tab-pane" data-pane="danger" style="display:none">
+            <div class="danger-zone" style="margin:0">
+              <h4 style="margin-top:0">Danger Zone</h4>
+              <div class="admin-row">
+                <div>
+                  <div class="admin-row-label">Reset Single Company</div>
+                  <div class="admin-row-sub">Delete all ROUs for one company</div>
+                </div>
+                <button class="btn btn-danger btn-sm" onclick="Admin.resetClient()">Reset Company</button>
+              </div>
+              <div class="admin-row">
+                <div>
+                  <div class="admin-row-label">Delete Current Company</div>
+                  <div class="admin-row-sub">Permanently delete this company and all its ROUs</div>
+                </div>
+                <button class="btn btn-danger btn-sm" onclick="Admin.deleteClient()">Delete Company</button>
+              </div>
+              <div class="admin-row" style="border:none">
+                <div>
+                  <div class="admin-row-label">Reset ALL Data</div>
+                  <div class="admin-row-sub">Permanently delete everything</div>
+                </div>
+                <button class="btn btn-danger btn-sm" onclick="Admin.confirmResetAll()">Reset All</button>
+              </div>
+              <div class="form-row" style="margin-top:12px">
+                <label class="form-label">Type <strong>RESET</strong> to confirm full reset:</label>
+                <input class="form-input" id="reset-confirm-input" type="text" placeholder="Type RESET">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('modal-admin-panel')">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="modal-profile">
+  <div class="modal" style="width:480px">
+    <div class="modal-header">
+      <h3>My Profile</h3>
+      <button class="modal-close" onclick="Modal.close('modal-profile')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- User info header -->
+      <div id="profile-header" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:#f8fafc;border-radius:10px;margin-bottom:20px;border:1px solid #e2e8f0">
+        <div id="profile-avatar" style="width:48px;height:48px;border-radius:12px;background:#1a3f6b;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0">?</div>
+        <div>
+          <div id="profile-name-display" style="font-size:15px;font-weight:700;color:#0f172a"></div>
+          <div id="profile-email-display" style="font-size:12px;color:#94a3b8;margin-top:2px"></div>
+          <div id="profile-role-display" style="display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-top:5px"></div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div style="display:flex;border-bottom:1px solid #e2e8f0;margin-bottom:18px">
+        <div class="profile-tab active" onclick="switchProfileTab('details')" id="ptab-details" style="padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid #1a3f6b;color:#1a3f6b">Profile Details</div>
+        <div class="profile-tab" onclick="switchProfileTab('password')" id="ptab-password" style="padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:#94a3b8">Change Password</div>
+      </div>
+
+      <!-- TAB: DETAILS -->
+      <div id="profile-tab-details">
+        <div id="profile-details-alert" style="display:none;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;line-height:1.5"></div>
+        <div class="form-row">
+          <label class="form-label">Full Name</label>
+          <input class="form-input" id="profile-name-input" type="text" placeholder="Your full name">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Email Address</label>
+          <input class="form-input" id="profile-email-input" type="email" disabled style="background:#f1f5f9;cursor:not-allowed;color:#94a3b8">
+          <div class="form-hint">Email cannot be changed. Contact admin if needed.</div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Role</label>
+          <input class="form-input" id="profile-role-input" type="text" disabled style="background:#f1f5f9;cursor:not-allowed;color:#64748b">
+          <div class="form-hint">Roles are assigned by the Administrator.</div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:4px" onclick="App.saveProfile()">Save Changes</button>
+      </div>
+
+      <!-- TAB: PASSWORD -->
+      <div id="profile-tab-password" style="display:none">
+        <div id="profile-pw-alert" style="display:none;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;line-height:1.5"></div>
+        <div class="form-row">
+          <label class="form-label">Current Password</label>
+          <input class="form-input" id="profile-pw-current" type="password" placeholder="Enter current password">
+        </div>
+        <div class="form-row">
+          <label class="form-label">New Password</label>
+          <input class="form-input" id="profile-pw-new" type="password" placeholder="Min. 8 characters">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Confirm New Password</label>
+          <input class="form-input" id="profile-pw-confirm" type="password" placeholder="Repeat new password">
+        </div>
+        <button class="btn btn-primary" style="margin-top:4px" onclick="App.changePassword()">Update Password</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE ROU CONFIRM -->
+<div class="modal-overlay" id="modal-delete-rou">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3>Delete ROU</h3>
+      <button class="modal-close" onclick="Modal.close('modal-delete-rou')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--text)">Are you sure you want to delete <strong id="delete-rou-name">this ROU</strong>? This cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('modal-delete-rou')">Cancel</button>
+      <button class="btn btn-danger" onclick="App.confirmDeleteROU()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- DUPLICATE ROU CONFIRM -->
+<div class="modal-overlay" id="modal-duplicate-rou">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3>Duplicate ROU</h3>
+      <button class="modal-close" onclick="Modal.close('modal-duplicate-rou')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--text);line-height:1.6">Duplicate <strong id="duplicate-rou-name">this ROU</strong>?<br><span style="font-size:12px;color:var(--text3)">A full copy will be created with all lease terms, escalations and reassessments preserved.</span></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('modal-duplicate-rou')">Cancel</button>
+      <button class="btn btn-primary" onclick="App.confirmDuplicateROU()">Duplicate</button>
+    </div>
+  </div>
+</div>
+
+<!-- PERIOD SELECTOR MODAL -->
+<div class="modal-overlay" id="modal-period">
+  <div class="modal" style="width:420px">
+    <div class="modal-header">
+      <h3>Set Reporting Period</h3>
+      <button class="modal-close" onclick="Modal.close('modal-period')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-cols">
+        <div class="form-row">
+          <label class="form-label">From Date</label>
+          <input class="form-input" id="period-start-input" type="date">
+        </div>
+        <div class="form-row">
+          <label class="form-label">To Date</label>
+          <input class="form-input" id="period-end-input" type="date">
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;font-weight:600">Quick Select</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px" id="period-quick-btns"></div>
+      </div>
+      <div id="period-range-display" style="display:none;margin-top:14px;background:var(--light);border:1px solid var(--border);border-radius:8px;padding:11px 14px">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Selected Period</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text)" id="period-range-label">-</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('modal-period')">Cancel</button>
+      <button class="btn btn-primary" onclick="App.setPeriod()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+
+
+<!-- Vendor: ExcelJS + JSZip -->
+<script src="js/vendor/exceljs.bundle.js"></script>
+
+<!-- Core -->
+<script src="js/api.js"></script>
+<script src="js/db.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/modal.js"></script>
+<script src="js/app.js"></script>
+<script src="js/admin.js"></script>
+
+<!-- Engine & Forms -->
+<script src="js/engine.js"></script>
+<script src="js/form.js"></script>
+<script src="js/schedule.js"></script>
+
+<!-- Features -->
+<script src="js/exporter.js"></script>
+<script src="js/bulk-import.js"></script>
+<script src="js/audit-log.js"></script>
+<script src="js/reassess-override.js"></script>
+<script src="js/live-preview.js"></script>
+
+<!-- Boot -->
+<script src="js/boot.js"></script>
+
+
+
+
+<!-- ── PROFILE + WORKSPACE HELPERS ──────────────────────────── -->
+<script>
+/* Profile tab switcher */
+function switchProfileTab(tab) {
+  var tabs    = ['details','password'];
+  var tabIds  = { details:'ptab-details', password:'ptab-password' };
+  var paneIds = { details:'profile-tab-details', password:'profile-tab-password' };
+  tabs.forEach(function(t) {
+    var tabEl  = document.getElementById(tabIds[t]);
+    var paneEl = document.getElementById(paneIds[t]);
+    var active = t === tab;
+    if (tabEl) {
+      tabEl.style.color       = active ? '#1a3f6b' : '#94a3b8';
+      tabEl.style.borderBottomColor = active ? '#1a3f6b' : 'transparent';
+    }
+    if (paneEl) paneEl.style.display = active ? '' : 'none';
+  });
+}
+
+/* Profile alert helper */
+function profileAlert(tab, msg, type) {
+  var id = tab === 'password' ? 'profile-pw-alert' : 'profile-details-alert';
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = type === 'success' ? '#f0fdf4' : '#fef2f2';
+  el.style.border     = '1.5px solid ' + (type === 'success' ? '#bbf7d0' : '#fecaca');
+  el.style.color      = type === 'success' ? '#065f46' : '#991b1b';
+  if (type === 'success') {
+    setTimeout(function() { el.style.display = 'none'; }, 3000);
+  }
+}
+
+/* Period quick buttons */
+(function() {
+  var wrap = document.getElementById('period-quick-btns');
+  if (!wrap) return;
+  var yr = new Date().getFullYear();
+  for (var y = yr - 1; y <= yr + 1; y++) {
+    (function(year) {
+      var btn = document.createElement('button');
+      btn.className = 'btn btn-ghost btn-sm';
+      btn.textContent = 'FY ' + year + '-' + String(year+1).slice(2);
+      btn.style.fontSize = '12px';
+      btn.onclick = function() {
+        var si = document.getElementById('period-start-input');
+        var ei = document.getElementById('period-end-input');
+        if (si) si.value = year + '-04-01';
+        if (ei) ei.value = (year+1) + '-03-31';
+        var lbl = document.getElementById('period-range-label');
+        var wrap2 = document.getElementById('period-range-display');
+        if (lbl) lbl.textContent = '01 Apr ' + year + ' – 31 Mar ' + (year+1);
+        if (wrap2) wrap2.style.display = '';
+      };
+      wrap.appendChild(btn);
+    })(y);
+  }
+})();
+</script>
+
+
+<script>
+/* Update sidebar user bar + topbar pill after App.init() */
+(function patchSidebarUserBar() {
+  var token = localStorage.getItem('rou_token');
+  if (!token) return;
+  try {
+    var p = JSON.parse(atob(token.split('.')[1]));
+    var ROLE_COLORS = { admin:'#e8520a', partner:'#7c3aed', manager:'#1a3f6b', article:'#059669' };
+    var ROLE_LABELS = { admin:'Administrator', partner:'Partner', manager:'Manager', article:'Article' };
+    var color = ROLE_COLORS[p.role] || '#1a3f6b';
+    var label = ROLE_LABELS[p.role] || p.role;
+    var initial = (p.name || '?').charAt(0).toUpperCase();
+
+    // Sidebar user bar
+    var av  = document.getElementById('sidebar-user-avatar');
+    var nm  = document.getElementById('sidebar-user-name');
+    var rl  = document.getElementById('sidebar-user-role');
+    if (av) { av.textContent = initial; av.style.background = color; }
+    if (nm) nm.textContent = p.name || p.email || 'User';
+    if (rl) rl.textContent = label;
+
+    // Topbar pill
+    var tav = document.getElementById('topbar-user-avatar');
+    var tnm = document.getElementById('topbar-user-name');
+    if (tav) { tav.textContent = initial; tav.style.background = color; }
+    if (tnm) tnm.textContent = p.name || p.email || 'User';
+  } catch(e) {}
+})();
+</script>
+
+
+
+
+<!-- CHANGE PASSWORD MODAL -->
+<div class="pw-modal-overlay" id="modal-change-pw">
+  <div class="pw-modal">
+    <div class="pw-modal-hdr">
+      <h3>Change Password</h3>
+      <button class="pw-modal-close" onclick="App.closeChangePwModal()">&#x2715;</button>
+    </div>
+    <div class="pw-modal-body">
+      <div class="pw-alert" id="pw-modal-alert"></div>
+      <div class="pw-field">
+        <label>Current Password</label>
+        <input id="pm-pw-current" type="password" placeholder="Enter current password">
+      </div>
+      <div class="pw-field">
+        <label>New Password</label>
+        <input id="pm-pw-new" type="password" placeholder="Minimum 8 characters">
+      </div>
+      <div class="pw-field" style="margin-bottom:0">
+        <label>Confirm New Password</label>
+        <input id="pm-pw-confirm" type="password" placeholder="Repeat new password">
+      </div>
+    </div>
+    <div class="pw-modal-ftr">
+      <button onclick="App.closeChangePwModal()" style="padding:9px 16px;background:#f1f5f9;color:#475569;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Cancel</button>
+      <button onclick="App.submitChangePw()" style="padding:9px 16px;background:#0a1e3d;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.15s" onmouseover="this.style.background='#162f5a'" onmouseout="this.style.background='#0a1e3d'">Update Password</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
+
+
+
+
+
+
