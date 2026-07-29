@@ -386,23 +386,22 @@ window.App = {
     this.renderWorkspaceHome();
   },
 
-  /* Navigate to a page inside the app — if no client selected, show picker toast */
+  /* Navigate to a page inside the app */
   navToAppPage(page) {
     if (this.currentClient) {
       this.enterApp();
       this.showPage(page);
       return;
     }
-    // No client selected — open the app with the last/first available client
     const clients = DB.get('clients') || [];
     if (!clients.length) {
-      // No companies exist — prompt to add one
       Modal.openAddClient();
       return;
     }
-    // Use first available company
-    this.currentClient = clients[0];
-    DB.set('last_client', clients[0].id);
+    const lastId = DB.get('last_client');
+    const found  = lastId && clients.find(c => c.id === lastId);
+    this.currentClient = found || clients[0];
+    DB.set('last_client', this.currentClient.id);
     this.enterApp();
     this.showPage(page);
   },
@@ -776,5 +775,6 @@ window.App = {
 document.addEventListener('click', function() {
   document.getElementById('ws-dropdown')?.classList.remove('open');
 });
+
 
 
