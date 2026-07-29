@@ -324,6 +324,54 @@ document.documentElement.style.visibility = 'hidden';
 .pw-field input { width:100%; padding:9px 12px; font-size:13.5px; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:8px; color:#0f172a; outline:none; font-family:inherit; box-sizing:border-box; transition:border-color 0.15s; }
 .pw-field input:focus { border-color:#0a1e3d; box-shadow:0 0 0 3px rgba(10,30,61,0.07); }
 .pw-alert { display:none; border-radius:8px; padding:9px 12px; font-size:12.5px; margin-bottom:12px; line-height:1.5; }
+
+/* ── ENHANCEMENTS: popovers, sections, guide ── */
+.ent-notif-dot { position:absolute; top:6px; right:6px; width:7px; height:7px; border-radius:50%; background:#ef4444; border:1.5px solid #0a1e3d; }
+.ent-popover {
+  position:absolute; top:calc(100% + 8px); right:0; width:300px; background:#fff;
+  border:1px solid #e2e8f0; border-radius:11px; box-shadow:0 10px 40px rgba(0,0,0,0.14);
+  display:none; z-index:200; overflow:hidden; animation:ddIn 0.15s ease;
+}
+.ent-popover.open { display:block; }
+.ent-popover-hdr { padding:12px 15px; font-size:12.5px; font-weight:700; color:#0f172a; background:#f8fafc; border-bottom:1px solid #f1f5f9; }
+.ent-notif-item { display:flex; gap:10px; padding:11px 15px; border-bottom:1px solid #f8fafc; align-items:flex-start; }
+.ent-notif-item:last-child { border-bottom:none; }
+.ent-notif-ic { width:26px; height:26px; border-radius:7px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+.ent-notif-tt { font-size:12.5px; font-weight:600; color:#0f172a; }
+.ent-notif-ds { font-size:11px; color:#94a3b8; margin-top:1px; line-height:1.4; }
+.ent-notif-empty { padding:26px 15px; text-align:center; color:#94a3b8; font-size:12.5px; }
+.ent-help-item { padding:10px 15px; border-bottom:1px solid #f8fafc; display:flex; flex-direction:column; gap:2px; }
+.ent-help-item:last-child { border-bottom:none; }
+.ent-help-item strong { font-size:12.5px; color:#0f172a; }
+.ent-help-item span { font-size:11px; color:#94a3b8; line-height:1.4; }
+.ent-help-sep { height:1px; background:#f1f5f9; }
+
+/* Sections */
+.ent-section-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:4px; }
+.ent-section-title { font-size:20px; font-weight:800; color:#0f172a; letter-spacing:-0.5px; }
+.ent-section-sub { font-size:13px; color:#64748b; margin-top:2px; }
+.ent-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; }
+
+/* Guide steps */
+.ent-guide-step { display:flex; gap:12px; align-items:flex-start; }
+.ent-guide-num { width:24px; height:24px; border-radius:7px; background:#0a1e3d; color:#fff; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ent-guide-step strong { font-size:13px; color:#0f172a; }
+.ent-guide-step p { font-size:11.5px; color:#94a3b8; margin-top:2px; line-height:1.5; }
+
+/* Settings rows */
+.ent-set-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 0; border-bottom:1px solid #f1f5f9; }
+.ent-ghost-btn { padding:7px 14px; border:1.5px solid #e2e8f0; background:#fff; border-radius:8px; font-size:12.5px; font-weight:600; color:#0f172a; cursor:pointer; font-family:inherit; transition:all 0.15s; }
+.ent-ghost-btn:hover { border-color:#0a1e3d; background:#f7f9fc; }
+.ent-ghost-btn.danger { color:#dc2626; border-color:#fecaca; }
+.ent-ghost-btn.danger:hover { background:#fef2f2; border-color:#dc2626; }
+.ent-badge-soft { font-size:11px; font-weight:700; background:#eff6ff; color:#1d4ed8; padding:3px 11px; border-radius:20px; }
+
+/* Full company list rows */
+.ent-comp-row { display:flex; align-items:center; gap:13px; padding:13px 15px; border:1.5px solid #e8edf3; border-radius:10px; cursor:pointer; transition:all 0.15s; background:#fff; }
+.ent-comp-row:hover { border-color:#0a1e3d; background:#f7f9fc; transform:translateX(2px); box-shadow:0 2px 10px rgba(10,30,61,0.08); }
+.ent-comp-logo { width:42px; height:42px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; color:#fff; }
+.ent-comp-name { font-size:14px; font-weight:700; color:#0f172a; }
+.ent-comp-meta { font-size:11.5px; color:#94a3b8; margin-top:2px; }
 </style>
 
 </head>
@@ -347,12 +395,30 @@ document.documentElement.style.visibility = 'hidden';
       <span class="ent-search-kbd">⌘ K</span>
     </div>
     <div class="ent-topnav-right">
-      <button class="ent-icon-btn" title="Notifications">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
-      </button>
-      <button class="ent-icon-btn" title="Help">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
-      </button>
+      <div style="position:relative">
+        <button class="ent-icon-btn" title="Notifications" onclick="App.toggleNotifications(event)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span class="ent-notif-dot" id="ent-notif-dot" style="display:none"></span>
+        </button>
+        <div class="ent-popover" id="ent-notif-popover" onclick="event.stopPropagation()">
+          <div class="ent-popover-hdr">Notifications</div>
+          <div id="ent-notif-list"></div>
+        </div>
+      </div>
+      <div style="position:relative">
+        <button class="ent-icon-btn" title="Help" onclick="App.toggleHelp(event)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+        </button>
+        <div class="ent-popover" id="ent-help-popover" onclick="event.stopPropagation()">
+          <div class="ent-popover-hdr">Help &amp; Shortcuts</div>
+          <div class="ent-help-item"><strong>Add a company</strong><span>Click "Add Company" on the dashboard or Client Companies.</span></div>
+          <div class="ent-help-item"><strong>Open a workspace</strong><span>Click any company card to manage its ROUs &amp; leases.</span></div>
+          <div class="ent-help-item"><strong>Switch company</strong><span>Use the profile button at the bottom-left inside a workspace.</span></div>
+          <div class="ent-help-item"><strong>Change password</strong><span>Profile &rarr; Change Password tab.</span></div>
+          <div class="ent-help-sep"></div>
+          <div class="ent-help-item"><strong>Need more help?</strong><span>Contact your administrator or KG Somani IT support.</span></div>
+        </div>
+      </div>
       <div class="ent-divider-v"></div>
       <!-- User pill -->
       <div class="ent-user-pill" id="ws-user-pill" onclick="App.toggleUserDropdown(event)">
@@ -389,30 +455,28 @@ document.documentElement.style.visibility = 'hidden';
     <div class="ent-sidebar">
       <nav class="ent-nav">
         <div class="ent-nav-section-label">Main</div>
-        <a class="ent-nav-item active" href="#" onclick="App.goHome(); return false;">
+        <a class="ent-nav-item active" id="nav-dashboard" href="#" onclick="App.showHomeSection('dashboard'); return false;">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
           Dashboard
         </a>
-        <a class="ent-nav-item" href="#" onclick="App.goHome(); return false;">
+        <a class="ent-nav-item" id="nav-companies" href="#" onclick="App.showHomeSection('companies'); return false;">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           Client Companies
           <span class="ent-nav-badge" id="nav-badge-companies">0</span>
         </a>
-        <a class="ent-nav-item" href="#" onclick="App.navToAppPage('rous'); return false;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          ROU Assets
-          <span class="ent-nav-badge" id="nav-badge-rous">0</span>
+
+        <div class="ent-nav-section-label" style="margin-top:16px">Tools</div>
+        <a class="ent-nav-item" id="nav-activity" href="#" onclick="App.showHomeSection('activity'); return false;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Activity
         </a>
-        <a class="ent-nav-item" href="#" onclick="App.navToAppPage('rous'); return false;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          Leases
+        <a class="ent-nav-item" id="nav-help" href="#" onclick="App.showHomeSection('help'); return false;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+          Help &amp; Guide
         </a>
-        <a class="ent-nav-item" href="#" onclick="App.navToAppPage('export'); return false;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
-          Reports
-        </a>
+
         <div class="ent-nav-section-label" style="margin-top:16px">Account</div>
-        <a class="ent-nav-item" href="#" onclick="Modal.open('modal-profile'); return false;">
+        <a class="ent-nav-item" id="nav-profile" href="#" onclick="Modal.open('modal-profile'); return false;">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           Profile
         </a>
@@ -420,8 +484,8 @@ document.documentElement.style.visibility = 'hidden';
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M12 14a8 8 0 00-8 8"/><path d="M19.5 16c0 1.4-.6 2.7-1.5 3.6m3-3.6a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/></svg>
           Admin Panel
         </a>
-        <a class="ent-nav-item" href="#" onclick="App.openChangePwModal(); return false;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        <a class="ent-nav-item" id="nav-settings" href="#" onclick="App.showHomeSection('settings'); return false;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
           Settings
         </a>
       </nav>
@@ -438,6 +502,9 @@ document.documentElement.style.visibility = 'hidden';
 
     <!-- MAIN CONTENT -->
     <div class="ent-main">
+
+      <!-- ══ SECTION: DASHBOARD ══ -->
+      <div id="home-section-dashboard" class="home-section">
 
       <!-- HERO SECTION -->
       <div class="ent-hero">
@@ -540,7 +607,7 @@ document.documentElement.style.visibility = 'hidden';
           </div>
           <div class="ent-card-footer">
             <span id="ws-companies-count" style="font-size:12px;color:#94a3b8">Showing 0 companies</span>
-            <button class="ent-text-btn" onclick="App.goHome()">View All Companies →</button>
+            <button class="ent-text-btn" onclick="App.showHomeSection('companies')">View All Companies →</button>
           </div>
         </div>
 
@@ -548,7 +615,7 @@ document.documentElement.style.visibility = 'hidden';
         <div class="ent-card">
           <div class="ent-card-header">
             <div class="ent-card-title">Recent Activity</div>
-            <button class="ent-text-btn" onclick="App.navToAppPage('audit')">View All</button>
+            <button class="ent-text-btn" onclick="App.showHomeSection('activity')">View All</button>
           </div>
           <div class="ent-activity-list" id="ent-activity-list">
             <div class="ent-activity-item">
@@ -718,6 +785,103 @@ document.documentElement.style.visibility = 'hidden';
         </div>
 
       </div><!-- end ent-grid3 -->
+      </div><!-- end home-section-dashboard -->
+
+      <!-- ══ SECTION: CLIENT COMPANIES (full list) ══ -->
+      <div id="home-section-companies" class="home-section" style="display:none">
+        <div class="ent-section-head">
+          <div>
+            <div class="ent-section-title">Client Companies</div>
+            <div class="ent-section-sub">All companies assigned to you</div>
+          </div>
+          <button class="ent-primary-btn" id="companies-add-btn" onclick="Modal.openAddClient()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Add Company
+          </button>
+        </div>
+        <div class="ent-card">
+          <div class="ent-card-header">
+            <div class="ent-card-title">All Companies</div>
+            <input class="ent-card-search" id="companies-search" type="text" placeholder="Search companies&hellip;" oninput="App.filterAllCompanies()">
+          </div>
+          <div id="companies-full-list" style="padding:12px; display:flex; flex-direction:column; gap:8px; min-height:240px;"></div>
+        </div>
+      </div>
+
+      <!-- ══ SECTION: ACTIVITY ══ -->
+      <div id="home-section-activity" class="home-section" style="display:none">
+        <div class="ent-section-head">
+          <div>
+            <div class="ent-section-title">Activity</div>
+            <div class="ent-section-sub">Recent actions across your workspace</div>
+          </div>
+        </div>
+        <div class="ent-card">
+          <div class="ent-card-header"><div class="ent-card-title">Recent Activity</div></div>
+          <div id="activity-full-list" class="ent-activity-list" style="padding:12px 18px"></div>
+        </div>
+      </div>
+
+      <!-- ══ SECTION: HELP & GUIDE ══ -->
+      <div id="home-section-help" class="home-section" style="display:none">
+        <div class="ent-section-head">
+          <div>
+            <div class="ent-section-title">Help &amp; Guide</div>
+            <div class="ent-section-sub">Getting started with the Ind AS 116 ROU platform</div>
+          </div>
+        </div>
+        <div class="ent-grid2">
+          <div class="ent-card">
+            <div class="ent-card-header"><div class="ent-card-title">Getting Started</div></div>
+            <div style="padding:16px 18px; display:flex; flex-direction:column; gap:14px">
+              <div class="ent-guide-step"><span class="ent-guide-num">1</span><div><strong>Add a client company</strong><p>Create an engagement from the Dashboard or Client Companies tab.</p></div></div>
+              <div class="ent-guide-step"><span class="ent-guide-num">2</span><div><strong>Open the workspace</strong><p>Click a company card to manage its ROUs, leases and schedules.</p></div></div>
+              <div class="ent-guide-step"><span class="ent-guide-num">3</span><div><strong>Add ROU assets</strong><p>Enter lease terms; the engine computes ROU, liability &amp; schedules per Ind AS 116.</p></div></div>
+              <div class="ent-guide-step"><span class="ent-guide-num">4</span><div><strong>Export &amp; report</strong><p>Generate Excel workpapers and audit-ready reports.</p></div></div>
+            </div>
+          </div>
+          <div class="ent-card">
+            <div class="ent-card-header"><div class="ent-card-title">Quick Reference</div></div>
+            <div style="padding:8px 18px">
+              <div class="ent-info-row"><div class="ent-info-icon" style="background:#eff6ff"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div><div class="ent-info-label">Standard</div><div class="ent-info-val">Ind AS 116 — Right of Use</div></div></div>
+              <div class="ent-info-row"><div class="ent-info-icon" style="background:#f0fdf4"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg></div><div><div class="ent-info-label">Switch company</div><div class="ent-info-val">Bottom-left profile button inside a workspace</div></div></div>
+              <div class="ent-info-row"><div class="ent-info-icon" style="background:#fff7ed"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div><div><div class="ent-info-label">Password</div><div class="ent-info-val">Profile → Change Password tab</div></div></div>
+              <div class="ent-info-row"><div class="ent-info-icon" style="background:#fdf4ff"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><div class="ent-info-label">Support</div><div class="ent-info-val">Contact your administrator / KG Somani IT</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SECTION: SETTINGS ══ -->
+      <div id="home-section-settings" class="home-section" style="display:none">
+        <div class="ent-section-head">
+          <div>
+            <div class="ent-section-title">Settings</div>
+            <div class="ent-section-sub">Preferences for your workspace</div>
+          </div>
+        </div>
+        <div class="ent-card">
+          <div class="ent-card-header"><div class="ent-card-title">Preferences</div></div>
+          <div style="padding:8px 18px">
+            <div class="ent-set-row">
+              <div><div class="ent-info-val">Account</div><div class="ent-info-label" id="set-account-email">—</div></div>
+              <button class="ent-ghost-btn" onclick="Modal.open('modal-profile')">Edit Profile</button>
+            </div>
+            <div class="ent-set-row">
+              <div><div class="ent-info-val">Password</div><div class="ent-info-label">Update your account password</div></div>
+              <button class="ent-ghost-btn" onclick="App.openChangePwModal()">Change Password</button>
+            </div>
+            <div class="ent-set-row">
+              <div><div class="ent-info-val">Financial Year</div><div class="ent-info-label" id="set-fy-period">—</div></div>
+              <span class="ent-badge-soft">Ind AS 116</span>
+            </div>
+            <div class="ent-set-row" style="border-bottom:none">
+              <div><div class="ent-info-val">Sign out</div><div class="ent-info-label">End your session on this device</div></div>
+              <button class="ent-ghost-btn danger" onclick="App.signOut()">Sign Out</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- FOOTER -->
       <div class="ent-footer">
@@ -1275,6 +1439,7 @@ function profileAlert(tab, msg, type) {
 
 </body>
 </html>
+
 
 
 
