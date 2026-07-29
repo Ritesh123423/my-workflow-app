@@ -21,12 +21,17 @@ document.documentElement.style.visibility = 'hidden';
 ═══════════════════════════════════════════════════════ */
 #view-home {
   background:#f1f5f9 !important;
+  align-items:stretch !important;
+  justify-content:flex-start !important;
+}
+#view-home.active {
   display:flex !important;
   flex-direction:column !important;
   height:100vh !important;
   overflow:hidden !important;
-  align-items:stretch !important;
-  justify-content:flex-start !important;
+}
+#view-home:not(.active) {
+  display:none !important;
 }
 
 /* TOP NAV */
@@ -2267,6 +2272,7 @@ function profileAlert(tab, msg, type) {
 
 </body>
 </html>
+
 
 
 
