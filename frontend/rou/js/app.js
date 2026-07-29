@@ -178,6 +178,29 @@ window.App = {
     // Admin action — only for admin
     const adminA = document.getElementById('ws-action-admin');
     if (adminA) adminA.style.display = user.role === 'admin' ? 'flex' : 'none';
+    const adminNavA = document.getElementById('ws-action-admin-nav');
+    if (adminNavA) adminNavA.style.display = user.role === 'admin' ? 'flex' : 'none';
+
+    // Sidebar profile
+    const sbAv = document.getElementById('ws-sb-avatar');
+    if (sbAv) { sbAv.textContent = (user.name||'?').charAt(0).toUpperCase(); sbAv.style.background = color; }
+    const sbNm = document.getElementById('ws-sb-name'); if (sbNm) sbNm.textContent = user.name || '';
+    const sbRl = document.getElementById('ws-sb-role'); if (sbRl) sbRl.textContent = label;
+
+    // Hero card
+    const hcAv = document.getElementById('ws-profile-avatar');
+    if (hcAv) { hcAv.textContent = (user.name||'?').charAt(0).toUpperCase(); hcAv.style.background = color; }
+    const hcNm = document.getElementById('ws-profile-name');  if (hcNm) hcNm.textContent = user.name || '';
+    const hcEm = document.getElementById('ws-profile-email'); if (hcEm) hcEm.textContent = user.email || '';
+    const hcRl = document.getElementById('ws-profile-role');  if (hcRl) hcRl.textContent = label;
+
+    // KPI login time
+    const kpiL = document.getElementById('kpi-login');
+    if (kpiL) { const now = new Date(); kpiL.textContent = now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
+
+    // Activity timestamps
+    const t1 = document.getElementById('ent-act-time-1'); if (t1) { const n=new Date(); t1.textContent = n.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
+    const t2 = document.getElementById('ent-act-time-2'); if (t2) { const n=new Date(); t2.textContent = n.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
 
     this.renderCompaniesGrid();
   },
@@ -264,14 +287,21 @@ window.App = {
       clients = clients.filter(c => c.name.toLowerCase().includes(q) || (c.code||'').toLowerCase().includes(q));
     }
 
-    // Stats
+    // Stats (original + new KPI cards + nav badges)
     const sc = document.getElementById('ws-stat-companies'); if (sc) sc.textContent = clients.length;
     const sr = document.getElementById('ws-stat-rous');
-    if (sr) {
-      let t = 0;
-      clients.forEach(c => { t += (DB.get('rous_' + c.id) || []).length; });
-      sr.textContent = t;
-    }
+    let totalRous = 0;
+    clients.forEach(c => { totalRous += (DB.get('rous_' + c.id) || []).length; });
+    if (sr) sr.textContent = totalRous;
+
+    // KPI cards
+    const kpiC = document.getElementById('kpi-companies'); if (kpiC) kpiC.textContent = clients.length;
+    const kpiR = document.getElementById('kpi-rous');      if (kpiR) kpiR.textContent = totalRous;
+    // Nav badges
+    const nbC = document.getElementById('nav-badge-companies'); if (nbC) nbC.textContent = clients.length;
+    const nbR = document.getElementById('nav-badge-rous');      if (nbR) nbR.textContent = totalRous;
+    // Companies count footer
+    const cnt = document.getElementById('ws-companies-count'); if (cnt) cnt.textContent = `Showing ${clients.length} compan${clients.length===1?'y':'ies'}`;
 
     if (!clients.length) {
       const u = API.user();
@@ -712,3 +742,4 @@ window.App = {
 document.addEventListener('click', function() {
   document.getElementById('ws-dropdown')?.classList.remove('open');
 });
+
