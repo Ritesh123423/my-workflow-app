@@ -3,298 +3,439 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sign In — KG Somani ROU Platform</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<title>Sign In · K G Somani & Co LLP — Ind AS 116 ROU Platform</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%231D4ED8'/><text x='16' y='21' font-family='Arial,sans-serif' font-size='11' font-weight='bold' fill='white' text-anchor='middle'>KG</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
   :root {
-    --brand: #0f2a47;
-    --brand2: #1a3f6b;
-    --accent: #e8520a;
-    --accent2: #ff6b2b;
-    --green: #059669;
-    --red: #dc2626;
-    --bg: #f1f5f9;
-    --card: #ffffff;
-    --text: #0f172a;
-    --text2: #475569;
-    --text3: #94a3b8;
-    --border: #e2e8f0;
-    --shadow-card: 0 1px 3px rgba(0,0,0,0.05), 0 8px 32px rgba(0,0,0,0.08);
-    --shadow-btn: 0 4px 14px rgba(15,42,71,0.35);
-    --radius: 14px;
+    --primary:#1D4ED8; --primary-dark:#1e40af; --dark:#0F172A;
+    --secondary:#64748B; --border:#E2E8F0; --bg:#F8FAFC;
   }
-
-  /* Prevent flash — hide body until auth check done */
-  body { visibility: hidden; }
-  body.ready { visibility: visible; }
-
+  html, body { height:100%; }
   body {
-    font-family: 'Inter', -apple-system, sans-serif;
-    background: var(--bg);
-    min-height: 100vh;
-    display: flex;
-    align-items: stretch;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color:var(--dark); background:#fff;
+    opacity:0; transition:opacity 600ms ease;
+    -webkit-font-smoothing:antialiased;
+  }
+  body.ready { opacity:1; }
+
+  .lp-wrap { display:flex; min-height:100vh; }
+
+  /* ══ LEFT — BRANDING ══ */
+  .lp-left {
+    flex:1; position:relative; overflow:hidden;
+    background:linear-gradient(165deg, #0B1F4D 0%, #0d2a63 55%, #123D9A 100%);
+    display:flex; flex-direction:column; justify-content:space-between;
+    padding:52px 56px;
+    transform:translateX(-20px); opacity:0;
+    animation:slideInLeft 500ms ease 100ms forwards;
+  }
+  @keyframes slideInLeft { to { transform:translateX(0); opacity:1; } }
+
+  /* Background decoration */
+  .lp-deco { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+  .lp-circle {
+    position:absolute; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+    animation:floatCircle 26s ease-in-out infinite;
+  }
+  .lp-circle.c1 { width:560px; height:560px; top:-160px; right:-140px; }
+  .lp-circle.c2 { width:340px; height:340px; bottom:-80px; left:-100px; border:1px solid rgba(255,255,255,0.06); background:none; animation-duration:32s; animation-direction:reverse; }
+  .lp-circle.c3 { width:180px; height:180px; top:44%; left:60%; border:1px solid rgba(255,255,255,0.05); background:none; animation-duration:24s; }
+  @keyframes floatCircle {
+    0%,100% { transform:translate(0,0); }
+    50% { transform:translate(12px,-14px); }
+  }
+  .lp-grid {
+    position:absolute; inset:0;
+    background-image:linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                     linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size:56px 56px;
+    mask-image:radial-gradient(ellipse at center, black 30%, transparent 75%);
+    -webkit-mask-image:radial-gradient(ellipse at center, black 30%, transparent 75%);
+  }
+  .lp-dots {
+    position:absolute; inset:0;
+    background-image:radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size:24px 24px;
   }
 
-  /* LEFT PANEL */
-  .left-panel {
-    width: 420px;
-    flex-shrink: 0;
-    background: linear-gradient(160deg, var(--brand) 0%, #163260 50%, #1a3f6b 100%);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 48px 44px;
-    position: relative;
-    overflow: hidden;
-  }
-  .left-panel::before {
-    content: '';
-    position: absolute;
-    top: -80px; right: -80px;
-    width: 320px; height: 320px;
-    background: radial-gradient(circle, rgba(232,82,10,0.18) 0%, transparent 70%);
-    border-radius: 50%;
-  }
-  .left-panel::after {
-    content: '';
-    position: absolute;
-    bottom: -60px; left: -60px;
-    width: 260px; height: 260px;
-    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
-    border-radius: 50%;
-  }
-  .lp-logo { position: relative; z-index: 1; }
-  .lp-icon {
-    width: 52px; height: 52px;
-    background: var(--accent);
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px; font-weight: 800; color: #fff;
-    margin-bottom: 20px;
-    box-shadow: 0 8px 24px rgba(232,82,10,0.4);
-  }
-  .lp-firm { font-size: 22px; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 6px; letter-spacing: -0.3px; }
-  .lp-sub { font-size: 13px; color: rgba(255,255,255,0.55); letter-spacing: 0.2px; }
-  .lp-features { position: relative; z-index: 1; }
-  .lp-feat {
-    display: flex; align-items: flex-start; gap: 14px;
-    margin-bottom: 22px;
-  }
-  .lp-feat-icon {
-    width: 36px; height: 36px; flex-shrink: 0;
-    background: rgba(255,255,255,0.08);
-    border-radius: 9px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-  }
-  .lp-feat-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 2px; }
-  .lp-feat-desc { font-size: 11.5px; color: rgba(255,255,255,0.45); line-height: 1.5; }
-  .lp-footer { font-size: 11px; color: rgba(255,255,255,0.3); position: relative; z-index: 1; }
+  .lp-left-inner { position:relative; z-index:1; }
 
-  /* RIGHT PANEL */
-  .right-panel {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 32px;
+  /* Brand */
+  .lp-brand { display:flex; align-items:center; gap:13px; }
+  .lp-brand-mark {
+    width:46px; height:46px; border-radius:12px; flex-shrink:0;
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.5px;
+    box-shadow:0 8px 24px rgba(29,78,216,0.4);
   }
-  .form-box { width: 100%; max-width: 400px; }
-  .form-heading { margin-bottom: 32px; }
-  .form-heading h1 { font-size: 26px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; margin-bottom: 6px; }
-  .form-heading p { font-size: 14px; color: var(--text3); }
-  .form-heading p a { color: var(--accent); font-weight: 600; text-decoration: none; }
-  .form-heading p a:hover { text-decoration: underline; }
+  .lp-firm { font-size:18px; font-weight:700; color:#fff; letter-spacing:-0.3px; line-height:1.25; }
+  .lp-firm-sub { font-size:12px; color:rgba(255,255,255,0.5); margin-top:2px; }
 
-  .form-group { margin-bottom: 16px; }
-  .form-label {
-    display: flex; align-items: center; justify-content: space-between;
-    font-size: 12.5px; font-weight: 600; color: var(--text2);
-    margin-bottom: 7px; letter-spacing: 0.1px;
+  /* Middle content */
+  .lp-mid { position:relative; z-index:1; }
+  .lp-heading {
+    font-size:42px; font-weight:800; color:#fff; line-height:1.1;
+    letter-spacing:-1.2px; margin-bottom:20px;
   }
-  .input-wrap { position: relative; }
-  .form-input {
-    width: 100%;
-    padding: 12px 16px;
-    font-size: 14px;
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    outline: none;
-    font-family: inherit;
-    transition: border-color 0.15s, box-shadow 0.15s;
-    -webkit-appearance: none;
+  
+  .lp-heading .accent { background:linear-gradient(90deg,#60a5fa,#93c5fd); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .lp-sub {
+    font-size:15.5px; color:rgba(255,255,255,0.62); line-height:1.7;
+    max-width:440px; margin-bottom:40px;
   }
-  .form-input::placeholder { color: var(--text3); }
-  .form-input:focus { border-color: var(--brand2); box-shadow: 0 0 0 3px rgba(26,63,107,0.1); }
-  .form-input.has-icon { padding-right: 44px; }
-  .input-icon {
-    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-    background: none; border: none; cursor: pointer; color: var(--text3);
-    font-size: 16px; padding: 2px; line-height: 1;
-    transition: color 0.15s;
-  }
-  .input-icon:hover { color: var(--text2); }
 
-  .alert {
-    display: flex; align-items: flex-start; gap: 10px;
-    border-radius: 10px; padding: 12px 14px; font-size: 13px;
-    margin-bottom: 16px; line-height: 1.5; display: none;
+  /* Features */
+  .lp-features { display:flex; flex-direction:column; gap:20px; max-width:440px; }
+  .lp-feat { display:flex; gap:15px; align-items:flex-start; }
+  .lp-feat-ic {
+    width:42px; height:42px; border-radius:11px; flex-shrink:0;
+    background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1);
+    display:flex; align-items:center; justify-content:center;
+    color:#93c5fd; transition:transform 200ms ease, background 200ms ease;
   }
-  .alert.show { display: flex; }
-  .alert-error { background: #fef2f2; border: 1.5px solid #fecaca; color: #991b1b; }
-  .alert-success { background: #f0fdf4; border: 1.5px solid #bbf7d0; color: #065f46; }
-  .alert-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .lp-feat:hover .lp-feat-ic { transform:translateY(-2px); background:rgba(255,255,255,0.12); }
+  .lp-feat-title { font-size:14.5px; font-weight:600; color:#fff; margin-bottom:2px; }
+  .lp-feat-desc { font-size:12.5px; color:rgba(255,255,255,0.48); line-height:1.5; }
 
-  .btn-submit {
-    width: 100%;
-    padding: 13px;
-    font-size: 14.5px;
-    font-weight: 700;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-family: inherit;
-    background: linear-gradient(135deg, var(--brand) 0%, var(--brand2) 100%);
-    color: #fff;
-    box-shadow: var(--shadow-btn);
-    transition: all 0.18s;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    letter-spacing: 0.1px;
-    margin-top: 4px;
+  /* Bottom trust */
+  .lp-trust { position:relative; z-index:1; display:flex; gap:26px; flex-wrap:wrap; }
+  .lp-trust-item { display:flex; align-items:center; gap:8px; font-size:12.5px; color:rgba(255,255,255,0.55); font-weight:500; }
+  .lp-trust-item svg { color:#60a5fa; flex-shrink:0; }
+
+  /* ══ RIGHT — AUTH ══ */
+  .lp-right {
+    flex:1; background:linear-gradient(180deg,#ffffff 0%,#F8FAFC 100%);
+    display:flex; align-items:center; justify-content:center; padding:40px;
   }
-  .btn-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(15,42,71,0.4); }
-  .btn-submit:active:not(:disabled) { transform: translateY(0); }
-  .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; transform: none !important; }
-
-  .spinner { width: 16px; height: 16px; border: 2.5px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; display: none; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
-  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-  .divider span { font-size: 12px; color: var(--text3); }
-
-  .register-link {
-    text-align: center;
-    font-size: 13.5px;
-    color: var(--text2);
+  .lp-card {
+    width:100%; max-width:430px;
+    transform:translateY(30px); opacity:0;
+    animation:slideUp 500ms ease 150ms forwards;
   }
-  .register-link a { color: var(--accent); font-weight: 700; text-decoration: none; }
-  .register-link a:hover { text-decoration: underline; }
+  @keyframes slideUp { to { transform:translateY(0); opacity:1; } }
 
-  /* Responsive */
-  @media (max-width: 780px) {
-    .left-panel { display: none; }
-    body { background: var(--card); }
-    .right-panel { padding: 28px 20px; }
+  .lp-card-head { margin-bottom:28px; opacity:0; animation:fadeUp 500ms ease 200ms forwards; }
+  @keyframes fadeUp { from { transform:translateY(8px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+  .lp-title { font-size:28px; font-weight:800; color:var(--dark); letter-spacing:-0.8px; margin-bottom:6px; }
+  .lp-title-sub { font-size:15px; color:var(--secondary); }
+
+  /* Tabs */
+  .lp-tabs { display:flex; gap:4px; position:relative; margin-bottom:26px; border-bottom:1px solid var(--border); }
+  .lp-tab {
+    padding:11px 4px; margin-right:24px; font-size:14.5px; font-weight:600;
+    color:var(--secondary); cursor:pointer; background:none; border:none;
+    font-family:inherit; position:relative; transition:color 200ms ease;
   }
+  .lp-tab.active { color:var(--primary); }
+  .lp-tab-underline {
+    position:absolute; bottom:-1px; height:2px; background:var(--primary);
+    border-radius:2px; transition:all 250ms cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* Fields */
+  .lp-field { margin-bottom:16px; opacity:0; animation:fadeIn 400ms ease forwards; }
+  .lp-field:nth-of-type(1) { animation-delay:280ms; }
+  .lp-field:nth-of-type(2) { animation-delay:380ms; }
+  @keyframes fadeIn { to { opacity:1; } }
+  .lp-label { display:block; font-size:13px; font-weight:600; color:var(--dark); margin-bottom:7px; }
+  .lp-input-wrap { position:relative; }
+  .lp-input {
+    width:100%; height:46px; padding:0 14px; font-size:15px; font-family:inherit;
+    color:var(--dark); background:#fff; border:1.5px solid var(--border);
+    border-radius:10px; outline:none; transition:border-color 200ms ease, box-shadow 200ms ease;
+  }
+  .lp-input.has-icon { padding-right:44px; }
+  .lp-input::placeholder { color:#94a3b8; }
+  .lp-input:focus { border-color:var(--primary); box-shadow:0 0 0 4px rgba(29,78,216,0.1); }
+  .lp-eye {
+    position:absolute; right:8px; top:50%; transform:translateY(-50%);
+    width:30px; height:30px; border:none; background:none; cursor:pointer;
+    font-size:15px; opacity:0.55; display:flex; align-items:center; justify-content:center;
+    border-radius:6px; transition:opacity 150ms;
+  }
+  .lp-eye:hover { opacity:0.9; background:#f1f5f9; }
+
+  /* Row: remember + forgot */
+  .lp-row { display:flex; align-items:center; justify-content:space-between; margin:4px 0 22px; opacity:0; animation:fadeIn 400ms ease 460ms forwards; }
+  .lp-remember { display:flex; align-items:center; gap:8px; font-size:13.5px; color:var(--secondary); cursor:pointer; user-select:none; }
+  .lp-remember input { width:15px; height:15px; accent-color:var(--primary); cursor:pointer; }
+  .lp-forgot { font-size:13.5px; color:var(--primary); font-weight:600; text-decoration:none; }
+  .lp-forgot:hover { text-decoration:underline; }
+
+  /* Button */
+  .lp-btn {
+    width:100%; height:52px; border:none; border-radius:10px;
+    background:var(--primary); color:#fff; font-size:15px; font-weight:600;
+    font-family:inherit; cursor:pointer; position:relative; overflow:hidden;
+    display:flex; align-items:center; justify-content:center; gap:9px;
+    transition:transform 150ms ease, background 150ms ease, box-shadow 150ms ease;
+    opacity:0; animation:fadeIn 400ms ease 520ms forwards;
+  }
+  .lp-btn:hover:not(:disabled) { background:var(--primary-dark); transform:scale(1.02); box-shadow:0 8px 24px rgba(29,78,216,0.28); }
+  .lp-btn:active:not(:disabled) { transform:scale(0.99); }
+  .lp-btn:disabled { cursor:not-allowed; opacity:0.85; }
+  .lp-spinner {
+    width:18px; height:18px; border:2.5px solid rgba(255,255,255,0.35);
+    border-top-color:#fff; border-radius:50%; display:none;
+    animation:spin 0.6s linear infinite;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .lp-check { display:none; }
+
+  /* Divider */
+  .lp-divider { display:flex; align-items:center; gap:14px; margin:22px 0; opacity:0; animation:fadeIn 400ms ease 580ms forwards; }
+  .lp-divider::before, .lp-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+  .lp-divider span { font-size:12px; color:#94a3b8; font-weight:500; }
+
+  /* SSO */
+  .lp-sso { display:flex; flex-direction:column; gap:10px; opacity:0; animation:fadeIn 400ms ease 640ms forwards; }
+  .lp-sso-btn {
+    width:100%; height:46px; border:1.5px solid var(--border); border-radius:10px;
+    background:#fff; font-size:14px; font-weight:600; color:var(--dark);
+    font-family:inherit; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;
+    transition:border-color 150ms ease, background 150ms ease;
+  }
+  .lp-sso-btn:hover { border-color:#cbd5e1; background:#f8fafc; }
+
+  /* Footer */
+  .lp-foot { text-align:center; margin-top:26px; font-size:13.5px; color:var(--secondary); opacity:0; animation:fadeIn 400ms ease 700ms forwards; }
+  .lp-foot a { color:var(--primary); font-weight:600; text-decoration:none; }
+  .lp-foot a:hover { text-decoration:underline; }
+
+  /* Alert */
+  .lp-alert {
+    display:none; align-items:center; gap:9px; padding:11px 14px; margin-bottom:18px;
+    background:#fef2f2; border:1.5px solid #fecaca; border-radius:10px;
+    font-size:13.5px; color:#991b1b; line-height:1.4;
+  }
+  .lp-alert.show { display:flex; }
+  .lp-alert svg { flex-shrink:0; color:#dc2626; }
+
+  /* ══ RESPONSIVE ══ */
+  @media (max-width:1024px) {
+    .lp-left { padding:44px 40px; }
+    .lp-heading { font-size:36px; }
+  }
+  @media (max-width:860px) {
+    .lp-left { display:none; }
+    .lp-right { flex:1; background:#fff; }
+    .lp-card { max-width:400px; }
+    .lp-mobile-brand { display:flex !important; }
+  }
+  .lp-mobile-brand { display:none; align-items:center; gap:11px; justify-content:center; margin-bottom:30px; }
+  .lp-mobile-brand .lp-brand-mark { width:40px; height:40px; font-size:13px; }
+  .lp-mobile-brand .lp-firm { color:var(--dark); font-size:16px; }
+  .lp-mobile-brand .lp-firm-sub { color:var(--secondary); }
 </style>
 </head>
 <body>
 
-<!-- LEFT -->
-<div class="left-panel">
-  <div class="lp-logo">
-    <div class="lp-icon">ROU</div>
-    <div class="lp-firm">K G Somani & Co LLP</div>
-    <div class="lp-sub">Chartered Accountants · Ind AS 116 Platform</div>
+<div class="lp-wrap">
+
+  <!-- ══ LEFT: BRANDING ══ -->
+  <div class="lp-left">
+    <div class="lp-deco">
+      <div class="lp-grid"></div>
+      <div class="lp-dots"></div>
+      <div class="lp-circle c1"></div>
+      <div class="lp-circle c2"></div>
+      <div class="lp-circle c3"></div>
+    </div>
+
+    <div class="lp-left-inner lp-brand">
+      <div class="lp-brand-mark">KG</div>
+      <div>
+        <div class="lp-firm">K G Somani &amp; Co LLP</div>
+        <div class="lp-firm-sub">Chartered Accountants · Ind AS 116 Platform</div>
+      </div>
+    </div>
+
+    <div class="lp-mid">
+      <h1 class="lp-heading">Ind AS 116 Lease<br><span class="accent">Management Platform</span></h1>
+      <p class="lp-sub">A collaborative enterprise platform for Chartered Accountants to manage lease accounting, audit workpapers, disclosures and compliance.</p>
+
+      <div class="lp-features">
+        <div class="lp-feat">
+          <div class="lp-feat-ic">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>
+          </div>
+          <div>
+            <div class="lp-feat-title">Lease Computation</div>
+            <div class="lp-feat-desc">Present value, IBR discounting &amp; escalations</div>
+          </div>
+        </div>
+        <div class="lp-feat">
+          <div class="lp-feat-ic">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div>
+            <div class="lp-feat-title">Excel Workpapers</div>
+            <div class="lp-feat-desc">Schedule III, journal entries &amp; exports</div>
+          </div>
+        </div>
+        <div class="lp-feat">
+          <div class="lp-feat-ic">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <div class="lp-feat-title">Role Based Access</div>
+            <div class="lp-feat-desc">Partner, Manager, Article &amp; Admin</div>
+          </div>
+        </div>
+        <div class="lp-feat">
+          <div class="lp-feat-ic">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg>
+          </div>
+          <div>
+            <div class="lp-feat-title">Cloud Synchronisation</div>
+            <div class="lp-feat-desc">Automatic backups, access anywhere</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lp-trust">
+      <div class="lp-trust-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Encrypted
+      </div>
+      <div class="lp-trust-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        99.9% uptime
+      </div>
+      <div class="lp-trust-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+        Enterprise Security
+      </div>
+    </div>
   </div>
-  <div class="lp-features">
-    <div class="lp-feat">
-      <div class="lp-feat-icon">📐</div>
-      <div>
-        <div class="lp-feat-title">Precise Lease Computation</div>
-        <div class="lp-feat-desc">PV-based ROU asset & liability with IBR, escalations, reassessments</div>
+
+  <!-- ══ RIGHT: AUTH ══ -->
+  <div class="lp-right">
+    <div class="lp-card">
+
+      <!-- mobile-only brand -->
+      <div class="lp-mobile-brand">
+        <div class="lp-brand-mark">KG</div>
+        <div>
+          <div class="lp-firm">K G Somani &amp; Co LLP</div>
+          <div class="lp-firm-sub">Ind AS 116 Platform</div>
+        </div>
       </div>
-    </div>
-    <div class="lp-feat">
-      <div class="lp-feat-icon">📊</div>
-      <div>
-        <div class="lp-feat-title">Excel Workpapers</div>
-        <div class="lp-feat-desc">One-click export — Schedule III, Journal Entries, Disclosures</div>
+
+      <div class="lp-card-head">
+        <div class="lp-title">Sign In</div>
+        <div class="lp-title-sub">Access your firm's audit engagements.</div>
       </div>
-    </div>
-    <div class="lp-feat">
-      <div class="lp-feat-icon">🔒</div>
-      <div>
-        <div class="lp-feat-title">Role-Based Access</div>
-        <div class="lp-feat-desc">Admin, Partner, Manager, Article — each with right permissions</div>
+
+      <!-- Tabs -->
+      <div class="lp-tabs">
+        <button class="lp-tab active" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
+        <button class="lp-tab" id="tab-register" onclick="switchTab('register')">Create Account</button>
+        <div class="lp-tab-underline" id="tab-underline"></div>
       </div>
-    </div>
-    <div class="lp-feat">
-      <div class="lp-feat-icon">☁️</div>
-      <div>
-        <div class="lp-feat-title">Cloud Sync</div>
-        <div class="lp-feat-desc">All data persisted to PostgreSQL — access from any device</div>
+
+      <!-- Error -->
+      <div class="lp-alert" id="alert-error">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="alert-error-msg"></span>
       </div>
-    </div>
-  </div>
-  <div class="lp-footer">© 2024 K G Somani & Co LLP · Confidential</div>
-</div>
 
-<!-- RIGHT -->
-<div class="right-panel">
-  <div class="form-box">
-    <div class="form-heading">
-      <h1>Welcome back</h1>
-      <p>Don't have an account? <a href="register.html">Create one</a></p>
-    </div>
-
-    <div class="alert alert-error" id="alert-error">
-      <span class="alert-icon">⚠️</span>
-      <span id="alert-error-msg"></span>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Email Address</label>
-      <div class="input-wrap">
-        <input class="form-input" id="email" type="email" placeholder="you@kgsomani.com" autocomplete="email">
+      <!-- Email -->
+      <div class="lp-field">
+        <label class="lp-label" for="email">Email</label>
+        <div class="lp-input-wrap">
+          <input class="lp-input" id="email" type="email" placeholder="you@kgsomani.com" autocomplete="email">
+        </div>
       </div>
-    </div>
 
-    <div class="form-group">
-      <label class="form-label">Password</label>
-      <div class="input-wrap">
-        <input class="form-input has-icon" id="password" type="password" placeholder="Enter your password" autocomplete="current-password">
-        <button class="input-icon" type="button" onclick="togglePw()" tabindex="-1" id="pw-toggle">👁</button>
+      <!-- Password -->
+      <div class="lp-field">
+        <label class="lp-label" for="password">Password</label>
+        <div class="lp-input-wrap">
+          <input class="lp-input has-icon" id="password" type="password" placeholder="Enter your password" autocomplete="current-password">
+          <button class="lp-eye" type="button" onclick="togglePw()" tabindex="-1" id="pw-toggle">👁</button>
+        </div>
       </div>
-    </div>
 
-    <button class="btn-submit" id="login-btn" onclick="doLogin()">
-      <div class="spinner" id="spinner"></div>
-      <span id="btn-text">Sign In →</span>
-    </button>
+      <!-- Remember + forgot -->
+      <div class="lp-row">
+        <label class="lp-remember"><input type="checkbox" id="remember"> Remember me</label>
+        <a class="lp-forgot" href="#" onclick="return false;">Forgot password?</a>
+      </div>
 
-    <div class="divider"><span>or</span></div>
+      <!-- Submit -->
+      <button class="lp-btn" id="login-btn" onclick="doLogin()">
+        <div class="lp-spinner" id="spinner"></div>
+        <span id="btn-text">Sign In</span>
+      </button>
 
-    <div class="register-link">
-      New to the platform? <a href="register.html">Create an account</a>
+      <!-- Divider -->
+      <div class="lp-divider"><span>OR</span></div>
+
+      <!-- SSO -->
+      <div class="lp-sso">
+        <button class="lp-sso-btn" type="button" onclick="ssoUnavailable()">
+          <svg width="17" height="17" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0012 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 010-4.2V7.06H2.18a11 11 0 000 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1a11 11 0 00-9.82 6.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38z"/></svg>
+          Continue with Google
+        </button>
+        <button class="lp-sso-btn" type="button" onclick="ssoUnavailable()">
+          <svg width="16" height="16" viewBox="0 0 23 23"><path fill="#f35325" d="M1 1h10v10H1z"/><path fill="#81bc06" d="M12 1h10v10H12z"/><path fill="#05a6f0" d="M1 12h10v10H1z"/><path fill="#ffba08" d="M12 12h10v10H12z"/></svg>
+          Continue with Microsoft
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="lp-foot">
+        Need an account? <a href="register.html">Create one</a>
+      </div>
+
     </div>
   </div>
 </div>
 
 <script>
-  // ── Auth check — must run BEFORE showing page ─────────────
+  // ── Auth check — run BEFORE showing page ─────────────
   (function() {
     var token = localStorage.getItem('rou_token');
     if (token) {
       try {
         var p = JSON.parse(atob(token.split('.')[1]));
         if (p.exp * 1000 > Date.now()) {
-          // Already logged in — redirect without showing login page
           window.location.replace(p.role === 'admin' ? 'admin.html' : 'home.html');
-          return; // stop here, don't show page
+          return;
         }
       } catch(e) {}
       localStorage.removeItem('rou_token');
       localStorage.removeItem('rou_user');
     }
-    // Not logged in — show the page
     document.body.classList.add('ready');
   })();
+
+  // Position the tab underline under the active tab
+  function positionUnderline() {
+    var active = document.querySelector('.lp-tab.active');
+    var ul = document.getElementById('tab-underline');
+    if (active && ul) { ul.style.left = active.offsetLeft + 'px'; ul.style.width = active.offsetWidth + 'px'; }
+  }
+
+  function switchTab(which) {
+    if (which === 'register') {
+      // Register has its own dedicated page/flow
+      window.location.href = 'register.html';
+      return;
+    }
+    document.getElementById('tab-signin').classList.add('active');
+    document.getElementById('tab-register').classList.remove('active');
+    positionUnderline();
+  }
 
   function togglePw() {
     var el = document.getElementById('password');
@@ -311,7 +452,11 @@
   function setLoading(v) {
     document.getElementById('login-btn').disabled = v;
     document.getElementById('spinner').style.display = v ? 'block' : 'none';
-    document.getElementById('btn-text').textContent = v ? 'Signing in…' : 'Sign In →';
+    document.getElementById('btn-text').textContent = v ? 'Signing in…' : 'Sign In';
+  }
+
+  function ssoUnavailable() {
+    showError('Single sign-on is not enabled for your firm yet. Please sign in with your email and password.');
   }
 
   async function doLogin() {
@@ -332,8 +477,12 @@
 
       localStorage.setItem('rou_token', data.token);
       localStorage.setItem('rou_user', JSON.stringify(data.user));
-      // use replace() so back button doesn't return to login
-      window.location.replace(data.user.role === 'admin' ? 'admin.html' : 'home.html');
+      // success — brief transition then redirect
+      document.body.style.transition = 'opacity 300ms ease';
+      document.body.style.opacity = '0';
+      setTimeout(function() {
+        window.location.replace(data.user.role === 'admin' ? 'admin.html' : 'home.html');
+      }, 300);
     } catch(e) {
       showError('Network error. Please check your connection and try again.');
       setLoading(false);
@@ -343,7 +492,9 @@
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !document.getElementById('login-btn').disabled) doLogin();
   });
+
+  window.addEventListener('load', positionUnderline);
+  window.addEventListener('resize', positionUnderline);
 </script>
 </body>
 </html>
-
