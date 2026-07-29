@@ -214,6 +214,14 @@ window.App = {
     const t2 = document.getElementById('ent-act-time-2'); if (t2) { const n=new Date(); t2.textContent = n.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
 
     this.renderCompaniesGrid();
+
+    // Notification dot: show if there are actionable alerts
+    const dot = document.getElementById('ent-notif-dot');
+    if (dot) {
+      const cl = DB.get('clients') || [];
+      const hasAlert = !cl.length || cl.some(c => !(DB.get('rous_'+c.id)||[]).length);
+      dot.style.display = hasAlert ? 'block' : 'none';
+    }
   },
 
   toggleUserDropdown(e) {
@@ -316,6 +324,131 @@ window.App = {
   filterCompanies() {
     const q = document.getElementById('ws-company-search')?.value || '';
     this.renderCompaniesGrid(q);
+  },
+
+  /* ══ HOME SECTION SWITCHING ══ */
+  showHomeSection(section) {
+    const sections = ['dashboard','companies','activity','help','settings'];
+    sections.forEach(s => {
+      const el = document.getElementById('home-section-' + s);
+      if (el) el.style.display = (s === section) ? '' : 'none';
+    });
+    // Nav highlight
+    const navMap = { dashboard:'nav-dashboard', companies:'nav-companies', activity:'nav-activity', help:'nav-help', settings:'nav-settings' };
+    Object.values(navMap).forEach(id => { const n = document.getElementById(id); if (n) n.classList.remove('active'); });
+    const active = document.getElementById(navMap[section]); if (active) active.classList.add('active');
+    // Populate on demand
+    if (section === 'companies') this.renderAllCompanies();
+    if (section === 'activity')  this.renderActivityFeed();
+    if (section === 'settings')  this.populateSettings();
+    // Scroll to top
+    document.querySelector('.ent-main')?.scrollTo(0,0);
+  },
+
+  /* ══ FULL COMPANIES LIST ══ */
+  renderAllCompanies(filter) {
+    const list = document.getElementById('companies-full-list');
+    if (!list) return;
+    let clients = DB.get('clients') || [];
+    if (filter) {
+      const q = filter.toLowerCase();
+      clients = clients.filter(c => (c.name||'').toLowerCase().includes(q) || (c.code||'').toLowerCase().includes(q));
+    }
+    if (!clients.length) {
+      list.innerHTML = '<div style="text-align:center;padding:48px 20px;color:#94a3b8;font-size:13px">' +
+        (filter ? 'No companies match your search.' : 'No companies yet. Click "Add Company" to get started.') + '</div>';
+      return;
+    }
+    const COLORS = ['#0f2a47','#1a3f6b','#e8520a','#059669','#7c3aed','#d97706','#0891b2','#be123c'];
+    list.innerHTML = clients.map((c, i) => {
+      const rous = (DB.get('rous_' + c.id) || []).length;
+      const col  = COLORS[i % COLORS.length];
+      const init = (c.name||'?').replace(/[^A-Za-z0-9 ]/g,'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase() || '?';
+      const nm = (Utils.esc ? Utils.esc(c.name) : c.name);
+      return '<div class="ent-comp-row" onclick="App.openClientById(\'' + c.id + '\')">' +
+        '<div class="ent-comp-logo" style="background:' + col + '">' + init + '</div>' +
+        '<div style="flex:1;min-width:0"><div class="ent-comp-name">' + nm + '</div>' +
+        '<div class="ent-comp-meta">' + (c.code||'—') + ' &middot; ' + (c.address ? (c.address.substring(0,50) + (c.address.length>50?'…':'')) : 'No address set') + '</div></div>' +
+        '<div style="font-size:12px;font-weight:600;color:#475569;white-space:nowrap">' + rous + ' ROU' + (rous!==1?'s':'') + '</div>' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>' +
+      '</div>';
+    }).join('');
+  },
+
+  filterAllCompanies() {
+    const q = document.getElementById('companies-search')?.value || '';
+    this.renderAllCompanies(q);
+  },
+
+  /* ══ ACTIVITY FEED ══ */
+  renderActivityFeed() {
+    const list = document.getElementById('activity-full-list');
+    if (!list) return;
+    const user = API.user() || {};
+    const now = new Date();
+    const t = now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    const items = [
+      { ic:'#eff6ff', st:'#2563eb', t:'Signed in', d:'Successful login from this device', tm:t },
+      { ic:'#f0fdf4', st:'#16a34a', t:'Profile loaded', d:'Workspace data synced successfully', tm:t },
+    ];
+    // Add per-company creation notes
+    (DB.get('clients')||[]).slice(0,6).forEach(c => {
+      items.push({ ic:'#fff7ed', st:'#ea580c', t:'Company available', d:c.name, tm:'' });
+    });
+    list.innerHTML = items.map(a =>
+      '<div class="ent-activity-item"><div class="ent-act-icon" style="background:' + a.ic + '">' +
+      '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="' + a.st + '" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>' +
+      '<div class="ent-act-body"><div class="ent-act-title">' + a.t + '</div><div class="ent-act-sub">' + a.d + '</div></div>' +
+      '<div class="ent-act-time">' + a.tm + '</div></div>'
+    ).join('');
+  },
+
+  /* ══ SETTINGS ══ */
+  populateSettings() {
+    const user = API.user() || {};
+    const em = document.getElementById('set-account-email'); if (em) em.textContent = user.email || '—';
+    const s = DB.get('settings') || {};
+    const fy = document.getElementById('set-fy-period'); if (fy) fy.textContent = s.periodLabel || s.periodShort || 'Not set';
+  },
+
+  /* ══ NOTIFICATIONS POPOVER ══ */
+  toggleNotifications(e) {
+    if (e) e.stopPropagation();
+    document.getElementById('ent-help-popover')?.classList.remove('open');
+    const pop = document.getElementById('ent-notif-popover');
+    if (!pop) return;
+    const opening = !pop.classList.contains('open');
+    pop.classList.toggle('open');
+    if (opening) {
+      this.renderNotifications();
+      const dot = document.getElementById('ent-notif-dot'); if (dot) dot.style.display = 'none';
+    }
+  },
+
+  renderNotifications() {
+    const list = document.getElementById('ent-notif-list');
+    if (!list) return;
+    const clients = DB.get('clients') || [];
+    const notifs = [];
+    if (!clients.length) {
+      notifs.push({ ic:'#eff6ff', st:'#2563eb', t:'Welcome to the ROU platform', d:'Add your first client company to begin.' });
+    } else {
+      notifs.push({ ic:'#f0fdf4', st:'#16a34a', t:'Workspace ready', d:clients.length + ' company' + (clients.length!==1?'ies':'') + ' available.' });
+      const noRou = clients.filter(c => !(DB.get('rous_'+c.id)||[]).length);
+      if (noRou.length) notifs.push({ ic:'#fff7ed', st:'#ea580c', t:'Action needed', d:noRou.length + ' company' + (noRou.length!==1?'ies':'') + ' with no ROUs yet.' });
+    }
+    list.innerHTML = notifs.map(n =>
+      '<div class="ent-notif-item"><div class="ent-notif-ic" style="background:' + n.ic + '">' +
+      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="' + n.st + '" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg></div>' +
+      '<div><div class="ent-notif-tt">' + n.t + '</div><div class="ent-notif-ds">' + n.d + '</div></div></div>'
+    ).join('') || '<div class="ent-notif-empty">No notifications</div>';
+  },
+
+  /* ══ HELP POPOVER ══ */
+  toggleHelp(e) {
+    if (e) e.stopPropagation();
+    document.getElementById('ent-notif-popover')?.classList.remove('open');
+    document.getElementById('ent-help-popover')?.classList.toggle('open');
   },
 
   openClientById(id) {
@@ -758,10 +891,13 @@ window.App = {
 };
 
 
-/* Close dropdown on outside click */
+/* Close dropdowns/popovers on outside click */
 document.addEventListener('click', function() {
   document.getElementById('ws-dropdown')?.classList.remove('open');
+  document.getElementById('ent-notif-popover')?.classList.remove('open');
+  document.getElementById('ent-help-popover')?.classList.remove('open');
 });
+
 
 
 
