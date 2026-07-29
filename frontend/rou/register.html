@@ -269,7 +269,7 @@
       try {
         var p = JSON.parse(atob(token.split('.')[1]));
         if (p.exp * 1000 > Date.now()) {
-          window.location.replace(p.role === 'admin' ? 'admin.html' : 'index.html');
+          window.location.replace(p.role === 'admin' ? 'admin.html' : 'home.html');
           return;
         }
       } catch(e) {}
@@ -370,7 +370,7 @@
 
       // Delay slightly so user sees the success message, then replace (not push)
       setTimeout(function() {
-        window.location.replace('index.html');
+        window.location.replace('home.html');
       }, 1000);
 
     } catch(e) {
@@ -381,3 +381,4 @@
 </script>
 </body>
 </html>
+
