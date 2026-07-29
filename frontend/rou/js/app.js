@@ -386,6 +386,27 @@ window.App = {
     this.renderWorkspaceHome();
   },
 
+  /* Navigate to a page inside the app — if no client selected, show picker toast */
+  navToAppPage(page) {
+    if (this.currentClient) {
+      this.enterApp();
+      this.showPage(page);
+      return;
+    }
+    // No client selected — open the app with the last/first available client
+    const clients = DB.get('clients') || [];
+    if (!clients.length) {
+      // No companies exist — prompt to add one
+      Modal.openAddClient();
+      return;
+    }
+    // Use first available company
+    this.currentClient = clients[0];
+    DB.set('last_client', clients[0].id);
+    this.enterApp();
+    this.showPage(page);
+  },
+
   showPage(page) {
     ['dashboard','rous','add-rou','schedule','export','audit','bulk-import','reassess-override'].forEach(p => {
       const el = document.getElementById('page-' + p);
@@ -452,8 +473,21 @@ window.App = {
   /* Which view was active before opening profile */
 
   openProfileView() {
-    // Profile is now embedded in the workspace home — just go there
-    this.goHome();
+    // Open the profile modal (populated with current user data)
+    const user = API.user();
+    if (user) {
+      const nd = document.getElementById('profile-name-display');   if (nd) nd.textContent = user.name || '';
+      const ed = document.getElementById('profile-email-display');  if (ed) ed.textContent = user.email || '';
+      const pav = document.getElementById('profile-avatar');
+      const ROLE_COLORS = { admin:'#e8520a', partner:'#7c3aed', manager:'#1a3f6b', article:'#059669' };
+      const ROLE_LABELS = { admin:'Administrator', partner:'Partner', manager:'Manager', article:'Article' };
+      if (pav) { pav.textContent = (user.name||'?').charAt(0).toUpperCase(); pav.style.background = ROLE_COLORS[user.role]||'#1a3f6b'; }
+      const rd = document.getElementById('profile-role-display');
+      if (rd) { rd.textContent = ROLE_LABELS[user.role]||user.role; rd.style.background=(ROLE_COLORS[user.role]||'#1a3f6b')+'22'; rd.style.color=ROLE_COLORS[user.role]||'#1a3f6b'; }
+      const ni = document.getElementById('profile-name-input'); if (ni) ni.value = user.name || '';
+      const ei = document.getElementById('profile-email-input'); if (ei) { ei.value = user.email || ''; ei.setAttribute('readonly','true'); }
+    }
+    Modal.open('modal-profile');
   },
 
   closeProfileView() {
@@ -742,4 +776,5 @@ window.App = {
 document.addEventListener('click', function() {
   document.getElementById('ws-dropdown')?.classList.remove('open');
 });
+
 
