@@ -249,35 +249,6 @@ window.App = {
     } catch(e) { showA('Network error. Please try again.','err'); }
   },
 
-  async saveNameInline() {
-    const input   = document.getElementById('ws-name-input');
-    const alertEl = document.getElementById('ws-name-alert');
-    const name    = input?.value.trim();
-    if (!name) { _inlineAlert(alertEl,'Name cannot be empty.','error'); return; }
-    try {
-      const r = await fetch('/api/auth/profile', {
-        method:'PUT', headers:{'Content-Type':'application/json','Authorization':'Bearer '+API.token()},
-        body: JSON.stringify({ name })
-      });
-      const d = await r.json();
-      if (!r.ok) { _inlineAlert(alertEl, d.error||'Update failed.','error'); return; }
-      localStorage.setItem('rou_token', d.token);
-      localStorage.setItem('rou_user', JSON.stringify(d.user));
-      _inlineAlert(alertEl,'Name updated.','success');
-      _refreshUserDisplay(d.user);
-      this.renderWorkspaceHome();
-    } catch(e) { _inlineAlert(alertEl,'Network error.','error'); }
-  },
-
-  togglePwSection() {
-    const sec = document.getElementById('ws-pw-section');
-    const ch  = document.getElementById('ws-pw-chevron');
-    if (!sec) return;
-    const open = sec.style.display === 'none' || !sec.style.display;
-    sec.style.display = open ? 'block' : 'none';
-    if (ch) ch.style.transform = open ? 'rotate(180deg)' : '';
-  },
-
   renderCompaniesGrid(filter) {
     const list = document.getElementById('ws-companies-list');
     if (!list) return;
@@ -485,6 +456,7 @@ window.App = {
       if (rd) { rd.textContent = ROLE_LABELS[user.role]||user.role; rd.style.background=(ROLE_COLORS[user.role]||'#1a3f6b')+'22'; rd.style.color=ROLE_COLORS[user.role]||'#1a3f6b'; }
       const ni = document.getElementById('profile-name-input'); if (ni) ni.value = user.name || '';
       const ei = document.getElementById('profile-email-input'); if (ei) { ei.value = user.email || ''; ei.setAttribute('readonly','true'); }
+      const ri = document.getElementById('profile-role-input'); if (ri) ri.value = ROLE_LABELS[user.role] || user.role || '';
     }
     Modal.open('modal-profile');
   },
@@ -493,63 +465,45 @@ window.App = {
     this.goHome();
   },
 
-
-
-  
-
-
-
-  /* ── ACCOUNT CARD IN WS-HOME ─────────────────────────────────────── */
-
-  togglePwSection() {
-    const sec = document.getElementById('ws-pw-section');
-    const ch  = document.getElementById('ws-pw-chevron');
-    if (!sec) return;
-    const open = sec.style.display === 'none' || sec.style.display === '';
-    sec.style.display = open ? 'block' : 'none';
-    if (ch) ch.style.transform = open ? 'rotate(180deg)' : '';
-  },
-
-  async saveNameInline() {
-    const input   = document.getElementById('ws-name-input');
-    const alertEl = document.getElementById('ws-account-alert');
-    const name    = input?.value.trim();
-    if (!name) { _inlineAlert(alertEl, 'Name cannot be empty.', 'error'); return; }
+  /* ── PROFILE MODAL: Save Details ──────────────────────────── */
+  async saveProfile() {
+    const name = document.getElementById('profile-name-input')?.value.trim();
+    if (!name) { profileAlert('details', 'Name cannot be empty.', 'error'); return; }
     try {
       const r = await fetch('/api/auth/profile', {
         method:'PUT', headers:{'Content-Type':'application/json','Authorization':'Bearer '+API.token()},
         body: JSON.stringify({ name })
       });
       const d = await r.json();
-      if (!r.ok) { _inlineAlert(alertEl, d.error||'Update failed.', 'error'); return; }
+      if (!r.ok) { profileAlert('details', d.error || 'Update failed.', 'error'); return; }
       localStorage.setItem('rou_token', d.token);
       localStorage.setItem('rou_user', JSON.stringify(d.user));
-      _inlineAlert(alertEl, '✓ Name updated!', 'success');
+      profileAlert('details', '\u2713 Profile updated successfully!', 'success');
       _refreshUserDisplay(d.user);
-      this._populateAccountCard(d.user);
-    } catch(e) { _inlineAlert(alertEl, 'Network error.', 'error'); }
+      this.renderWorkspaceHome();
+    } catch(e) { profileAlert('details', 'Network error. Please try again.', 'error'); }
   },
 
-  async changePasswordInline() {
-    const cur     = document.getElementById('ws-pw-current')?.value;
-    const nw      = document.getElementById('ws-pw-new')?.value;
-    const conf    = document.getElementById('ws-pw-confirm')?.value;
-    const alertEl = document.getElementById('ws-pw-alert');
-    if (!cur||!nw||!conf) { _inlineAlert(alertEl, 'All three fields required.', 'error'); return; }
-    if (nw.length < 8)    { _inlineAlert(alertEl, 'New password must be at least 8 characters.', 'error'); return; }
-    if (nw !== conf)       { _inlineAlert(alertEl, 'Passwords do not match.', 'error'); return; }
+  /* ── PROFILE MODAL: Change Password ───────────────────────── */
+  async changePassword() {
+    const cur  = document.getElementById('profile-pw-current')?.value;
+    const nw   = document.getElementById('profile-pw-new')?.value;
+    const conf = document.getElementById('profile-pw-confirm')?.value;
+    if (!cur || !nw || !conf) { profileAlert('password', 'All three fields are required.', 'error'); return; }
+    if (nw.length < 8)        { profileAlert('password', 'New password must be at least 8 characters.', 'error'); return; }
+    if (nw !== conf)          { profileAlert('password', 'New passwords do not match.', 'error'); return; }
     try {
       const r = await fetch('/api/auth/change-password', {
         method:'PUT', headers:{'Content-Type':'application/json','Authorization':'Bearer '+API.token()},
         body: JSON.stringify({ currentPassword:cur, newPassword:nw })
       });
       const d = await r.json();
-      if (!r.ok) { _inlineAlert(alertEl, d.error||'Failed.', 'error'); return; }
-      _inlineAlert(alertEl, '✓ Password changed!', 'success');
-      ['ws-pw-current','ws-pw-new','ws-pw-confirm'].forEach(id => {
+      if (!r.ok) { profileAlert('password', d.error || 'Failed to change password.', 'error'); return; }
+      profileAlert('password', '\u2713 Password changed successfully!', 'success');
+      ['profile-pw-current','profile-pw-new','profile-pw-confirm'].forEach(id => {
         const el = document.getElementById(id); if (el) el.value = '';
       });
-    } catch(e) { _inlineAlert(alertEl, 'Network error.', 'error'); }
+    } catch(e) { profileAlert('password', 'Network error. Please try again.', 'error'); }
   },
 
   /* ── ADMIN LOGIN (ROU admin panel inside app) ────────────── */
@@ -775,6 +729,7 @@ window.App = {
 document.addEventListener('click', function() {
   document.getElementById('ws-dropdown')?.classList.remove('open');
 });
+
 
 
 
