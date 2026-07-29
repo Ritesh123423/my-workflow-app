@@ -16,56 +16,67 @@ document.documentElement.style.visibility = 'hidden';
 
 <style>
 /* ═══════════════════════════════════════════════════════
-   WORKSPACE HOME
+   ENTERPRISE HOME DASHBOARD
 ═══════════════════════════════════════════════════════ */
-#view-home { background:#eef1f6; }
+#view-home { background:#f1f5f9; display:flex; flex-direction:column; height:100vh; overflow:hidden; }
 
-/* TOPBAR */
-.ws-topbar {
-  background:#0a1e3d; height:60px; padding:0 28px;
-  display:flex; align-items:center; justify-content:space-between; flex-shrink:0;
-  box-shadow:0 1px 0 rgba(255,255,255,0.04), 0 4px 20px rgba(0,0,0,0.25);
+/* TOP NAV */
+.ent-topnav {
+  background:#0a1e3d; height:56px; padding:0 24px;
+  display:flex; align-items:center; gap:16px; flex-shrink:0;
+  box-shadow:0 1px 0 rgba(255,255,255,0.04),0 2px 16px rgba(0,0,0,0.2);
   position:relative; z-index:50;
 }
-.ws-brand { display:flex; align-items:center; gap:12px; }
-.ws-brand-icon {
-  width:36px; height:36px; background:#e8520a; border-radius:9px;
+.ent-brand { display:flex; align-items:center; gap:10px; flex-shrink:0; min-width:220px; }
+.ent-brand-icon {
+  width:32px; height:32px; background:#e8520a; border-radius:8px;
   display:flex; align-items:center; justify-content:center;
-  font-size:11px; font-weight:800; color:#fff; letter-spacing:-0.5px;
-  box-shadow:0 3px 10px rgba(232,82,10,0.4);
+  font-size:10px; font-weight:800; color:#fff; letter-spacing:-0.5px;
+  box-shadow:0 2px 8px rgba(232,82,10,0.4); flex-shrink:0;
 }
-.ws-brand-name { font-size:14.5px; font-weight:700; color:#fff; letter-spacing:-0.2px; }
-.ws-brand-sub  { font-size:10px; color:rgba(255,255,255,0.38); margin-top:1px; letter-spacing:0.2px; }
-.ws-topbar-right { display:flex; align-items:center; gap:10px; position:relative; }
-
-/* User pill */
-.ws-user-pill {
-  display:flex; align-items:center; gap:9px; cursor:pointer;
-  padding:5px 11px 5px 5px; border-radius:9px;
+.ent-brand-name { font-size:13.5px; font-weight:700; color:#fff; letter-spacing:-0.2px; }
+.ent-brand-sub  { font-size:9.5px; color:rgba(255,255,255,0.35); margin-top:1px; }
+.ent-search-wrap {
+  flex:1; max-width:480px; display:flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);
+  border-radius:8px; padding:0 12px; height:34px;
+}
+.ent-search { flex:1; background:none; border:none; outline:none; color:#fff; font-size:13px; font-family:inherit; }
+.ent-search::placeholder { color:rgba(255,255,255,0.35); }
+.ent-search-kbd { font-size:10.5px; color:rgba(255,255,255,0.25); background:rgba(255,255,255,0.08); padding:2px 6px; border-radius:4px; white-space:nowrap; }
+.ent-topnav-right { display:flex; align-items:center; gap:6px; margin-left:auto; position:relative; }
+.ent-icon-btn {
+  width:32px; height:32px; border-radius:7px; border:none; cursor:pointer;
+  background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.65);
+  display:flex; align-items:center; justify-content:center; transition:background 0.15s;
+}
+.ent-icon-btn:hover { background:rgba(255,255,255,0.14); color:#fff; }
+.ent-divider-v { width:1px; height:20px; background:rgba(255,255,255,0.1); margin:0 4px; }
+.ent-user-pill {
+  display:flex; align-items:center; gap:8px; cursor:pointer;
+  padding:4px 10px 4px 4px; border-radius:8px;
   border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.07);
-  transition:background 0.15s; user-select:none;
+  transition:background 0.15s; user-select:none; margin-left:4px;
 }
-.ws-user-pill:hover { background:rgba(255,255,255,0.13); }
-.ws-user-avatar {
-  width:30px; height:30px; border-radius:7px; font-size:12px; font-weight:800; color:#fff;
+.ent-user-pill:hover { background:rgba(255,255,255,0.13); }
+.ent-user-av {
+  width:28px; height:28px; border-radius:6px; font-size:11px; font-weight:800; color:#fff;
   display:flex; align-items:center; justify-content:center; flex-shrink:0;
 }
-.ws-user-name { font-size:12.5px; font-weight:600; color:#fff; white-space:nowrap; }
-.ws-user-role { font-size:10px; color:rgba(255,255,255,0.42); margin-top:1px; }
+.ent-user-name { font-size:12px; font-weight:600; color:#fff; white-space:nowrap; }
+.ent-user-role { font-size:9.5px; color:rgba(255,255,255,0.4); margin-top:1px; }
 
-/* Dropdown */
+/* Dropdown — reuse existing .ws-dropdown styles */
 .ws-dropdown {
   position:absolute; top:calc(100% + 8px); right:0;
   background:#fff; border-radius:11px; border:1px solid #e2e8f0;
-  box-shadow:0 4px 6px rgba(0,0,0,0.05), 0 10px 40px rgba(0,0,0,0.12);
+  box-shadow:0 4px 6px rgba(0,0,0,0.05),0 10px 40px rgba(0,0,0,0.12);
   min-width:220px; overflow:hidden; display:none; z-index:200;
   animation:ddIn 0.15s ease;
 }
-@keyframes ddIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+@keyframes ddIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
 .ws-dropdown.open { display:block; }
-.ws-dd-header {
-  padding:14px 16px 12px; background:#f8fafc; border-bottom:1px solid #f1f5f9;
-}
+.ws-dd-header { padding:14px 16px 12px; background:#f8fafc; border-bottom:1px solid #f1f5f9; }
 .ws-dd-name  { font-size:13.5px; font-weight:700; color:#0f172a; }
 .ws-dd-email { font-size:11.5px; color:#94a3b8; margin-top:2px; }
 .ws-dd-item {
@@ -82,119 +93,206 @@ document.documentElement.style.visibility = 'hidden';
 .ws-dd-item.danger svg { color:#dc2626; }
 
 /* BODY */
-.ws-body { display:flex; flex:1; overflow:hidden; height:calc(100vh - 60px); }
+.ent-body { display:flex; flex:1; overflow:hidden; }
 
-/* LEFT */
-.ws-left { flex:1; min-width:0; display:flex; flex-direction:column; padding:28px 20px 24px 28px; gap:20px; overflow-y:auto; }
-
-/* Greeting */
-.ws-greeting-label { font-size:11px; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
-.ws-greeting-name  { font-size:30px; font-weight:800; color:#0f172a; letter-spacing:-1px; line-height:1.1; margin-bottom:5px; }
-.ws-greeting-sub   { font-size:13.5px; color:#64748b; }
-
-/* Companies card */
-.ws-companies-card {
-  background:#fff; border-radius:14px; border:1px solid #e2e8f0;
-  box-shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 16px rgba(0,0,0,0.04);
-  display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden;
+/* SIDEBAR */
+.ent-sidebar {
+  width:220px; flex-shrink:0; background:#fff; border-right:1px solid #e2e8f0;
+  display:flex; flex-direction:column; overflow-y:auto;
 }
-.ws-companies-header {
+.ent-nav { padding:16px 10px; flex:1; }
+.ent-nav-section-label {
+  font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase;
+  letter-spacing:0.7px; padding:0 10px; margin-bottom:4px;
+}
+.ent-nav-item {
+  display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:8px;
+  font-size:13px; font-weight:500; color:#475569; cursor:pointer; text-decoration:none;
+  transition:all 0.12s; margin-bottom:2px; position:relative;
+}
+.ent-nav-item:hover { background:#f8fafc; color:#0f172a; }
+.ent-nav-item.active { background:#eff6ff; color:#1d4ed8; font-weight:600; }
+.ent-nav-item svg { flex-shrink:0; opacity:0.7; }
+.ent-nav-item.active svg { opacity:1; }
+.ent-nav-badge {
+  margin-left:auto; font-size:10px; font-weight:700; background:#f1f5f9;
+  color:#64748b; padding:1px 6px; border-radius:10px;
+}
+.ent-sidebar-profile {
+  padding:12px 14px; border-top:1px solid #f1f5f9;
+  display:flex; align-items:center; gap:9px;
+}
+.ent-sb-av {
+  width:32px; height:32px; border-radius:8px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:800; color:#fff;
+}
+.ent-sb-name { font-size:12.5px; font-weight:600; color:#0f172a; }
+.ent-sb-role { font-size:10.5px; color:#94a3b8; margin-top:1px; }
+
+/* MAIN */
+.ent-main { flex:1; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:20px; min-width:0; }
+
+/* HERO */
+.ent-hero {
+  background:#fff; border-radius:14px; border:1px solid #e2e8f0;
+  padding:24px 28px; display:flex; align-items:center; justify-content:space-between; gap:24px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);
+}
+.ent-hero-left { min-width:0; }
+.ent-greeting-label { font-size:11px; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
+.ent-greeting-name  { font-size:28px; font-weight:800; color:#0f172a; letter-spacing:-0.8px; line-height:1.15; margin-bottom:5px; }
+.ent-greeting-sub   { font-size:13px; color:#64748b; }
+.ent-hero-card {
+  display:flex; align-items:center; gap:16px; flex-shrink:0;
+  background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px 20px;
+}
+.ent-hc-av {
+  width:48px; height:48px; border-radius:12px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; font-weight:800; color:#fff;
+  box-shadow:0 3px 12px rgba(0,0,0,0.15);
+}
+.ent-hc-name  { font-size:15px; font-weight:700; color:#0f172a; }
+.ent-hc-email { font-size:12px; color:#64748b; margin-top:2px; }
+.ent-hc-badge { display:inline-flex; padding:2px 10px; border-radius:20px; font-size:10.5px; font-weight:700; background:rgba(10,30,61,0.08); color:#0a1e3d; }
+.ent-hc-verified {
+  display:inline-flex; align-items:center; gap:4px; padding:2px 8px;
+  border-radius:20px; font-size:10.5px; font-weight:600;
+  background:#dcfce7; color:#16a34a;
+}
+.ent-hc-meta { border-left:1px solid #e2e8f0; padding-left:16px; display:flex; flex-direction:column; gap:6px; }
+.ent-hc-meta-row { display:flex; flex-direction:column; gap:1px; }
+.ent-hc-meta-label { font-size:10px; color:#94a3b8; text-transform:uppercase; letter-spacing:0.4px; }
+.ent-hc-meta-val   { font-size:12.5px; font-weight:600; color:#0f172a; }
+.ent-edit-btn {
+  display:inline-flex; align-items:center; gap:6px; padding:7px 14px;
+  background:#0a1e3d; color:#fff; border:none; border-radius:8px;
+  font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;
+  transition:all 0.15s; white-space:nowrap; flex-shrink:0;
+}
+.ent-edit-btn:hover { background:#162f5a; box-shadow:0 4px 12px rgba(10,30,61,0.25); }
+
+/* KPI ROW */
+.ent-kpi-row { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; }
+.ent-kpi-card {
+  background:#fff; border-radius:12px; border:1px solid #e2e8f0;
+  padding:16px; box-shadow:0 1px 3px rgba(0,0,0,0.04); transition:box-shadow 0.15s;
+}
+.ent-kpi-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.08); }
+.ent-kpi-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
+.ent-kpi-val   { font-size:24px; font-weight:800; color:#0f172a; letter-spacing:-0.5px; line-height:1; margin-bottom:3px; }
+.ent-kpi-label { font-size:11.5px; color:#64748b; font-weight:500; margin-bottom:4px; }
+.ent-kpi-trend { font-size:10.5px; color:#94a3b8; }
+.ent-kpi-progress { height:3px; background:#f1f5f9; border-radius:2px; margin-top:6px; }
+.ent-kpi-progress-bar { height:100%; background:#1d4ed8; border-radius:2px; transition:width 0.4s; }
+
+/* 3-COLUMN GRID */
+.ent-grid3 { display:grid; grid-template-columns:1fr 1fr 340px; gap:16px; align-items:start; }
+
+/* CARDS */
+.ent-card {
+  background:#fff; border-radius:12px; border:1px solid #e2e8f0;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04); overflow:hidden;
+}
+.ent-col-large { display:flex; flex-direction:column; }
+.ent-card-header {
   padding:14px 18px; border-bottom:1px solid #f1f5f9;
   display:flex; align-items:center; justify-content:space-between; gap:10px; flex-shrink:0;
 }
-.ws-section-label { font-size:11px; font-weight:700; color:#0f172a; text-transform:uppercase; letter-spacing:0.7px; }
-.ws-search {
-  padding:7px 11px; font-size:13px; background:#f8fafc; border:1.5px solid #e2e8f0;
-  border-radius:7px; color:#0f172a; outline:none; font-family:inherit; width:170px; transition:border-color 0.15s;
+.ent-card-title { font-size:13px; font-weight:700; color:#0f172a; }
+.ent-card-footer {
+  padding:10px 18px; border-top:1px solid #f1f5f9;
+  display:flex; align-items:center; justify-content:space-between;
 }
-.ws-search:focus { border-color:#0a1e3d; }
-.ws-add-btn {
-  display:inline-flex; align-items:center; gap:6px; padding:7px 14px;
-  background:#0a1e3d; color:#fff; border:none; border-radius:8px;
-  font-size:12.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:all 0.15s; white-space:nowrap;
+.ent-card-search {
+  padding:6px 10px; font-size:12.5px; background:#f8fafc; border:1.5px solid #e2e8f0;
+  border-radius:7px; color:#0f172a; outline:none; font-family:inherit; width:160px; transition:border-color 0.15s;
 }
-.ws-add-btn:hover { background:#162f5a; box-shadow:0 4px 12px rgba(10,30,61,0.25); }
-.ws-add-btn.disabled { background:#94a3b8; cursor:not-allowed; }
+.ent-card-search:focus { border-color:#0a1e3d; }
+.ent-primary-btn {
+  display:inline-flex; align-items:center; gap:5px; padding:6px 13px;
+  background:#0a1e3d; color:#fff; border:none; border-radius:7px;
+  font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;
+  transition:all 0.15s; white-space:nowrap;
+}
+.ent-primary-btn:hover { background:#162f5a; }
+.ent-text-btn { font-size:12px; font-weight:600; color:#1d4ed8; background:none; border:none; cursor:pointer; font-family:inherit; padding:0; }
+.ent-text-btn:hover { text-decoration:underline; }
 
-/* Company list */
-.ws-companies-list { padding:10px; display:flex; flex-direction:column; gap:6px; overflow-y:auto; flex:1; }
+/* Companies list — reuse existing styles */
+.ws-companies-list { padding:10px; display:flex; flex-direction:column; gap:6px; overflow-y:auto; min-height:180px; max-height:340px; }
 .ws-company-item {
-  display:flex; align-items:center; gap:13px; padding:13px 15px;
-  border-radius:10px; border:1.5px solid #e8edf3; cursor:pointer;
+  display:flex; align-items:center; gap:13px; padding:12px 14px;
+  border-radius:9px; border:1.5px solid #e8edf3; cursor:pointer;
   transition:all 0.15s; background:#fff;
 }
-.ws-company-item:hover {
-  border-color:#0a1e3d; background:#f7f9fc;
-  transform:translateX(3px); box-shadow:0 2px 10px rgba(10,30,61,0.08);
-}
-.ws-company-logo {
-  width:42px; height:42px; border-radius:10px; flex-shrink:0;
-  display:flex; align-items:center; justify-content:center;
-  font-size:13px; font-weight:800; color:#fff; letter-spacing:-0.5px;
-}
-.ws-company-name { font-size:13.5px; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
-.ws-company-meta { font-size:11.5px; color:#94a3b8; display:flex; align-items:center; gap:6px; }
+.ws-company-item:hover { border-color:#0a1e3d; background:#f7f9fc; transform:translateX(2px); box-shadow:0 2px 10px rgba(10,30,61,0.08); }
+.ws-company-logo { width:38px; height:38px; border-radius:9px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#fff; letter-spacing:-0.5px; }
+.ws-company-name { font-size:13px; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+.ws-company-meta { font-size:11px; color:#94a3b8; display:flex; align-items:center; gap:5px; }
 .ws-company-dot  { width:3px; height:3px; border-radius:50%; background:#cbd5e1; display:inline-block; }
-.ws-company-rous { font-size:12px; font-weight:600; color:#475569; white-space:nowrap; flex-shrink:0; }
+.ws-company-rous { font-size:11.5px; font-weight:600; color:#475569; white-space:nowrap; flex-shrink:0; }
 .ws-company-arrow { color:#cbd5e1; transition:color 0.15s; flex-shrink:0; }
 .ws-company-item:hover .ws-company-arrow { color:#0a1e3d; }
+.ws-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; text-align:center; }
+.ws-empty-icon  { color:#cbd5e1; margin-bottom:12px; }
+.ws-empty-title { font-size:13.5px; font-weight:700; color:#475569; margin-bottom:4px; }
+.ws-empty-desc  { font-size:12px; color:#94a3b8; line-height:1.6; max-width:260px; }
 
-.ws-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:52px 20px; text-align:center; }
-.ws-empty-icon  { color:#cbd5e1; margin-bottom:14px; }
-.ws-empty-title { font-size:14px; font-weight:700; color:#475569; margin-bottom:5px; }
-.ws-empty-desc  { font-size:12.5px; color:#94a3b8; line-height:1.6; max-width:280px; }
+/* ACTIVITY */
+.ent-activity-list { padding:8px 14px; display:flex; flex-direction:column; gap:2px; }
+.ent-activity-item { display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid #f8fafc; }
+.ent-activity-item:last-child { border-bottom:none; }
+.ent-act-icon { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+.ent-act-body { flex:1; min-width:0; }
+.ent-act-title { font-size:12.5px; font-weight:600; color:#0f172a; }
+.ent-act-sub   { font-size:11px; color:#94a3b8; margin-top:2px; line-height:1.4; }
+.ent-act-time  { font-size:10.5px; color:#94a3b8; white-space:nowrap; flex-shrink:0; padding-top:2px; }
 
-/* RIGHT PANEL */
-.ws-right {
-  width:340px; flex-shrink:0; border-left:1px solid #e2e8f0; background:#fff;
-  display:flex; flex-direction:column; overflow:hidden;
+/* QUICK ACTIONS */
+.ent-quick-actions { padding:10px 14px; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.ent-qa-btn {
+  display:flex; align-items:center; gap:9px; padding:10px 11px; border-radius:9px;
+  border:1.5px solid #e2e8f0; background:#fff; cursor:pointer; font-family:inherit;
+  transition:all 0.15s; text-align:left; text-decoration:none;
 }
-.ws-right-scroll { flex:1; overflow-y:auto; display:flex; flex-direction:column; }
+.ent-qa-btn:hover { border-color:#0a1e3d; background:#f7f9fc; }
+.ent-qa-icon { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ent-qa-title { font-size:12px; font-weight:600; color:#0f172a; }
+.ent-qa-sub   { font-size:10.5px; color:#94a3b8; margin-top:1px; }
 
-/* Account header */
-.ws-account-header {
-  background:linear-gradient(155deg,#08192e 0%,#0f2a47 55%,#162f5a 100%);
-  padding:22px 20px 18px; flex-shrink:0;
+/* PLATFORM INFO */
+.ent-info-list { padding:8px 14px; }
+.ent-info-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid #f8fafc; }
+.ent-info-row:last-child { border-bottom:none; }
+.ent-info-icon { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ent-info-label { font-size:10.5px; color:#94a3b8; margin-bottom:1px; }
+.ent-info-val   { font-size:12.5px; font-weight:600; color:#0f172a; }
+
+/* SECURITY */
+.ent-security-list { padding:6px 14px; }
+.ent-sec-item {
+  display:flex; align-items:center; gap:10px; padding:10px 0;
+  border-bottom:1px solid #f8fafc; background:none; border-left:none; border-right:none; border-top:none;
+  cursor:pointer; font-family:inherit; width:100;
 }
-.ws-account-av {
-  width:50px; height:50px; border-radius:12px; flex-shrink:0;
-  display:flex; align-items:center; justify-content:center;
-  font-size:19px; font-weight:800; color:#fff;
-  box-shadow:0 4px 16px rgba(0,0,0,0.3);
+.ent-sec-item:last-child { border-bottom:none; }
+.ent-toggle-off { font-size:10px; font-weight:700; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:10px; }
+
+/* Role card */
+.ws-role-badge { display:inline-flex; padding:3px 12px; border-radius:20px; font-size:11px; font-weight:700; }
+.ws-role-desc  { font-size:12px; color:#64748b; line-height:1.6; margin-top:6px; }
+
+/* FOOTER */
+.ent-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 0 4px; border-top:1px solid #e2e8f0;
+  font-size:11.5px; color:#94a3b8;
 }
-.ws-account-name   { font-size:15px; font-weight:700; color:#fff; letter-spacing:-0.2px; }
-.ws-account-email  { font-size:11px; color:rgba(255,255,255,0.48); margin-top:2px; }
-.ws-account-badge  { display:inline-flex; margin-top:7px; padding:2px 10px; border-radius:20px; font-size:10px; font-weight:700; background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.88); letter-spacing:0.3px; }
-
-/* Stats row */
-.ws-stats-row { display:flex; gap:8px; padding:14px 16px; border-bottom:1px solid #f1f5f9; flex-shrink:0; background:#f8fafc; }
-.ws-stat-card { flex:1; background:#fff; border:1px solid #e2e8f0; border-radius:9px; padding:12px 10px; text-align:center; }
-.ws-stat-val { font-size:22px; font-weight:800; color:#0f172a; letter-spacing:-0.5px; line-height:1; }
-.ws-stat-lbl { font-size:9.5px; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; margin-top:4px; }
-
-/* Panel sections */
-.ws-panel-sec { padding:14px 18px; border-bottom:1px solid #f1f5f9; }
-.ws-panel-title { font-size:10.5px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:10px; }
-
-/* Info rows */
-.ws-info-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #f8fafc; }
-.ws-info-row:last-child { border-bottom:none; }
-.ws-info-icon { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.ws-info-label { font-size:11px; color:#94a3b8; margin-bottom:1px; }
-.ws-info-val   { font-size:13px; font-weight:600; color:#0f172a; }
-
-/* Quick actions */
-.ws-action-btn {
-  width:100%; padding:10px 14px; border-radius:9px; border:1.5px solid #e2e8f0;
-  background:#fff; color:#0f172a; font-size:13px; font-weight:600; cursor:pointer;
-  font-family:inherit; transition:all 0.15s; display:flex; align-items:center; gap:10px;
-  text-align:left; text-decoration:none; box-sizing:border-box; margin-bottom:7px;
-}
-.ws-action-btn:last-child { margin-bottom:0; }
-.ws-action-btn:hover { border-color:#0a1e3d; background:#f7f9fc; }
-.ws-action-btn .ab-icon { width:30px; height:30px; border-radius:7px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.ws-action-btn .ab-title { font-size:13px; font-weight:600; color:#0f172a; }
-.ws-action-btn .ab-sub   { font-size:11px; color:#94a3b8; margin-top:1px; }
+.ent-footer-links { display:flex; gap:16px; align-items:center; }
+.ent-footer-links a { color:#64748b; text-decoration:none; font-size:11.5px; }
+.ent-footer-links a:hover { color:#0a1e3d; }
 
 /* CW modal */
 .pw-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:300; padding:20px; backdrop-filter:blur(4px); }
@@ -218,35 +316,45 @@ document.documentElement.style.visibility = 'hidden';
 <body>
 
 <!-- ══════════════════════════════════════
-     VIEW 1: HOME
+     VIEW 1: HOME (Enterprise Dashboard)
 ══════════════════════════════════════ -->
 <div id="view-home" class="view active">
 
-  <!-- TOPBAR -->
-  <div class="ws-topbar">
-    <div class="ws-brand">
-      <div class="ws-brand-icon">ROU</div>
+  <!-- TOP NAV -->
+  <div class="ent-topnav">
+    <div class="ent-brand">
+      <div class="ent-brand-icon">ROU</div>
       <div>
-        <div class="ws-brand-name">K G Somani &amp; Co LLP</div>
-        <div class="ws-brand-sub">Ind AS 116 &middot; ROU Platform</div>
+        <div class="ent-brand-name">K G Somani &amp; Co LLP</div>
+        <div class="ent-brand-sub">Ind AS 116 &middot; ROU Platform</div>
       </div>
     </div>
-
-    <div class="ws-topbar-right">
-      <!-- User pill — click toggles dropdown -->
-      <div class="ws-user-pill" id="ws-user-pill" onclick="App.toggleUserDropdown(event)">
-        <div class="ws-user-avatar" id="ws-avatar"></div>
-        <div>
-          <div class="ws-user-name" id="ws-user-name">Loading&hellip;</div>
-          <div class="ws-user-role" id="ws-user-role">&mdash;</div>
+    <div class="ent-search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" class="ent-search" placeholder="Search companies, ROUs, leases&hellip;" />
+      <span class="ent-search-kbd">⌘ K</span>
+    </div>
+    <div class="ent-topnav-right">
+      <button class="ent-icon-btn" title="Notifications">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </button>
+      <button class="ent-icon-btn" title="Help">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      </button>
+      <div class="ent-divider-v"></div>
+      <!-- User pill -->
+      <div class="ent-user-pill" id="ws-user-pill" onclick="App.toggleUserDropdown(event)">
+        <div class="ent-user-av" id="ws-avatar"></div>
+        <div class="ent-user-info">
+          <div class="ent-user-name" id="ws-user-name">Loading&hellip;</div>
+          <div class="ent-user-role" id="ws-user-role">&mdash;</div>
         </div>
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
       </div>
-
       <!-- Dropdown -->
       <div class="ws-dropdown" id="ws-dropdown">
         <div class="ws-dd-header">
-          <div class="ws-dd-name"  id="dd-name"></div>
+          <div class="ws-dd-name" id="dd-name"></div>
           <div class="ws-dd-email" id="dd-email"></div>
         </div>
         <button class="ws-dd-item" onclick="App.openChangePwModal()">
@@ -262,156 +370,358 @@ document.documentElement.style.visibility = 'hidden';
     </div>
   </div>
 
-  <!-- BODY -->
-  <div class="ws-body">
+  <!-- DASHBOARD BODY -->
+  <div class="ent-body">
 
-    <!-- LEFT -->
-    <div class="ws-left">
-      <div id="ws-greeting">
-        <div class="ws-greeting-label">Good morning</div>
-        <div class="ws-greeting-name" id="ws-greeting-name">&mdash;</div>
-        <div class="ws-greeting-sub" id="ws-greeting-sub">Select a company below to continue</div>
-      </div>
+    <!-- SIDEBAR -->
+    <div class="ent-sidebar">
+      <nav class="ent-nav">
+        <div class="ent-nav-section-label">Main</div>
+        <a class="ent-nav-item active" href="#">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </a>
+        <a class="ent-nav-item" href="#" onclick="return false;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Client Companies
+          <span class="ent-nav-badge" id="nav-badge-companies">0</span>
+        </a>
+        <a class="ent-nav-item" href="#" onclick="return false;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          ROU Assets
+          <span class="ent-nav-badge" id="nav-badge-rous">0</span>
+        </a>
+        <a class="ent-nav-item" href="#" onclick="return false;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Leases
+        </a>
+        <a class="ent-nav-item" href="#" onclick="return false;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><bar/><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+          Reports
+        </a>
+        <div class="ent-nav-section-label" style="margin-top:16px">Account</div>
+        <a class="ent-nav-item" href="#" onclick="return false;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profile
+        </a>
+        <a class="ent-nav-item" id="ws-action-admin-nav" href="admin.html" style="display:none">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M12 14a8 8 0 00-8 8"/><path d="M19.5 16c0 1.4-.6 2.7-1.5 3.6m3-3.6a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/></svg>
+          Admin Panel
+        </a>
+        <a class="ent-nav-item" href="#" onclick="App.openChangePwModal(); return false;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Settings
+        </a>
+      </nav>
 
-      <div class="ws-companies-card">
-        <div class="ws-companies-header">
-          <div class="ws-section-label">Client Companies</div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input class="ws-search" id="ws-company-search" type="text" placeholder="Search companies&hellip;" oninput="App.filterCompanies()">
-            <button class="ws-add-btn" id="ws-add-company-btn" onclick="Modal.openAddClient()">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-              Add Company
-            </button>
-          </div>
-        </div>
-        <div class="ws-companies-list" id="ws-companies-list">
-          <div class="ws-empty">
-            <div class="ws-empty-icon">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-            </div>
-            <div class="ws-empty-title">No companies yet</div>
-            <div class="ws-empty-desc" id="ws-empty-desc">Add your first client company to get started with Ind AS 116 lease accounting</div>
-          </div>
+      <!-- Profile completion at bottom -->
+      <div class="ent-sidebar-profile">
+        <div class="ent-sb-av" id="ws-sb-avatar"></div>
+        <div class="ent-sb-info">
+          <div class="ent-sb-name" id="ws-sb-name">—</div>
+          <div class="ent-sb-role" id="ws-sb-role">—</div>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT PANEL -->
-    <div class="ws-right">
-      <div class="ws-right-scroll">
+    <!-- MAIN CONTENT -->
+    <div class="ent-main">
 
-        <!-- Account header -->
-        <div class="ws-account-header">
-          <div style="display:flex;align-items:center;gap:13px;margin-bottom:16px">
-            <div class="ws-account-av" id="ws-profile-avatar"></div>
-            <div style="min-width:0">
-              <div class="ws-account-name"  id="ws-profile-name"></div>
-              <div class="ws-account-email" id="ws-profile-email"></div>
-              <div class="ws-account-badge" id="ws-profile-role"></div>
-            </div>
-          </div>
-          <!-- Edit name inline -->
-          <div id="ws-name-alert" style="display:none;border-radius:7px;padding:7px 10px;font-size:11.5px;margin-bottom:8px;line-height:1.4"></div>
-          <div style="display:flex;gap:6px">
-            <input id="ws-name-input" type="text" placeholder="Display name" style="flex:1;padding:7px 11px;font-size:13px;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;outline:none;font-family:inherit;min-width:0;transition:border-color 0.15s" onfocus="this.style.borderColor='rgba(255,255,255,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'" placeholder="Display name" style="color:#fff" ::placeholder="color:rgba(255,255,255,0.4)">
-            <button onclick="App.saveNameInline()" style="padding:7px 13px;background:#e8520a;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s;flex-shrink:0" onmouseover="this.style.background='#d4470a'" onmouseout="this.style.background='#e8520a'">Save</button>
-          </div>
+      <!-- HERO SECTION -->
+      <div class="ent-hero">
+        <div class="ent-hero-left">
+          <div class="ent-greeting-label">Good morning,</div>
+          <div class="ent-greeting-name" id="ws-greeting-name">&mdash;</div>
+          <div class="ent-greeting-sub">Manage your profile, companies and platform settings.</div>
         </div>
-
-        <!-- Stats -->
-        <div class="ws-stats-row">
-          <div class="ws-stat-card">
-            <div class="ws-stat-val" id="ws-stat-companies">0</div>
-            <div class="ws-stat-lbl">Companies</div>
-          </div>
-          <div class="ws-stat-card">
-            <div class="ws-stat-val" id="ws-stat-rous">0</div>
-            <div class="ws-stat-lbl">Total ROUs</div>
-          </div>
-          <div class="ws-stat-card">
-            <div class="ws-stat-val" id="ws-stat-active">0</div>
-            <div class="ws-stat-lbl">Active</div>
-          </div>
-        </div>
-
-        <!-- Platform Info -->
-        <div class="ws-panel-sec">
-          <div class="ws-panel-title">Platform Overview</div>
-          <div class="ws-info-row">
-            <div class="ws-info-icon" style="background:#f0f6ff">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a3f6b" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            </div>
-            <div>
-              <div class="ws-info-label">FY Period</div>
-              <div class="ws-info-val" id="ws-info-period">Not set</div>
+        <div class="ent-hero-card">
+          <div class="ent-hc-av" id="ws-profile-avatar"></div>
+          <div class="ent-hc-info">
+            <div class="ent-hc-name" id="ws-profile-name"></div>
+            <div class="ent-hc-email" id="ws-profile-email"></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap">
+              <span class="ent-hc-badge" id="ws-profile-role"></span>
+              <span class="ent-hc-verified">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Verified
+              </span>
             </div>
           </div>
-          <div class="ws-info-row">
-            <div class="ws-info-icon" style="background:#f0fdf4">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            </div>
-            <div>
-              <div class="ws-info-label">Standard</div>
-              <div class="ws-info-val">Ind AS 116 &mdash; Right of Use</div>
-            </div>
+          <div class="ent-hc-meta">
+            <div class="ent-hc-meta-row"><span class="ent-hc-meta-label">Department</span><span class="ent-hc-meta-val">Audit &amp; Assurance</span></div>
+            <div class="ent-hc-meta-row"><span class="ent-hc-meta-label">Standard</span><span class="ent-hc-meta-val">Ind AS 116</span></div>
           </div>
-          <div class="ws-info-row">
-            <div class="ws-info-icon" style="background:#fef3c7">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-            </div>
-            <div>
-              <div class="ws-info-label">Your Role</div>
-              <div class="ws-info-val" id="ws-info-role">—</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="ws-panel-sec">
-          <div class="ws-panel-title">Quick Actions</div>
-          <button id="ws-action-add" class="ws-action-btn" onclick="Modal.openAddClient()">
-            <div class="ab-icon" style="background:#f0f6ff">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a3f6b" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            </div>
-            <div>
-              <div class="ab-title">Add Client Company</div>
-              <div class="ab-sub">Create a new Ind AS 116 engagement</div>
-            </div>
-          </button>
-          <a id="ws-action-admin" href="admin.html" class="ws-action-btn" style="display:none">
-            <div class="ab-icon" style="background:#fff8f5">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#e8520a" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M12 14a8 8 0 00-8 8"/><path d="M19.5 16c0 1.4-.6 2.7-1.5 3.6m3-3.6a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/></svg>
-            </div>
-            <div>
-              <div class="ab-title">Admin Panel</div>
-              <div class="ab-sub">Manage team, roles and access</div>
-            </div>
-          </a>
-          <button class="ws-action-btn" onclick="App.openChangePwModal()">
-            <div class="ab-icon" style="background:#f0fdf4">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-            </div>
-            <div>
-              <div class="ab-title">Change Password</div>
-              <div class="ab-sub">Update your account password</div>
-            </div>
+          <button class="ent-edit-btn" onclick="App.openChangePwModal()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit Profile
           </button>
         </div>
+      </div>
 
-        <!-- Role info -->
-        <div class="ws-panel-sec" id="ws-role-card">
-          <div class="ws-role-badge" id="ws-role-badge"></div>
-          <div class="ws-role-desc"  id="ws-role-desc" style="font-size:12px;color:#64748b;line-height:1.6;margin-top:6px"></div>
+      <!-- KPI ROW -->
+      <div class="ent-kpi-row">
+        <div class="ent-kpi-card">
+          <div class="ent-kpi-icon" style="background:#eff6ff">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          </div>
+          <div class="ent-kpi-val" id="kpi-companies">0</div>
+          <div class="ent-kpi-label">Client Companies</div>
+          <div class="ent-kpi-trend">+0 this month</div>
+        </div>
+        <div class="ent-kpi-card">
+          <div class="ent-kpi-icon" style="background:#f0fdf4">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="ent-kpi-val" id="kpi-rous">0</div>
+          <div class="ent-kpi-label">Total ROUs</div>
+          <div class="ent-kpi-trend">+0 this month</div>
+        </div>
+        <div class="ent-kpi-card">
+          <div class="ent-kpi-icon" style="background:#fefce8">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ca8a04" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="ent-kpi-val" id="kpi-active">0</div>
+          <div class="ent-kpi-label">Active Leases</div>
+          <div class="ent-kpi-trend">+0 this month</div>
+        </div>
+        <div class="ent-kpi-card">
+          <div class="ent-kpi-icon" style="background:#fdf4ff">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="ent-kpi-val" id="kpi-completion">100%</div>
+          <div class="ent-kpi-label">Profile Completion</div>
+          <div class="ent-kpi-progress"><div class="ent-kpi-progress-bar" id="kpi-completion-bar" style="width:100%"></div></div>
+        </div>
+        <div class="ent-kpi-card">
+          <div class="ent-kpi-icon" style="background:#fff7ed">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="ent-kpi-val" id="kpi-login">—</div>
+          <div class="ent-kpi-label">Last Login</div>
+          <div class="ent-kpi-trend">Today</div>
+        </div>
+      </div>
+
+      <!-- 3-COLUMN SECTION -->
+      <div class="ent-grid3">
+
+        <!-- COL 1: Client Companies -->
+        <div class="ent-card ent-col-large">
+          <div class="ent-card-header">
+            <div class="ent-card-title">Client Companies</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input class="ent-card-search" id="ws-company-search" type="text" placeholder="Search companies&hellip;" oninput="App.filterCompanies()">
+              <button class="ent-primary-btn" id="ws-add-company-btn" onclick="Modal.openAddClient()">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                Add Company
+              </button>
+            </div>
+          </div>
+          <div class="ws-companies-list" id="ws-companies-list">
+            <div class="ws-empty">
+              <div class="ws-empty-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+              </div>
+              <div class="ws-empty-title">No companies yet</div>
+              <div class="ws-empty-desc" id="ws-empty-desc">Add your first client company to get started with Ind AS 116 lease accounting</div>
+            </div>
+          </div>
+          <div class="ent-card-footer">
+            <span id="ws-companies-count" style="font-size:12px;color:#94a3b8">Showing 0 companies</span>
+            <button class="ent-text-btn">View All Companies →</button>
+          </div>
         </div>
 
-      </div><!-- end ws-right-scroll -->
-    </div><!-- end ws-right -->
-  </div><!-- end ws-body -->
+        <!-- COL 2: Recent Activity -->
+        <div class="ent-card">
+          <div class="ent-card-header">
+            <div class="ent-card-title">Recent Activity</div>
+            <button class="ent-text-btn">View All</button>
+          </div>
+          <div class="ent-activity-list" id="ent-activity-list">
+            <div class="ent-activity-item">
+              <div class="ent-act-icon" style="background:#eff6ff">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <div class="ent-act-body">
+                <div class="ent-act-title">Profile updated</div>
+                <div class="ent-act-sub">Profile information was updated successfully</div>
+              </div>
+              <div class="ent-act-time" id="ent-act-time-1">—</div>
+            </div>
+            <div class="ent-activity-item">
+              <div class="ent-act-icon" style="background:#f0fdf4">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+              </div>
+              <div class="ent-act-body">
+                <div class="ent-act-title">Logged in</div>
+                <div class="ent-act-sub">Successful login from Chrome on Windows</div>
+              </div>
+              <div class="ent-act-time" id="ent-act-time-2">—</div>
+            </div>
+            <div class="ent-activity-item">
+              <div class="ent-act-icon" style="background:#fff7ed">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              </div>
+              <div class="ent-act-body">
+                <div class="ent-act-title">Password changed</div>
+                <div class="ent-act-sub">Password was changed successfully</div>
+              </div>
+              <div class="ent-act-time">Yesterday</div>
+            </div>
+          </div>
+
+          <div class="ent-card-header" style="margin-top:16px;border-top:1px solid #f1f5f9;padding-top:16px">
+            <div class="ent-card-title">Quick Actions</div>
+          </div>
+          <div class="ent-quick-actions">
+            <button class="ent-qa-btn" id="ws-action-add" onclick="Modal.openAddClient()">
+              <div class="ent-qa-icon" style="background:#eff6ff">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </div>
+              <div>
+                <div class="ent-qa-title">Add Client</div>
+                <div class="ent-qa-sub">New engagement</div>
+              </div>
+            </button>
+            <a class="ent-qa-btn" id="ws-action-admin" href="admin.html" style="display:none;text-decoration:none">
+              <div class="ent-qa-icon" style="background:#fff7ed">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M12 14a8 8 0 00-8 8"/></svg>
+              </div>
+              <div>
+                <div class="ent-qa-title">Admin Panel</div>
+                <div class="ent-qa-sub">Manage team</div>
+              </div>
+            </a>
+            <button class="ent-qa-btn" onclick="App.openChangePwModal()">
+              <div class="ent-qa-icon" style="background:#f0fdf4">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              </div>
+              <div>
+                <div class="ent-qa-title">Change Password</div>
+                <div class="ent-qa-sub">Security settings</div>
+              </div>
+            </button>
+            <button class="ent-qa-btn" onclick="return false;">
+              <div class="ent-qa-icon" style="background:#fdf4ff">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+              </div>
+              <div>
+                <div class="ent-qa-title">Export Data</div>
+                <div class="ent-qa-sub">Download reports</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- COL 3: Platform Overview + Security -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div class="ent-card">
+            <div class="ent-card-header">
+              <div class="ent-card-title">Platform Overview</div>
+            </div>
+            <div class="ent-info-list">
+              <div class="ent-info-row">
+                <div class="ent-info-icon" style="background:#f0f6ff">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a3f6b" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div>
+                  <div class="ent-info-label">FY Period</div>
+                  <div class="ent-info-val" id="ws-info-period">Not set</div>
+                </div>
+              </div>
+              <div class="ent-info-row">
+                <div class="ent-info-icon" style="background:#f0fdf4">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <div>
+                  <div class="ent-info-label">Ind AS Standard</div>
+                  <div class="ent-info-val">Ind AS 116 &mdash; Right of Use</div>
+                </div>
+              </div>
+              <div class="ent-info-row">
+                <div class="ent-info-icon" style="background:#fef3c7">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                </div>
+                <div>
+                  <div class="ent-info-label">Your Role</div>
+                  <div class="ent-info-val" id="ws-info-role">—</div>
+                </div>
+              </div>
+              <div class="ent-info-row">
+                <div class="ent-info-icon" style="background:#fdf4ff">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M12 8v8"/></svg>
+                </div>
+                <div>
+                  <div class="ent-info-label">Account Type</div>
+                  <div class="ent-info-val">Professional Plan</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ent-card">
+            <div class="ent-card-header">
+              <div class="ent-card-title">Security &amp; Preferences</div>
+            </div>
+            <div class="ent-security-list">
+              <button class="ent-sec-item" onclick="App.openChangePwModal()">
+                <div class="ent-info-icon" style="background:#f0fdf4">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                </div>
+                <div style="flex:1;text-align:left">
+                  <div class="ent-info-val">Change Password</div>
+                  <div class="ent-info-label">Update your account password</div>
+                </div>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+              <div class="ent-sec-item">
+                <div class="ent-info-icon" style="background:#fef3c7">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div style="flex:1">
+                  <div class="ent-info-val">Two-Factor Auth</div>
+                  <div class="ent-info-label">Add an extra layer of security</div>
+                </div>
+                <div class="ent-toggle-off">Off</div>
+              </div>
+              <div class="ent-sec-item">
+                <div class="ent-info-icon" style="background:#eff6ff">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+                </div>
+                <div style="flex:1">
+                  <div class="ent-info-val">Notifications</div>
+                  <div class="ent-info-label">Manage your notifications</div>
+                </div>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Role card -->
+          <div class="ent-card" id="ws-role-card">
+            <div class="ws-role-badge" id="ws-role-badge"></div>
+            <div class="ws-role-desc" id="ws-role-desc" style="font-size:12px;color:#64748b;line-height:1.6;margin-top:6px"></div>
+          </div>
+        </div>
+
+      </div><!-- end ent-grid3 -->
+
+      <!-- FOOTER -->
+      <div class="ent-footer">
+        <span>&copy; 2026 K G Somani &amp; Co LLP. All rights reserved.</span>
+        <div class="ent-footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Documentation</a>
+          <span style="color:#cbd5e1">Ind AS 116 ROU Platform v2.5.0</span>
+        </div>
+      </div>
+
+    </div><!-- end ent-main -->
+  </div><!-- end ent-body -->
 </div>
 
-<!-- ══════════════════════════════════════
-     VIEW 2: APP (sidebar + content)
-══════════════════════════════════════ -->
 <div id="view-app" class="view">
 
   <!-- SIDEBAR -->
@@ -1948,3 +2258,4 @@ function profileAlert(tab, msg, type) {
 
 </body>
 </html>
+
