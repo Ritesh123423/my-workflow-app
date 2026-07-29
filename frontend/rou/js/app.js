@@ -421,10 +421,10 @@ window.App = {
     if (tb) tb.textContent = titles[page] || page;
     if (page === 'dashboard') this.renderDashboard();
     if (page === 'rous')      this.renderROUsTable();
-    if (page === 'add-rou')   Form.prepareAdd();
+    if (page === 'add-rou')   Form.reset();
     if (page === 'export')    this.prepareExport();
-    if (page === 'audit')     AuditLog.render();
-    if (page === 'reassess-override') ReassessOverride.render();
+    if (page === 'audit')     AuditLog.renderPage(this.currentClient.id);
+    if (page === 'reassess-override') { ReassessOverride.prepare(); ReassessOverride.renderTable(); }
     document.querySelector('.main-content')?.scrollTo(0,0);
   },
 
@@ -703,7 +703,7 @@ window.App = {
     if (!this.pendingDeleteId || !this.currentClient) return;
     const rous = (DB.get('rous_' + this.currentClient.id)||[]).filter(r => r.id !== this.pendingDeleteId);
     DB.set('rous_' + this.currentClient.id, rous);
-    AuditLog.log('delete', this.pendingDeleteId, { branch:'deleted' });
+    AuditLog.record(this.currentClient.id, 'DELETE', { id: this.pendingDeleteId, branch:'deleted' });
     this.pendingDeleteId = null;
     Modal.close('modal-delete-rou');
     this.renderROUsTable();
@@ -727,7 +727,7 @@ window.App = {
     const copy = { ...orig, id: Utils.uid(), branch: (orig.branch||orig.name||'Copy') + ' (Copy)', createdAt: new Date().toISOString() };
     rous.push(copy);
     DB.set('rous_' + this.currentClient.id, rous);
-    AuditLog.log('duplicate', copy.id, copy);
+    AuditLog.record(this.currentClient.id, 'DUPLICATE', copy);
     this.pendingDuplicateId = null;
     Modal.close('modal-duplicate-rou');
     this.renderROUsTable();
@@ -775,6 +775,7 @@ window.App = {
 document.addEventListener('click', function() {
   document.getElementById('ws-dropdown')?.classList.remove('open');
 });
+
 
 
 
