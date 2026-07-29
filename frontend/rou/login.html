@@ -285,7 +285,7 @@
         var p = JSON.parse(atob(token.split('.')[1]));
         if (p.exp * 1000 > Date.now()) {
           // Already logged in — redirect without showing login page
-          window.location.replace(p.role === 'admin' ? 'admin.html' : 'index.html');
+          window.location.replace(p.role === 'admin' ? 'admin.html' : 'home.html');
           return; // stop here, don't show page
         }
       } catch(e) {}
@@ -333,7 +333,7 @@
       localStorage.setItem('rou_token', data.token);
       localStorage.setItem('rou_user', JSON.stringify(data.user));
       // use replace() so back button doesn't return to login
-      window.location.replace(data.user.role === 'admin' ? 'admin.html' : 'index.html');
+      window.location.replace(data.user.role === 'admin' ? 'admin.html' : 'home.html');
     } catch(e) {
       showError('Network error. Please check your connection and try again.');
       setLoading(false);
@@ -346,3 +346,4 @@
 </script>
 </body>
 </html>
+
