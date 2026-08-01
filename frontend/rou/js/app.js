@@ -1,35 +1,16 @@
-/* ── Inline alert helper ── */
+/* ── Shared alert helper (replaces _inlineAlert / _pvAlert / _pageAlert) ── */
 function _inlineAlert(el, msg, type) {
   if (!el) return;
-  el.textContent = msg;
-  el.style.display = 'block';
-  el.style.background = type === 'success' ? '#f0fdf4' : '#fef2f2';
-  el.style.border     = '1.5px solid ' + (type === 'success' ? '#bbf7d0' : '#fecaca');
-  el.style.color      = type === 'success' ? '#065f46' : '#991b1b';
-  if (type === 'success') setTimeout(() => { el.style.display = 'none'; }, 3000);
-}
-
-/* ── Alert helper for profile view ── */
-function _pvAlert(el, msg, type) {
-  if (!el) return;
-  el.textContent = msg;
-  el.style.display = 'block';
-  el.style.background = type === 'success' ? '#f0fdf4' : '#fef2f2';
-  el.style.border     = '1.5px solid ' + (type === 'success' ? '#bbf7d0' : '#fecaca');
-  el.style.color      = type === 'success' ? '#065f46' : '#991b1b';
-  if (type === 'success') setTimeout(function() { el.style.display = 'none'; }, 3500);
-}
-
-/* ── Standalone alert helper for profile page ── */
-function _pageAlert(el, msg, type) {
-  if (!el) return;
-  el.textContent = msg;
-  el.style.display = 'block';
+  el.textContent      = msg;
+  el.style.display    = 'block';
   el.style.background = type === 'success' ? '#f0fdf4' : '#fef2f2';
   el.style.border     = '1.5px solid ' + (type === 'success' ? '#bbf7d0' : '#fecaca');
   el.style.color      = type === 'success' ? '#065f46' : '#991b1b';
   if (type === 'success') setTimeout(function() { el.style.display = 'none'; }, 3000);
 }
+// Legacy aliases — kept so existing callers need no changes
+var _pvAlert   = _inlineAlert;
+var _pageAlert = _inlineAlert;
 
 /* ── Standalone helper: update sidebar + topbar user pill ── */
 function _refreshUserDisplay(user) {
@@ -128,7 +109,7 @@ window.App = {
     if (!user) {
       try {
         const t = localStorage.getItem('rou_token');
-        if (t) { const p = JSON.parse(atob(t.split('.')[1])); user={id:p.id,role:p.role,name:p.name,email:p.email}; localStorage.setItem('rou_user',JSON.stringify(user)); }
+        if (t) { var b64 = t.split('.')[1]; b64 += '='.repeat((4 - b64.length % 4) % 4); const p = JSON.parse(atob(b64)); user={id:p.id,role:p.role,name:p.name,email:p.email}; localStorage.setItem('rou_user',JSON.stringify(user)); }
       } catch(e) {}
     }
     if (!user) return;
