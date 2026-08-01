@@ -36,32 +36,11 @@
   }
   @keyframes slideInLeft { to { transform:translateX(0); opacity:1; } }
 
-  /* Background decoration */
-  .lp-deco { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
-  .lp-circle {
-    position:absolute; border-radius:50%;
-    background:radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
-    animation:floatCircle 26s ease-in-out infinite;
-  }
-  .lp-circle.c1 { width:560px; height:560px; top:-160px; right:-140px; }
-  .lp-circle.c2 { width:340px; height:340px; bottom:-80px; left:-100px; border:1px solid rgba(255,255,255,0.06); background:none; animation-duration:32s; animation-direction:reverse; }
-  .lp-circle.c3 { width:180px; height:180px; top:44%; left:60%; border:1px solid rgba(255,255,255,0.05); background:none; animation-duration:24s; }
-  @keyframes floatCircle {
-    0%,100% { transform:translate(0,0); }
-    50% { transform:translate(12px,-14px); }
-  }
-  .lp-grid {
-    position:absolute; inset:0;
-    background-image:linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-                     linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-    background-size:56px 56px;
-    mask-image:radial-gradient(ellipse at center, black 30%, transparent 75%);
-    -webkit-mask-image:radial-gradient(ellipse at center, black 30%, transparent 75%);
-  }
+  /* subtle dot grid kept as texture */
   .lp-dots {
-    position:absolute; inset:0;
-    background-image:radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
-    background-size:24px 24px;
+    position:absolute; inset:0; pointer-events:none; z-index:0;
+    background-image:radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size:28px 28px;
   }
 
   .lp-left-inner { position:relative; z-index:1; }
@@ -91,18 +70,8 @@
     max-width:440px; margin-bottom:40px;
   }
 
-  /* Features */
-  .lp-features { display:flex; flex-direction:column; gap:20px; max-width:440px; }
-  .lp-feat { display:flex; gap:15px; align-items:flex-start; }
-  .lp-feat-ic {
-    width:42px; height:42px; border-radius:11px; flex-shrink:0;
-    background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1);
-    display:flex; align-items:center; justify-content:center;
-    color:#93c5fd; transition:transform 200ms ease, background 200ms ease;
-  }
-  .lp-feat:hover .lp-feat-ic { transform:translateY(-2px); background:rgba(255,255,255,0.12); }
-  .lp-feat-title { font-size:14.5px; font-weight:600; color:#fff; margin-bottom:2px; }
-  .lp-feat-desc { font-size:12.5px; color:rgba(255,255,255,0.48); line-height:1.5; }
+  /* Bubble canvas */
+  #bubble-canvas { position:absolute; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; }
 
   /* Bottom trust */
   .lp-trust { position:relative; z-index:1; display:flex; gap:26px; flex-wrap:wrap; }
@@ -241,13 +210,8 @@
 
   <!-- ══ LEFT: BRANDING ══ -->
   <div class="lp-left">
-    <div class="lp-deco">
-      <div class="lp-grid"></div>
-      <div class="lp-dots"></div>
-      <div class="lp-circle c1"></div>
-      <div class="lp-circle c2"></div>
-      <div class="lp-circle c3"></div>
-    </div>
+    <canvas id="bubble-canvas"></canvas>
+    <div class="lp-dots"></div>
 
     <div class="lp-left-inner lp-brand">
       <div class="lp-brand-mark">KG</div>
@@ -261,44 +225,7 @@
       <h1 class="lp-heading">Ind AS 116 Lease<br><span class="accent">Management Platform</span></h1>
       <p class="lp-sub">A collaborative enterprise platform for Chartered Accountants to manage lease accounting, audit workpapers, disclosures and compliance.</p>
 
-      <div class="lp-features">
-        <div class="lp-feat">
-          <div class="lp-feat-ic">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>
-          </div>
-          <div>
-            <div class="lp-feat-title">Lease Computation</div>
-            <div class="lp-feat-desc">Present value, IBR discounting &amp; escalations</div>
-          </div>
-        </div>
-        <div class="lp-feat">
-          <div class="lp-feat-ic">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          </div>
-          <div>
-            <div class="lp-feat-title">Excel Workpapers</div>
-            <div class="lp-feat-desc">Schedule III, journal entries &amp; exports</div>
-          </div>
-        </div>
-        <div class="lp-feat">
-          <div class="lp-feat-ic">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          </div>
-          <div>
-            <div class="lp-feat-title">Role Based Access</div>
-            <div class="lp-feat-desc">Partner, Manager, Article &amp; Admin</div>
-          </div>
-        </div>
-        <div class="lp-feat">
-          <div class="lp-feat-ic">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg>
-          </div>
-          <div>
-            <div class="lp-feat-title">Cloud Synchronisation</div>
-            <div class="lp-feat-desc">Automatic backups, access anywhere</div>
-          </div>
-        </div>
-      </div>
+
     </div>
 
     <div class="lp-trust">
@@ -495,6 +422,110 @@
 
   window.addEventListener('load', positionUnderline);
   window.addEventListener('resize', positionUnderline);
+</script>
+
+<script>
+// ── Bubble canvas animation ────────────────────────────────────────────
+(function() {
+  var canvas = document.getElementById('bubble-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var bubbles = [];
+  var RAF;
+
+  var PALETTE = [
+    'rgba(96,165,250,',   // blue-400
+    'rgba(147,197,253,',  // blue-300
+    'rgba(59,130,246,',   // blue-500
+    'rgba(191,219,254,',  // blue-200
+    'rgba(255,255,255,',  // white
+  ];
+
+  function resize() {
+    var left = canvas.parentElement;
+    canvas.width  = left.offsetWidth;
+    canvas.height = left.offsetHeight;
+  }
+
+  function rand(min, max) { return min + Math.random() * (max - min); }
+
+  function makeBubble(fromBottom) {
+    var r = rand(4, 26);
+    return {
+      x: rand(r, canvas.width - r),
+      y: fromBottom ? canvas.height + r + rand(0, canvas.height) : rand(0, canvas.height),
+      r: r,
+      vx: rand(-0.28, 0.28),
+      vy: -rand(0.30, 0.85),
+      alpha: rand(0.06, 0.22),
+      strokeAlpha: rand(0.12, 0.38),
+      color: PALETTE[Math.floor(Math.random() * PALETTE.length)],
+      wobble: rand(0, Math.PI * 2),
+      wobbleSpeed: rand(0.008, 0.022),
+      wobbleAmp: rand(0.4, 1.1),
+    };
+  }
+
+  function initBubbles() {
+    bubbles = [];
+    var count = Math.floor((canvas.width * canvas.height) / 14000);
+    count = Math.max(18, Math.min(count, 55));
+    for (var i = 0; i < count; i++) bubbles.push(makeBubble(false));
+  }
+
+  function drawBubble(b) {
+    ctx.save();
+    // filled translucent circle
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fillStyle = b.color + b.alpha + ')';
+    ctx.fill();
+
+    // glossy ring
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.strokeStyle = b.color + b.strokeAlpha + ')';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // specular highlight
+    var gx = b.x - b.r * 0.30;
+    var gy = b.y - b.r * 0.32;
+    var gr = ctx.createRadialGradient(gx, gy, 0, gx, gy, b.r * 0.65);
+    gr.addColorStop(0, 'rgba(255,255,255,' + (b.alpha * 1.8) + ')');
+    gr.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fillStyle = gr;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function step() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (var i = bubbles.length - 1; i >= 0; i--) {
+      var b = bubbles[i];
+      b.wobble += b.wobbleSpeed;
+      b.x += b.vx + Math.sin(b.wobble) * b.wobbleAmp * 0.15;
+      b.y += b.vy;
+      drawBubble(b);
+      // recycle when fully above the panel
+      if (b.y + b.r < -10) {
+        bubbles[i] = makeBubble(true);
+      }
+    }
+    RAF = requestAnimationFrame(step);
+  }
+
+  window.addEventListener('resize', function() {
+    resize();
+    initBubbles();
+  });
+
+  resize();
+  initBubbles();
+  step();
+})();
 </script>
 </body>
 </html>
