@@ -170,8 +170,10 @@
     background:#fff; font-size:14px; font-weight:600; color:var(--dark);
     font-family:inherit; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;
     transition:border-color 150ms ease, background 150ms ease;
+    text-decoration:none; box-sizing:border-box;
   }
   .lp-sso-btn:hover { border-color:#cbd5e1; background:#f8fafc; }
+  .lp-sso-btn.sso-loading { opacity:0.65; pointer-events:none; }
 
   /* Footer */
   .lp-foot { text-align:center; margin-top:26px; font-size:13.5px; color:var(--secondary); opacity:0; animation:fadeIn 400ms ease 700ms forwards; }
@@ -309,14 +311,14 @@
 
       <!-- SSO -->
       <div class="lp-sso">
-        <button class="lp-sso-btn" type="button" onclick="ssoUnavailable()">
+        <a class="lp-sso-btn" href="/api/auth/google" id="btn-google">
           <svg width="17" height="17" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0012 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 010-4.2V7.06H2.18a11 11 0 000 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1a11 11 0 00-9.82 6.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38z"/></svg>
           Continue with Google
-        </button>
-        <button class="lp-sso-btn" type="button" onclick="ssoUnavailable()">
+        </a>
+        <a class="lp-sso-btn" href="/api/auth/microsoft" id="btn-microsoft">
           <svg width="16" height="16" viewBox="0 0 23 23"><path fill="#f35325" d="M1 1h10v10H1z"/><path fill="#81bc06" d="M12 1h10v10H12z"/><path fill="#05a6f0" d="M1 12h10v10H1z"/><path fill="#ffba08" d="M12 12h10v10H12z"/></svg>
           Continue with Microsoft
-        </button>
+        </a>
       </div>
 
       <!-- Footer -->
@@ -331,6 +333,22 @@
 <script>
   // ── Auth check — run BEFORE showing page ─────────────
   (function() {
+    // Handle SSO callback — token delivered via query param to home.html
+    // (backend redirects there; this block also guards if it lands here)
+    var params = new URLSearchParams(window.location.search);
+    var ssoToken = params.get('sso_token');
+    if (ssoToken) {
+      try {
+        var sp = JSON.parse(atob(ssoToken.split('.')[1]));
+        if (sp.exp * 1000 > Date.now()) {
+          localStorage.setItem('rou_token', ssoToken);
+          localStorage.setItem('rou_user', JSON.stringify({ id: sp.id, name: sp.name, email: sp.email, role: sp.role }));
+          window.location.replace(sp.role === 'admin' ? 'admin.html' : 'home.html');
+          return;
+        }
+      } catch(e) {}
+    }
+
     var token = localStorage.getItem('rou_token');
     if (token) {
       try {
@@ -382,9 +400,26 @@
     document.getElementById('btn-text').textContent = v ? 'Signing in…' : 'Sign In';
   }
 
-  function ssoUnavailable() {
-    showError('Single sign-on is not enabled for your firm yet. Please sign in with your email and password.');
-  }
+  // ── SSO query-param handling ──────────────────────────────
+  (function handleSSOParams() {
+    var params = new URLSearchParams(window.location.search);
+    var ssoErr = params.get('sso_error');
+    if (ssoErr) {
+      // Remove param from URL without reload
+      history.replaceState({}, '', window.location.pathname);
+      showError(decodeURIComponent(ssoErr));
+    }
+  })();
+
+  // ── SSO button loading state ──────────────────────────────
+  document.getElementById('btn-google').addEventListener('click', function() {
+    this.classList.add('sso-loading');
+    this.innerHTML = this.innerHTML.replace('Continue with Google', 'Redirecting…');
+  });
+  document.getElementById('btn-microsoft').addEventListener('click', function() {
+    this.classList.add('sso-loading');
+    this.innerHTML = this.innerHTML.replace('Continue with Microsoft', 'Redirecting…');
+  });
 
   async function doLogin() {
     document.getElementById('alert-error').classList.remove('show');
