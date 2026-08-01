@@ -3,382 +3,545 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Create Account — KG Somani ROU Platform</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Create Account · K G Somani &amp; Co LLP — Ind AS 116 ROU Platform</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%231D4ED8'/><text x='16' y='21' font-family='Arial,sans-serif' font-size='11' font-weight='bold' fill='white' text-anchor='middle'>KG</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
   :root {
-    --brand: #0f2a47; --brand2: #1a3f6b; --accent: #e8520a; --accent2: #ff6b2b;
-    --green: #059669; --red: #dc2626; --amber: #d97706; --purple: #7c3aed;
-    --bg: #f1f5f9; --card: #ffffff;
-    --text: #0f172a; --text2: #475569; --text3: #94a3b8;
-    --border: #e2e8f0;
+    --primary:#1D4ED8; --primary-dark:#1e40af;
+    --dark:#0F172A; --secondary:#64748B;
+    --border:#E2E8F0; --bg:#F8FAFC;
+    --green:#059669; --amber:#d97706;
+    --error-bg:#fef2f2; --error-border:#fecaca; --error-text:#991b1b;
+    --success-bg:#f0fdf4; --success-border:#bbf7d0; --success-text:#065f46;
   }
-  /* Prevent flash */
-  body { visibility: hidden; font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); min-height: 100vh; display: flex; align-items: stretch; }
-  body.ready { visibility: visible; }
+  html, body { height:100%; }
+  body {
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color:var(--dark); background:#fff;
+    opacity:0; transition:opacity 500ms ease;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    display:flex; min-height:100vh;
+  }
+  body.ready { opacity:1; }
 
-  /* LEFT PANEL */
-  .left-panel {
-    width: 380px; flex-shrink: 0;
-    background: linear-gradient(160deg, var(--brand) 0%, #163260 60%, var(--brand2) 100%);
-    display: flex; flex-direction: column; justify-content: space-between;
-    padding: 48px 40px; position: relative; overflow: hidden;
+  /* ══ LEFT PANEL ══ */
+  .lp-left {
+    width:360px; flex-shrink:0; position:relative; overflow:hidden;
+    background:linear-gradient(165deg, #0B1F4D 0%, #0d2a63 55%, #123D9A 100%);
+    display:flex; flex-direction:column; justify-content:space-between;
+    padding:52px 44px;
   }
-  .left-panel::before {
-    content: ''; position: absolute; top: -60px; right: -60px;
-    width: 280px; height: 280px;
-    background: radial-gradient(circle, rgba(232,82,10,0.2) 0%, transparent 70%);
-    border-radius: 50%;
+  .lp-dots {
+    position:absolute; inset:0; pointer-events:none; z-index:0;
+    background-image:radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size:28px 28px;
   }
-  .lp-icon {
-    width: 50px; height: 50px; background: var(--accent); border-radius: 13px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 18px;
-    box-shadow: 0 8px 24px rgba(232,82,10,0.4); position: relative; z-index:1;
+  .lp-glow {
+    position:absolute; top:-80px; right:-80px;
+    width:300px; height:300px; border-radius:50%;
+    background:radial-gradient(circle, rgba(29,78,216,0.25) 0%, transparent 70%);
+    pointer-events:none; z-index:0;
   }
-  .lp-firm { font-size: 21px; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 6px; position: relative; z-index:1; }
-  .lp-sub { font-size: 12.5px; color: rgba(255,255,255,0.5); position: relative; z-index:1; }
-  .lp-steps { position: relative; z-index:1; }
-  .lp-step { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 20px; }
+  .lp-inner { position:relative; z-index:1; }
+
+  .lp-brand { display:flex; align-items:center; gap:14px; margin-bottom:0; }
+  .lp-brand-mark {
+    width:46px; height:46px; border-radius:12px; flex-shrink:0;
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.5px;
+    box-shadow:0 8px 24px rgba(29,78,216,0.45);
+  }
+  .lp-firm { font-size:17px; font-weight:700; color:#fff; letter-spacing:-0.3px; line-height:1.3; }
+  .lp-firm-sub { font-size:12px; color:rgba(255,255,255,0.45); margin-top:2px; }
+
+  .lp-steps-label {
+    font-size:10.5px; font-weight:700; color:rgba(255,255,255,0.32);
+    text-transform:uppercase; letter-spacing:1px; margin-bottom:20px;
+  }
+  .lp-step { display:flex; align-items:flex-start; gap:14px; margin-bottom:22px; }
   .lp-step-num {
-    width: 28px; height: 28px; flex-shrink: 0;
-    background: rgba(255,255,255,0.1); border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.7);
+    width:28px; height:28px; flex-shrink:0; border-radius:8px;
+    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12);
+    display:flex; align-items:center; justify-content:center;
+    font-size:12.5px; font-weight:700; color:rgba(255,255,255,0.65);
   }
-  .lp-step-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); margin-bottom: 2px; }
-  .lp-step-desc { font-size: 11.5px; color: rgba(255,255,255,0.45); line-height: 1.5; }
-  .lp-footer { font-size: 11px; color: rgba(255,255,255,0.3); position: relative; z-index:1; }
+  .lp-step-title { font-size:13px; font-weight:600; color:rgba(255,255,255,0.85); margin-bottom:3px; }
+  .lp-step-desc { font-size:11.5px; color:rgba(255,255,255,0.42); line-height:1.55; }
 
-  /* RIGHT PANEL */
-  .right-panel { flex: 1; display: flex; align-items: center; justify-content: center; padding: 36px 28px; overflow-y: auto; }
-  .form-box { width: 100%; max-width: 480px; }
-  .form-heading { margin-bottom: 28px; }
-  .form-heading h1 { font-size: 24px; font-weight: 800; color: var(--text); letter-spacing: -0.4px; margin-bottom: 5px; }
-  .form-heading p { font-size: 13.5px; color: var(--text3); }
-  .form-heading p a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .lp-footer { font-size:11px; color:rgba(255,255,255,0.25); position:relative; z-index:1; }
 
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-  .form-full { grid-column: 1/-1; }
-  .form-group { }
-  .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; letter-spacing: 0.1px; }
-  .input-wrap { position: relative; }
-  .form-input {
-    width: 100%; padding: 11px 14px; font-size: 13.5px;
-    background: var(--card); border: 1.5px solid var(--border);
-    border-radius: 9px; color: var(--text); outline: none; font-family: inherit;
-    transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none;
+  /* ══ RIGHT PANEL ══ */
+  .rp { flex:1; display:flex; align-items:flex-start; justify-content:center; padding:52px 40px; overflow-y:auto; }
+  .rp-box { width:100%; max-width:500px; }
+
+  .rp-head { margin-bottom:28px; }
+  .rp-title { font-size:26px; font-weight:800; color:var(--dark); letter-spacing:-0.7px; margin-bottom:6px; }
+  .rp-sub { font-size:14px; color:var(--secondary); }
+  .rp-sub a { color:var(--primary); font-weight:600; text-decoration:none; }
+  .rp-sub a:hover { text-decoration:underline; }
+
+  /* Alerts */
+  .rp-alert {
+    display:none; align-items:flex-start; gap:10px;
+    border-radius:10px; padding:12px 14px; font-size:13.5px;
+    margin-bottom:18px; line-height:1.5;
+    animation:alertIn 200ms ease;
   }
-  .form-input::placeholder { color: var(--text3); }
-  .form-input:focus { border-color: var(--brand2); box-shadow: 0 0 0 3px rgba(26,63,107,0.08); }
-  .form-input.has-icon { padding-right: 42px; }
-  .input-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text3); font-size: 15px; }
+  @keyframes alertIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+  .rp-alert.show { display:flex; }
+  .rp-alert svg { flex-shrink:0; margin-top:1px; }
+  .rp-alert-error { background:var(--error-bg); border:1.5px solid var(--error-border); color:var(--error-text); }
+  .rp-alert-error svg { color:#dc2626; }
+  .rp-alert-success { background:var(--success-bg); border:1.5px solid var(--success-border); color:var(--success-text); }
+  .rp-alert-success svg { color:var(--green); }
 
-  /* ROLE SELECTOR */
-  .role-section { margin-bottom: 16px; }
-  .role-section-label { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 10px; display: block; letter-spacing: 0.1px; }
-  .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  /* Form grid */
+  .rp-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+  .rp-full { grid-column:1 / -1; }
+  .rp-group { }
+  .rp-label {
+    display:block; font-size:13px; font-weight:600;
+    color:var(--dark); margin-bottom:7px;
+  }
+  .rp-input-wrap { position:relative; }
+  .rp-input {
+    width:100%; height:46px; padding:0 14px; font-size:14.5px;
+    font-family:inherit; color:var(--dark); background:#fff;
+    border:1.5px solid var(--border); border-radius:10px;
+    outline:none; -webkit-appearance:none;
+    transition:border-color 180ms ease, box-shadow 180ms ease;
+  }
+  .rp-input::placeholder { color:#94a3b8; }
+  .rp-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(29,78,216,0.1); }
+  .rp-input.has-icon { padding-right:44px; }
+  .rp-input.error { border-color:#ef4444; }
+  .rp-eye {
+    position:absolute; right:8px; top:50%; transform:translateY(-50%);
+    width:30px; height:30px; border:none; background:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:6px; opacity:0.5; transition:opacity 150ms, background 150ms;
+  }
+  .rp-eye:hover { opacity:1; background:#f1f5f9; }
+  .rp-eye svg { width:16px; height:16px; color:var(--secondary); }
+
+  /* Password strength */
+  .pw-strength { margin-top:7px; }
+  .pw-track { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .pw-bar { height:100%; border-radius:2px; transition:width 0.25s ease, background 0.25s ease; width:0; }
+  .pw-label { font-size:11px; color:var(--secondary); margin-top:4px; }
+
+  /* Role selector */
+  .role-label {
+    display:block; font-size:13px; font-weight:600;
+    color:var(--dark); margin-bottom:10px;
+  }
+  .role-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
   .role-card {
-    border: 2px solid var(--border); border-radius: 11px; padding: 14px 10px 12px;
-    cursor: pointer; text-align: center; transition: all 0.15s; background: #fafbfc;
-    user-select: none;
+    border:1.5px solid var(--border); border-radius:11px;
+    padding:16px 10px 14px; cursor:pointer; text-align:center;
+    background:#fafbfc; transition:all 150ms ease; user-select:none;
   }
-  .role-card:hover:not(.locked-card) { border-color: #94a3b8; background: #f8fafc; transform: translateY(-1px); }
-  .role-card.selected { border-color: var(--brand2); background: #eff6ff; box-shadow: 0 0 0 3px rgba(26,63,107,0.1); }
-  .role-card.locked-card { cursor: default; background: #fffbeb; border-color: #fde68a; }
-  .role-card.locked-card.selected { border-color: var(--amber); background: #fffbeb; box-shadow: 0 0 0 3px rgba(217,119,6,0.1); }
-  .role-emoji { font-size: 22px; margin-bottom: 7px; display: block; }
-  .role-name { font-size: 12.5px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
-  .role-desc { font-size: 10.5px; color: var(--text3); line-height: 1.4; }
-  .role-lock { font-size: 10px; font-weight: 700; color: var(--amber); margin-top: 5px; }
+  .role-card:hover:not(.locked) { border-color:#94a3b8; background:#f8fafc; transform:translateY(-1px); }
+  .role-card.selected {
+    border-color:var(--primary); background:#eff6ff;
+    box-shadow:0 0 0 3px rgba(29,78,216,0.1);
+  }
+  .role-card.locked { cursor:default; background:#fffbeb; border-color:#fde68a; }
+  .role-card.locked.selected { border-color:var(--amber); background:#fffbeb; box-shadow:0 0 0 3px rgba(217,119,6,0.1); }
+  .role-icon { font-size:22px; margin-bottom:8px; display:block; }
+  .role-name { font-size:13px; font-weight:700; color:var(--dark); margin-bottom:3px; }
+  .role-desc { font-size:11px; color:var(--secondary); line-height:1.4; }
+  .role-badge {
+    display:inline-block; margin-top:6px; font-size:10.5px; font-weight:700;
+    padding:2px 7px; border-radius:100px;
+  }
+  .badge-free { background:#dcfce7; color:#166534; }
+  .badge-locked { background:#fef3c7; color:#92400e; }
 
-  /* ADMIN TOKEN BLOCK */
+  /* Admin token block */
   .token-block {
-    background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 10px;
-    padding: 14px 16px; margin-bottom: 16px; display: none; animation: fadeIn 0.2s ease;
+    display:none; background:#fffbeb; border:1.5px solid #fde68a;
+    border-radius:10px; padding:16px; margin-bottom:16px;
+    animation:alertIn 200ms ease;
   }
-  .token-block.show { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-  .token-block-title { font-size: 12px; font-weight: 700; color: var(--amber); margin-bottom: 6px; }
-  .token-block-desc { font-size: 11.5px; color: #78350f; margin-bottom: 10px; line-height: 1.5; }
+  .token-block.show { display:block; }
+  .token-block-title { font-size:12.5px; font-weight:700; color:var(--amber); margin-bottom:5px; }
+  .token-block-desc { font-size:12px; color:#78350f; margin-bottom:12px; line-height:1.55; }
 
-  /* PASSWORD STRENGTH */
-  .pw-strength-wrap { margin-top: 6px; }
-  .pw-strength-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
-  .pw-strength-bar { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; width: 0%; }
-  .pw-strength-label { font-size: 10.5px; color: var(--text3); margin-top: 4px; }
-
-  /* ALERT */
-  .alert { display: none; align-items: flex-start; gap: 10px; border-radius: 10px; padding: 12px 14px; font-size: 13px; margin-bottom: 14px; line-height: 1.5; }
-  .alert.show { display: flex; }
-  .alert-error { background: #fef2f2; border: 1.5px solid #fecaca; color: #991b1b; }
-  .alert-success { background: #f0fdf4; border: 1.5px solid #bbf7d0; color: #065f46; }
-  .alert-icon { flex-shrink: 0; margin-top: 1px; }
-
-  /* SUBMIT */
-  .btn-submit {
-    width: 100%; padding: 13px; font-size: 14.5px; font-weight: 700;
-    border: none; border-radius: 10px; cursor: pointer; font-family: inherit;
-    background: linear-gradient(135deg, var(--brand) 0%, var(--brand2) 100%);
-    color: #fff; box-shadow: 0 4px 14px rgba(15,42,71,0.35);
-    transition: all 0.18s; display: flex; align-items: center; justify-content: center; gap: 8px;
-    margin-top: 6px;
+  /* Submit */
+  .rp-btn {
+    width:100%; height:50px; border:none; border-radius:10px;
+    background:var(--primary); color:#fff;
+    font-size:15px; font-weight:700; font-family:inherit;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; gap:9px;
+    transition:background 150ms ease, transform 120ms ease, box-shadow 150ms ease;
+    margin-top:4px;
   }
-  .btn-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(15,42,71,0.4); }
-  .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; transform: none !important; }
-  .spinner { width: 16px; height: 16px; border: 2.5px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; display: none; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .rp-btn:hover:not(:disabled) {
+    background:var(--primary-dark);
+    box-shadow:0 6px 20px rgba(29,78,216,0.3);
+    transform:translateY(-1px);
+  }
+  .rp-btn:active:not(:disabled) { transform:translateY(0); box-shadow:none; }
+  .rp-btn:disabled { opacity:0.75; cursor:not-allowed; transform:none !important; }
+  .rp-spinner {
+    width:18px; height:18px; display:none;
+    border:2.5px solid rgba(255,255,255,0.3); border-top-color:#fff;
+    border-radius:50%; animation:spin 0.65s linear infinite; flex-shrink:0;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
 
-  .signin-link { text-align: center; margin-top: 18px; font-size: 13.5px; color: var(--text2); }
-  .signin-link a { color: var(--accent); font-weight: 700; text-decoration: none; }
+  .rp-signin { text-align:center; margin-top:24px; font-size:13.5px; color:var(--secondary); }
+  .rp-signin a { color:var(--primary); font-weight:600; text-decoration:none; }
+  .rp-signin a:hover { text-decoration:underline; }
 
-  @media (max-width: 780px) {
-    .left-panel { display: none; }
-    body { background: var(--card); }
+  /* Divider */
+  .rp-divider {
+    display:flex; align-items:center; gap:14px; margin:22px 0;
+  }
+  .rp-divider::before, .rp-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+  .rp-divider span { font-size:12px; color:#94a3b8; font-weight:500; white-space:nowrap; }
+
+  /* SSO */
+  .rp-sso { display:flex; flex-direction:column; gap:10px; }
+  .rp-sso-btn {
+    width:100%; height:46px; border:1.5px solid var(--border); border-radius:10px;
+    background:#fff; font-size:14px; font-weight:600; color:var(--dark);
+    font-family:inherit; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    transition:border-color 150ms, background 150ms;
+    text-decoration:none; box-sizing:border-box;
+  }
+  .rp-sso-btn:hover { border-color:#94a3b8; background:#f8fafc; }
+  .rp-sso-btn.loading { opacity:0.65; pointer-events:none; }
+
+  /* ══ RESPONSIVE ══ */
+  @media (max-width:860px) {
+    .lp-left { display:none; }
+    body { background:#fff; }
+    .rp { padding:36px 24px; }
+  }
+  @media (max-width:520px) {
+    .rp-grid { grid-template-columns:1fr; }
+    .rp-full { grid-column:1; }
   }
 </style>
 </head>
 <body>
 
-<!-- LEFT -->
-<div class="left-panel">
-  <div>
-    <div class="lp-icon">ROU</div>
-    <div class="lp-firm">K G Somani & Co LLP</div>
-    <div class="lp-sub">Chartered Accountants · Ind AS 116</div>
+<!-- ══ LEFT ══ -->
+<div class="lp-left">
+  <div class="lp-dots"></div>
+  <div class="lp-glow"></div>
+
+  <div class="lp-inner lp-brand">
+    <div class="lp-brand-mark">KG</div>
+    <div>
+      <div class="lp-firm">K G Somani &amp; Co LLP</div>
+      <div class="lp-firm-sub">Chartered Accountants · Ind AS 116</div>
+    </div>
   </div>
-  <div class="lp-steps">
-    <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:18px">Getting Started</div>
+
+  <div class="lp-inner">
+    <div class="lp-steps-label">Getting started</div>
     <div class="lp-step">
       <div class="lp-step-num">1</div>
       <div>
         <div class="lp-step-title">Create your account</div>
-        <div class="lp-step-desc">Articles register freely. Managers & Partners need an admin token.</div>
+        <div class="lp-step-desc">Articles register freely. Managers &amp; Partners need an admin approval token.</div>
       </div>
     </div>
     <div class="lp-step">
       <div class="lp-step-num">2</div>
       <div>
-        <div class="lp-step-title">Sign in & access your workspace</div>
-        <div class="lp-step-desc">Your companies and leases are synced to cloud instantly.</div>
+        <div class="lp-step-title">Sign in &amp; access your workspace</div>
+        <div class="lp-step-desc">Your clients and leases sync to the cloud instantly.</div>
       </div>
     </div>
     <div class="lp-step">
       <div class="lp-step-num">3</div>
       <div>
-        <div class="lp-step-title">Add clients & compute ROUs</div>
-        <div class="lp-step-desc">Full Ind AS 116 schedule — PV, depreciation, reassessments, exports.</div>
+        <div class="lp-step-title">Add clients &amp; compute ROUs</div>
+        <div class="lp-step-desc">Full Ind AS 116 schedule — PV, depreciation, reassessments, disclosures &amp; exports.</div>
       </div>
     </div>
   </div>
-  <div class="lp-footer">© 2024 K G Somani & Co LLP · Confidential</div>
+
+  <div class="lp-footer">© 2025 K G Somani &amp; Co LLP · Confidential</div>
 </div>
 
-<!-- RIGHT -->
-<div class="right-panel">
-  <div class="form-box">
-    <div class="form-heading">
-      <h1>Create your account</h1>
-      <p>Already registered? <a href="login.html">Sign in instead</a></p>
+<!-- ══ RIGHT ══ -->
+<div class="rp">
+  <div class="rp-box">
+
+    <div class="rp-head">
+      <div class="rp-title">Create your account</div>
+      <div class="rp-sub">Already registered? <a href="login.html">Sign in instead</a></div>
     </div>
 
-    <div class="alert alert-error" id="alert-error">
-      <span class="alert-icon">⚠️</span>
+    <div class="rp-alert rp-alert-error" id="alert-error" role="alert" aria-live="assertive">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <span id="alert-error-msg"></span>
     </div>
-    <div class="alert alert-success" id="alert-success">
-      <span class="alert-icon">✅</span>
+    <div class="rp-alert rp-alert-success" id="alert-success" role="status" aria-live="polite">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
       <span id="alert-success-msg"></span>
     </div>
 
-    <div class="form-grid">
-      <div class="form-group">
-        <label class="form-label">Full Name *</label>
-        <input class="form-input" id="name" type="text" placeholder="Ritesh Sharma" autocomplete="name">
+    <div class="rp-grid">
+      <div class="rp-group">
+        <label class="rp-label" for="name">Full name <span style="color:#ef4444">*</span></label>
+        <input class="rp-input" id="name" type="text" placeholder="Ritesh Sharma" autocomplete="name">
       </div>
-      <div class="form-group">
-        <label class="form-label">Work Email *</label>
-        <input class="form-input" id="email" type="email" placeholder="you@kgsomani.com" autocomplete="email">
+      <div class="rp-group">
+        <label class="rp-label" for="email">Work email <span style="color:#ef4444">*</span></label>
+        <input class="rp-input" id="email" type="email" placeholder="you@kgsomani.com" autocomplete="email" autocapitalize="off">
       </div>
-      <div class="form-group">
-        <label class="form-label">Password *</label>
-        <div class="input-wrap">
-          <input class="form-input has-icon" id="password" type="password" placeholder="Min. 8 characters" oninput="checkStrength(this.value)">
-          <button class="input-icon" type="button" onclick="togglePw('password','pw-eye')" tabindex="-1" id="pw-eye">👁</button>
+      <div class="rp-group">
+        <label class="rp-label" for="password">Password <span style="color:#ef4444">*</span></label>
+        <div class="rp-input-wrap">
+          <input class="rp-input has-icon" id="password" type="password" placeholder="Min. 8 characters" autocomplete="new-password" oninput="checkStrength(this.value)">
+          <button class="rp-eye" type="button" id="pw-eye" onclick="togglePw('password','pw-eye')" tabindex="-1" aria-label="Toggle password">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
         </div>
-        <div class="pw-strength-wrap">
-          <div class="pw-strength-track"><div class="pw-strength-bar" id="pw-bar"></div></div>
-          <div class="pw-strength-label" id="pw-label">Enter a password</div>
+        <div class="pw-strength">
+          <div class="pw-track"><div class="pw-bar" id="pw-bar"></div></div>
+          <div class="pw-label" id="pw-label">Enter a password</div>
         </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Confirm Password *</label>
-        <div class="input-wrap">
-          <input class="form-input has-icon" id="confirm-pw" type="password" placeholder="Repeat password">
-          <button class="input-icon" type="button" onclick="togglePw('confirm-pw','cpw-eye')" tabindex="-1" id="cpw-eye">👁</button>
+      <div class="rp-group">
+        <label class="rp-label" for="confirm-pw">Confirm password <span style="color:#ef4444">*</span></label>
+        <div class="rp-input-wrap">
+          <input class="rp-input has-icon" id="confirm-pw" type="password" placeholder="Repeat password" autocomplete="new-password">
+          <button class="rp-eye" type="button" id="cpw-eye" onclick="togglePw('confirm-pw','cpw-eye')" tabindex="-1" aria-label="Toggle password">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
         </div>
       </div>
     </div>
 
-    <div class="role-section">
-      <span class="role-section-label">Select Your Role *</span>
-      <div class="role-grid">
-        <div class="role-card selected" data-role="article" onclick="selectRole('article',this)">
-          <span class="role-emoji">📋</span>
-          <div class="role-name">Article</div>
-          <div class="role-desc">Audit staff</div>
-          <div class="role-desc" style="color:var(--green);font-weight:600;margin-top:4px">Free signup</div>
-        </div>
-        <div class="role-card locked-card" data-role="manager" onclick="selectRole('manager',this)">
-          <span class="role-emoji">👔</span>
-          <div class="role-name">Manager</div>
-          <div class="role-desc">Senior staff</div>
-          <div class="role-lock">🔒 Token required</div>
-        </div>
-        <div class="role-card locked-card" data-role="partner" onclick="selectRole('partner',this)">
-          <span class="role-emoji">🏛</span>
-          <div class="role-name">Partner</div>
-          <div class="role-desc">Firm partner</div>
-          <div class="role-lock">🔒 Token required</div>
-        </div>
+    <span class="role-label">Your role <span style="color:#ef4444">*</span></span>
+    <div class="role-grid" role="radiogroup" aria-label="Select role">
+      <div class="role-card selected" data-role="article" onclick="selectRole('article',this)" role="radio" aria-checked="true" tabindex="0">
+        <span class="role-icon">📋</span>
+        <div class="role-name">Article</div>
+        <div class="role-desc">Audit staff</div>
+        <span class="role-badge badge-free">Free signup</span>
+      </div>
+      <div class="role-card locked" data-role="manager" onclick="selectRole('manager',this)" role="radio" aria-checked="false" tabindex="0">
+        <span class="role-icon">👔</span>
+        <div class="role-name">Manager</div>
+        <div class="role-desc">Senior staff</div>
+        <span class="role-badge badge-locked">Token required</span>
+      </div>
+      <div class="role-card locked" data-role="partner" onclick="selectRole('partner',this)" role="radio" aria-checked="false" tabindex="0">
+        <span class="role-icon">🏛</span>
+        <div class="role-name">Partner</div>
+        <div class="role-desc">Firm partner</div>
+        <span class="role-badge badge-locked">Token required</span>
       </div>
     </div>
 
     <div class="token-block" id="token-block">
-      <div class="token-block-title">⚠️ Admin Approval Token Required</div>
-      <div class="token-block-desc">Manager and Partner registrations require a 24-hour approval token issued by the Administrator. Contact your admin to get this token before proceeding.</div>
-      <label class="form-label">Approval Token *</label>
-      <input class="form-input" id="admin-token" type="text" placeholder="Paste the token from your admin">
+      <div class="token-block-title">Admin approval token required</div>
+      <div class="token-block-desc">Manager and Partner accounts require a 24-hour approval token from your Administrator. Contact your admin before proceeding.</div>
+      <label class="rp-label" for="admin-token">Approval token <span style="color:#ef4444">*</span></label>
+      <input class="rp-input" id="admin-token" type="text" placeholder="Paste the token from your admin" autocomplete="off">
     </div>
 
-    <button class="btn-submit" id="reg-btn" onclick="doRegister()">
-      <div class="spinner" id="spinner"></div>
-      <span id="btn-text">Create Account →</span>
+    <button class="rp-btn" id="reg-btn" type="button" onclick="doRegister()">
+      <div class="rp-spinner" id="spinner" aria-hidden="true"></div>
+      <span id="btn-text">Create Account</span>
     </button>
 
-    <div class="signin-link">Already have an account? <a href="login.html">Sign in</a></div>
+    <div class="rp-divider"><span>or sign up with</span></div>
+
+    <div class="rp-sso">
+      <a class="rp-sso-btn" href="/api/auth/google" id="btn-google" role="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0012 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 010-4.2V7.06H2.18a11 11 0 000 9.88l3.66-2.84z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1a11 11 0 00-9.82 6.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38z"/>
+        </svg>
+        Continue with Google
+      </a>
+      <a class="rp-sso-btn" href="/api/auth/microsoft" id="btn-microsoft" role="button">
+        <svg width="17" height="17" viewBox="0 0 23 23" aria-hidden="true">
+          <path fill="#f35325" d="M1 1h10v10H1z"/>
+          <path fill="#81bc06" d="M12 1h10v10H12z"/>
+          <path fill="#05a6f0" d="M1 12h10v10H1z"/>
+          <path fill="#ffba08" d="M12 12h10v10H12z"/>
+        </svg>
+        Continue with Microsoft
+      </a>
+    </div>
+
+    <div class="rp-signin">Already have an account? <a href="login.html">Sign in</a></div>
+
   </div>
 </div>
 
 <script>
-  // ── Auth check — prevent flash ────────────────────────────
-  (function() {
-    var token = localStorage.getItem('rou_token');
-    if (token) {
-      try {
-        var p = JSON.parse(atob(token.split('.')[1]));
-        if (p.exp * 1000 > Date.now()) {
-          window.location.replace(p.role === 'admin' ? 'admin.html' : 'home.html');
-          return;
-        }
-      } catch(e) {}
-      localStorage.removeItem('rou_token');
-      localStorage.removeItem('rou_user');
-    }
-    document.body.classList.add('ready');
-  })();
-
-  var selectedRole = 'article';
-
-  function selectRole(role, el) {
-    document.querySelectorAll('.role-card').forEach(function(c) { c.classList.remove('selected'); });
-    el.classList.add('selected');
-    selectedRole = role;
-    var block = document.getElementById('token-block');
-    if (role === 'manager' || role === 'partner') block.classList.add('show');
-    else block.classList.remove('show');
-  }
-
-  function togglePw(inputId, btnId) {
-    var el = document.getElementById(inputId);
-    var btn = document.getElementById(btnId);
-    el.type = el.type === 'password' ? 'text' : 'password';
-    btn.textContent = el.type === 'password' ? '👁' : '🙈';
-  }
-
-  var strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
-  var strengthColors = ['', '#dc2626', '#f97316', '#eab308', '#059669'];
-
-  function checkStrength(pw) {
-    var score = 0;
-    if (pw.length >= 8) score++;
-    if (/[A-Z]/.test(pw)) score++;
-    if (/[0-9]/.test(pw)) score++;
-    if (/[^A-Za-z0-9]/.test(pw)) score++;
-    var bar = document.getElementById('pw-bar');
-    var lbl = document.getElementById('pw-label');
-    bar.style.width = (score * 25) + '%';
-    bar.style.background = strengthColors[score] || '#e2e8f0';
-    lbl.textContent = pw.length === 0 ? 'Enter a password' : (strengthLabels[score] || '');
-    lbl.style.color = strengthColors[score] || 'var(--text3)';
-  }
-
-  function showError(msg) {
-    document.getElementById('alert-error-msg').textContent = msg;
-    document.getElementById('alert-error').classList.add('show');
-    document.getElementById('alert-success').classList.remove('show');
-  }
-
-  function showSuccess(msg) {
-    document.getElementById('alert-success-msg').textContent = msg;
-    document.getElementById('alert-success').classList.add('show');
-    document.getElementById('alert-error').classList.remove('show');
-  }
-
-  function setLoading(v) {
-    document.getElementById('reg-btn').disabled = v;
-    document.getElementById('spinner').style.display = v ? 'block' : 'none';
-    document.getElementById('btn-text').textContent = v ? 'Creating account…' : 'Create Account →';
-  }
-
-  async function doRegister() {
-    document.getElementById('alert-error').classList.remove('show');
-    document.getElementById('alert-success').classList.remove('show');
-
-    var name = document.getElementById('name').value.trim();
-    var email = document.getElementById('email').value.trim();
-    var password = document.getElementById('password').value;
-    var confirmPw = document.getElementById('confirm-pw').value;
-    var adminToken = document.getElementById('admin-token').value.trim();
-
-    if (!name) return showError('Please enter your full name.');
-    if (!email || !/\S+@\S+\.\S+/.test(email)) return showError('Please enter a valid email address.');
-    if (!password || password.length < 8) return showError('Password must be at least 8 characters.');
-    if (password !== confirmPw) return showError('Passwords do not match.');
-    if ((selectedRole === 'manager' || selectedRole === 'partner') && !adminToken) {
-      return showError('An admin approval token is required for Manager and Partner accounts.');
-    }
-
-    setLoading(true);
+// ══ BOOT ══
+(function() {
+  var token = localStorage.getItem('rou_token');
+  if (token) {
     try {
-      var body = { name: name, email: email, password: password, role: selectedRole };
-      if (adminToken) body.adminToken = adminToken;
-
-      var r = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      var data = await r.json();
-      if (!r.ok) { showError(data.error || 'Registration failed. Please try again.'); setLoading(false); return; }
-
-      // ── KEY FIX: store token THEN show success, THEN redirect ──
-      localStorage.setItem('rou_token', data.token);
-      localStorage.setItem('rou_user', JSON.stringify(data.user));
-      showSuccess('Account created successfully! Taking you to your workspace…');
-
-      // Delay slightly so user sees the success message, then replace (not push)
-      setTimeout(function() {
-        window.location.replace('home.html');
-      }, 1000);
-
-    } catch(e) {
-      showError('Network error. Please check your connection and try again.');
-      setLoading(false);
-    }
+      var pad = token.split('.')[1];
+      pad += '='.repeat((4 - pad.length % 4) % 4);
+      var p = JSON.parse(atob(pad));
+      if (p.exp * 1000 > Date.now()) {
+        window.location.replace(p.role === 'admin' ? 'admin.html' : 'home.html');
+        return;
+      }
+    } catch(e) {}
+    localStorage.removeItem('rou_token');
+    localStorage.removeItem('rou_user');
   }
+  document.body.classList.add('ready');
+})();
+
+// ══ STATE ══
+var selectedRole = 'article';
+
+// ══ ROLE SELECTION ══
+function selectRole(role, el) {
+  document.querySelectorAll('.role-card').forEach(function(c) {
+    c.classList.remove('selected');
+    c.setAttribute('aria-checked', 'false');
+  });
+  el.classList.add('selected');
+  el.setAttribute('aria-checked', 'true');
+  selectedRole = role;
+  var block = document.getElementById('token-block');
+  if (role === 'manager' || role === 'partner') block.classList.add('show');
+  else block.classList.remove('show');
+}
+
+// Keyboard support for role cards
+document.querySelectorAll('.role-card').forEach(function(card) {
+  card.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      selectRole(card.dataset.role, card);
+    }
+  });
+});
+
+// ══ PASSWORD VISIBILITY ══
+function togglePw(inputId, btnId) {
+  var el  = document.getElementById(inputId);
+  var btn = document.getElementById(btnId);
+  var isHidden = el.type === 'password';
+  el.type = isHidden ? 'text' : 'password';
+  btn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+  btn.querySelector('svg').innerHTML = isHidden
+    ? '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'
+    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+}
+
+// ══ PASSWORD STRENGTH ══
+var PW_LABELS = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+var PW_COLORS = ['', '#ef4444', '#f97316', '#eab308', '#059669'];
+
+function checkStrength(pw) {
+  var score = 0;
+  if (pw.length >= 8)          score++;
+  if (/[A-Z]/.test(pw))        score++;
+  if (/[0-9]/.test(pw))        score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  var bar = document.getElementById('pw-bar');
+  var lbl = document.getElementById('pw-label');
+  bar.style.width      = (score * 25) + '%';
+  bar.style.background = PW_COLORS[score] || '#e2e8f0';
+  lbl.textContent      = pw.length === 0 ? 'Enter a password' : (PW_LABELS[score] || '');
+  lbl.style.color      = PW_COLORS[score] || 'var(--secondary)';
+}
+
+// ══ ALERTS ══
+function showError(msg) {
+  document.getElementById('alert-error-msg').textContent = msg;
+  document.getElementById('alert-error').classList.add('show');
+  document.getElementById('alert-success').classList.remove('show');
+}
+function showSuccess(msg) {
+  document.getElementById('alert-success-msg').textContent = msg;
+  document.getElementById('alert-success').classList.add('show');
+  document.getElementById('alert-error').classList.remove('show');
+}
+function clearAlerts() {
+  document.getElementById('alert-error').classList.remove('show');
+  document.getElementById('alert-success').classList.remove('show');
+}
+
+// ══ LOADING ══
+function setLoading(on) {
+  document.getElementById('reg-btn').disabled = on;
+  document.getElementById('spinner').style.display = on ? 'block' : 'none';
+  document.getElementById('btn-text').textContent   = on ? 'Creating account…' : 'Create Account';
+}
+
+// ══ REGISTER ══
+async function doRegister() {
+  clearAlerts();
+  var name       = document.getElementById('name').value.trim();
+  var email      = document.getElementById('email').value.trim();
+  var password   = document.getElementById('password').value;
+  var confirmPw  = document.getElementById('confirm-pw').value;
+  var adminToken = document.getElementById('admin-token').value.trim();
+
+  if (!name)                               return showError('Please enter your full name.');
+  if (!email || !/\S+@\S+\.\S+/.test(email)) return showError('Please enter a valid email address.');
+  if (!password || password.length < 8)    return showError('Password must be at least 8 characters.');
+  if (password !== confirmPw)              return showError('Passwords do not match.');
+  if ((selectedRole === 'manager' || selectedRole === 'partner') && !adminToken) {
+    return showError('An admin approval token is required for Manager and Partner accounts.');
+  }
+
+  setLoading(true);
+  try {
+    var body = { name: name, email: email, password: password, role: selectedRole };
+    if (adminToken) body.adminToken = adminToken;
+
+    var r = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    var data = await r.json();
+    if (!r.ok) {
+      showError(data.error || 'Registration failed. Please try again.');
+      setLoading(false);
+      return;
+    }
+    localStorage.setItem('rou_token', data.token);
+    localStorage.setItem('rou_user', JSON.stringify(data.user));
+    showSuccess('Account created! Taking you to your workspace…');
+    setTimeout(function() {
+      window.location.replace('home.html');
+    }, 900);
+  } catch(e) {
+    showError('Network error. Check your connection and try again.');
+    setLoading(false);
+  }
+}
+
+// ══ SSO LOADING STATES ══
+document.getElementById('btn-google').addEventListener('click', function() {
+  this.classList.add('loading');
+  this.textContent = 'Redirecting to Google…';
+});
+document.getElementById('btn-microsoft').addEventListener('click', function() {
+  this.classList.add('loading');
+  this.textContent = 'Redirecting to Microsoft…';
+});
 </script>
 </body>
 </html>
-
