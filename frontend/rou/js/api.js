@@ -18,7 +18,30 @@ window.API = {
     try { return JSON.parse(localStorage.getItem('rou_user') || 'null'); } catch { return null; }
   },
 
+  // Called by boot.js before App.init() — returns false if redirecting
   requireAuth() {
+    // ── Handle SSO callback: ?sso_token=<jwt> in the URL ──────────────────
+    // The backend redirects here after Google / Microsoft OAuth with the
+    // session JWT as a query param. We absorb it into localStorage and clean
+    // the URL before the rest of the app boots.
+    var params = new URLSearchParams(window.location.search);
+    var ssoToken = params.get('sso_token');
+    if (ssoToken) {
+      try {
+        var sp = JSON.parse(atob(ssoToken.split('.')[1]));
+        if (sp.exp * 1000 > Date.now()) {
+          localStorage.setItem('rou_token', ssoToken);
+          localStorage.setItem('rou_user', JSON.stringify({
+            id: sp.id, name: sp.name, email: sp.email, role: sp.role
+          }));
+          // Clean URL without reload so boot continues normally
+          history.replaceState({}, '', window.location.pathname);
+        }
+      } catch(e) {
+        // Malformed token — fall through to normal auth check (will redirect to login)
+      }
+    }
+
     const token = this.token();
     if (!token) { window.location.replace('login.html'); return false; }
     try {
