@@ -13,6 +13,12 @@ services:
           property: connectionString
       - key: NODE_ENV
         value: production
+      - key: APP_URL
+        value: https://my-workflow-app.onrender.com
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
 
 databases:
   - name: audit-db
