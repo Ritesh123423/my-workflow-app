@@ -3,214 +3,276 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sign In · K G Somani & Co LLP — Ind AS 116 ROU Platform</title>
+<title>Sign In · K G Somani &amp; Co LLP — Ind AS 116 ROU Platform</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%231D4ED8'/><text x='16' y='21' font-family='Arial,sans-serif' font-size='11' font-weight='bold' fill='white' text-anchor='middle'>KG</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
   :root {
-    --primary:#1D4ED8; --primary-dark:#1e40af; --dark:#0F172A;
-    --secondary:#64748B; --border:#E2E8F0; --bg:#F8FAFC;
+    --primary:#1D4ED8; --primary-dark:#1e40af;
+    --dark:#0F172A; --secondary:#64748B;
+    --border:#E2E8F0; --bg:#F8FAFC;
+    --error-bg:#fef2f2; --error-border:#fecaca; --error-text:#991b1b;
   }
   html, body { height:100%; }
   body {
     font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     color:var(--dark); background:#fff;
-    opacity:0; transition:opacity 600ms ease;
-    -webkit-font-smoothing:antialiased;
+    opacity:0; transition:opacity 500ms ease;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
   }
   body.ready { opacity:1; }
 
+  /* ══ LAYOUT ══ */
   .lp-wrap { display:flex; min-height:100vh; }
 
-  /* ══ LEFT — BRANDING ══ */
+  /* ══ LEFT PANEL ══ */
   .lp-left {
     flex:1; position:relative; overflow:hidden;
     background:linear-gradient(165deg, #0B1F4D 0%, #0d2a63 55%, #123D9A 100%);
     display:flex; flex-direction:column; justify-content:space-between;
     padding:52px 56px;
     transform:translateX(-20px); opacity:0;
-    animation:slideInLeft 500ms ease 100ms forwards;
+    animation:slideInLeft 500ms ease 80ms forwards;
   }
   @keyframes slideInLeft { to { transform:translateX(0); opacity:1; } }
 
-  /* subtle dot grid kept as texture */
+  #bubble-canvas {
+    position:absolute; inset:0; width:100%; height:100%;
+    z-index:0; pointer-events:none;
+  }
   .lp-dots {
     position:absolute; inset:0; pointer-events:none; z-index:0;
-    background-image:radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-image:radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
     background-size:28px 28px;
   }
-
   .lp-left-inner { position:relative; z-index:1; }
 
   /* Brand */
-  .lp-brand { display:flex; align-items:center; gap:13px; }
+  .lp-brand { display:flex; align-items:center; gap:14px; }
   .lp-brand-mark {
     width:46px; height:46px; border-radius:12px; flex-shrink:0;
     background:linear-gradient(135deg,#2563eb,#1d4ed8);
     display:flex; align-items:center; justify-content:center;
     font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.5px;
-    box-shadow:0 8px 24px rgba(29,78,216,0.4);
+    box-shadow:0 8px 24px rgba(29,78,216,0.45);
   }
   .lp-firm { font-size:18px; font-weight:700; color:#fff; letter-spacing:-0.3px; line-height:1.25; }
-  .lp-firm-sub { font-size:12px; color:rgba(255,255,255,0.5); margin-top:2px; }
+  .lp-firm-sub { font-size:12px; color:rgba(255,255,255,0.48); margin-top:2px; }
 
-  /* Middle content */
+  /* Mid */
   .lp-mid { position:relative; z-index:1; }
   .lp-heading {
-    font-size:42px; font-weight:800; color:#fff; line-height:1.1;
-    letter-spacing:-1.2px; margin-bottom:20px;
+    font-size:44px; font-weight:800; color:#fff;
+    line-height:1.1; letter-spacing:-1.5px; margin-bottom:22px;
   }
-  
-  .lp-heading .accent { background:linear-gradient(90deg,#60a5fa,#93c5fd); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .lp-heading .accent {
+    background:linear-gradient(90deg,#60a5fa,#93c5fd);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  }
   .lp-sub {
-    font-size:15.5px; color:rgba(255,255,255,0.62); line-height:1.7;
-    max-width:440px; margin-bottom:40px;
+    font-size:15px; color:rgba(255,255,255,0.58); line-height:1.75;
+    max-width:420px;
   }
 
-  /* Bubble canvas */
-  #bubble-canvas { position:absolute; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; }
-
-  /* Bottom trust */
-  .lp-trust { position:relative; z-index:1; display:flex; gap:26px; flex-wrap:wrap; }
-  .lp-trust-item { display:flex; align-items:center; gap:8px; font-size:12.5px; color:rgba(255,255,255,0.55); font-weight:500; }
+  /* Trust bar */
+  .lp-trust { position:relative; z-index:1; display:flex; gap:24px; flex-wrap:wrap; }
+  .lp-trust-item {
+    display:flex; align-items:center; gap:8px;
+    font-size:12.5px; color:rgba(255,255,255,0.5); font-weight:500;
+  }
   .lp-trust-item svg { color:#60a5fa; flex-shrink:0; }
 
-  /* ══ RIGHT — AUTH ══ */
+  /* ══ RIGHT PANEL ══ */
   .lp-right {
     flex:1; background:linear-gradient(180deg,#ffffff 0%,#F8FAFC 100%);
-    display:flex; align-items:center; justify-content:center; padding:40px;
+    display:flex; align-items:center; justify-content:center;
+    padding:48px 40px;
   }
   .lp-card {
-    width:100%; max-width:430px;
-    transform:translateY(30px); opacity:0;
-    animation:slideUp 500ms ease 150ms forwards;
+    width:100%; max-width:420px;
+    transform:translateY(24px); opacity:0;
+    animation:slideUp 500ms ease 120ms forwards;
   }
   @keyframes slideUp { to { transform:translateY(0); opacity:1; } }
 
-  .lp-card-head { margin-bottom:28px; opacity:0; animation:fadeUp 500ms ease 200ms forwards; }
-  @keyframes fadeUp { from { transform:translateY(8px); opacity:0; } to { transform:translateY(0); opacity:1; } }
-  .lp-title { font-size:28px; font-weight:800; color:var(--dark); letter-spacing:-0.8px; margin-bottom:6px; }
-  .lp-title-sub { font-size:15px; color:var(--secondary); }
+  /* Mobile brand (hidden on desktop) */
+  .lp-mobile-brand {
+    display:none; align-items:center; gap:11px;
+    justify-content:center; margin-bottom:32px;
+  }
+  .lp-mobile-brand .lp-brand-mark { width:40px; height:40px; font-size:13px; }
+  .lp-mobile-brand .lp-firm { color:var(--dark); font-size:16px; }
+  .lp-mobile-brand .lp-firm-sub { color:var(--secondary); }
+
+  /* Card header */
+  .lp-card-head { margin-bottom:28px; }
+  .lp-title {
+    font-size:26px; font-weight:800; color:var(--dark);
+    letter-spacing:-0.7px; margin-bottom:6px;
+  }
+  .lp-title-sub { font-size:14.5px; color:var(--secondary); }
 
   /* Tabs */
-  .lp-tabs { display:flex; gap:4px; position:relative; margin-bottom:26px; border-bottom:1px solid var(--border); }
+  .lp-tabs {
+    display:flex; position:relative; margin-bottom:26px;
+    border-bottom:1.5px solid var(--border);
+  }
   .lp-tab {
-    padding:11px 4px; margin-right:24px; font-size:14.5px; font-weight:600;
-    color:var(--secondary); cursor:pointer; background:none; border:none;
-    font-family:inherit; position:relative; transition:color 200ms ease;
+    padding:11px 0; margin-right:28px;
+    font-size:14px; font-weight:600; color:var(--secondary);
+    cursor:pointer; background:none; border:none;
+    font-family:inherit; position:relative; transition:color 180ms ease;
   }
   .lp-tab.active { color:var(--primary); }
   .lp-tab-underline {
-    position:absolute; bottom:-1px; height:2px; background:var(--primary);
-    border-radius:2px; transition:all 250ms cubic-bezier(0.4,0,0.2,1);
+    position:absolute; bottom:-1.5px; height:2px;
+    background:var(--primary); border-radius:2px;
+    transition:left 240ms cubic-bezier(0.4,0,0.2,1),
+               width 240ms cubic-bezier(0.4,0,0.2,1);
   }
-
-  /* Fields */
-  .lp-field { margin-bottom:16px; opacity:0; animation:fadeIn 400ms ease forwards; }
-  .lp-field:nth-of-type(1) { animation-delay:280ms; }
-  .lp-field:nth-of-type(2) { animation-delay:380ms; }
-  @keyframes fadeIn { to { opacity:1; } }
-  .lp-label { display:block; font-size:13px; font-weight:600; color:var(--dark); margin-bottom:7px; }
-  .lp-input-wrap { position:relative; }
-  .lp-input {
-    width:100%; height:46px; padding:0 14px; font-size:15px; font-family:inherit;
-    color:var(--dark); background:#fff; border:1.5px solid var(--border);
-    border-radius:10px; outline:none; transition:border-color 200ms ease, box-shadow 200ms ease;
-  }
-  .lp-input.has-icon { padding-right:44px; }
-  .lp-input::placeholder { color:#94a3b8; }
-  .lp-input:focus { border-color:var(--primary); box-shadow:0 0 0 4px rgba(29,78,216,0.1); }
-  .lp-eye {
-    position:absolute; right:8px; top:50%; transform:translateY(-50%);
-    width:30px; height:30px; border:none; background:none; cursor:pointer;
-    font-size:15px; opacity:0.55; display:flex; align-items:center; justify-content:center;
-    border-radius:6px; transition:opacity 150ms;
-  }
-  .lp-eye:hover { opacity:0.9; background:#f1f5f9; }
-
-  /* Row: remember + forgot */
-  .lp-row { display:flex; align-items:center; justify-content:space-between; margin:4px 0 22px; opacity:0; animation:fadeIn 400ms ease 460ms forwards; }
-  .lp-remember { display:flex; align-items:center; gap:8px; font-size:13.5px; color:var(--secondary); cursor:pointer; user-select:none; }
-  .lp-remember input { width:15px; height:15px; accent-color:var(--primary); cursor:pointer; }
-  .lp-forgot { font-size:13.5px; color:var(--primary); font-weight:600; text-decoration:none; }
-  .lp-forgot:hover { text-decoration:underline; }
-
-  /* Button */
-  .lp-btn {
-    width:100%; height:52px; border:none; border-radius:10px;
-    background:var(--primary); color:#fff; font-size:15px; font-weight:600;
-    font-family:inherit; cursor:pointer; position:relative; overflow:hidden;
-    display:flex; align-items:center; justify-content:center; gap:9px;
-    transition:transform 150ms ease, background 150ms ease, box-shadow 150ms ease;
-    opacity:0; animation:fadeIn 400ms ease 520ms forwards;
-  }
-  .lp-btn:hover:not(:disabled) { background:var(--primary-dark); transform:scale(1.02); box-shadow:0 8px 24px rgba(29,78,216,0.28); }
-  .lp-btn:active:not(:disabled) { transform:scale(0.99); }
-  .lp-btn:disabled { cursor:not-allowed; opacity:0.85; }
-  .lp-spinner {
-    width:18px; height:18px; border:2.5px solid rgba(255,255,255,0.35);
-    border-top-color:#fff; border-radius:50%; display:none;
-    animation:spin 0.6s linear infinite;
-  }
-  @keyframes spin { to { transform:rotate(360deg); } }
-  .lp-check { display:none; }
-
-  /* Divider */
-  .lp-divider { display:flex; align-items:center; gap:14px; margin:22px 0; opacity:0; animation:fadeIn 400ms ease 580ms forwards; }
-  .lp-divider::before, .lp-divider::after { content:''; flex:1; height:1px; background:var(--border); }
-  .lp-divider span { font-size:12px; color:#94a3b8; font-weight:500; }
-
-  /* SSO */
-  .lp-sso { display:flex; flex-direction:column; gap:10px; opacity:0; animation:fadeIn 400ms ease 640ms forwards; }
-  .lp-sso-btn {
-    width:100%; height:46px; border:1.5px solid var(--border); border-radius:10px;
-    background:#fff; font-size:14px; font-weight:600; color:var(--dark);
-    font-family:inherit; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;
-    transition:border-color 150ms ease, background 150ms ease;
-    text-decoration:none; box-sizing:border-box;
-  }
-  .lp-sso-btn:hover { border-color:#cbd5e1; background:#f8fafc; }
-  .lp-sso-btn.sso-loading { opacity:0.65; pointer-events:none; }
-
-  /* Footer */
-  .lp-foot { text-align:center; margin-top:26px; font-size:13.5px; color:var(--secondary); opacity:0; animation:fadeIn 400ms ease 700ms forwards; }
-  .lp-foot a { color:var(--primary); font-weight:600; text-decoration:none; }
-  .lp-foot a:hover { text-decoration:underline; }
 
   /* Alert */
   .lp-alert {
-    display:none; align-items:center; gap:9px; padding:11px 14px; margin-bottom:18px;
-    background:#fef2f2; border:1.5px solid #fecaca; border-radius:10px;
-    font-size:13.5px; color:#991b1b; line-height:1.4;
+    display:none; align-items:flex-start; gap:10px;
+    padding:12px 14px; margin-bottom:20px;
+    background:var(--error-bg); border:1.5px solid var(--error-border);
+    border-radius:10px; font-size:13.5px; color:var(--error-text); line-height:1.5;
+    animation:alertIn 200ms ease;
   }
+  @keyframes alertIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
   .lp-alert.show { display:flex; }
-  .lp-alert svg { flex-shrink:0; color:#dc2626; }
+  .lp-alert svg { flex-shrink:0; color:#dc2626; margin-top:1px; }
+
+  /* Fields */
+  .lp-field { margin-bottom:16px; }
+  .lp-label {
+    display:block; font-size:13px; font-weight:600;
+    color:var(--dark); margin-bottom:7px;
+  }
+  .lp-input-wrap { position:relative; }
+  .lp-input {
+    width:100%; height:46px; padding:0 14px; font-size:14.5px;
+    font-family:inherit; color:var(--dark); background:#fff;
+    border:1.5px solid var(--border); border-radius:10px;
+    outline:none; transition:border-color 180ms ease, box-shadow 180ms ease;
+  }
+  .lp-input.has-icon { padding-right:44px; }
+  .lp-input::placeholder { color:#94a3b8; }
+  .lp-input:focus {
+    border-color:var(--primary);
+    box-shadow:0 0 0 3px rgba(29,78,216,0.1);
+  }
+  .lp-input.error { border-color:#ef4444; }
+  .lp-eye {
+    position:absolute; right:8px; top:50%; transform:translateY(-50%);
+    width:30px; height:30px; border:none; background:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:6px; opacity:0.5; transition:opacity 150ms, background 150ms;
+  }
+  .lp-eye:hover { opacity:1; background:#f1f5f9; }
+  .lp-eye svg { width:16px; height:16px; color:var(--secondary); }
+
+  /* Remember + forgot */
+  .lp-row {
+    display:flex; align-items:center; justify-content:space-between;
+    margin:2px 0 20px;
+  }
+  .lp-remember {
+    display:flex; align-items:center; gap:8px;
+    font-size:13.5px; color:var(--secondary);
+    cursor:pointer; user-select:none;
+  }
+  .lp-remember input { width:15px; height:15px; accent-color:var(--primary); cursor:pointer; }
+  .lp-forgot {
+    font-size:13.5px; color:var(--primary); font-weight:600;
+    text-decoration:none; transition:opacity 150ms;
+  }
+  .lp-forgot:hover { opacity:0.75; }
+
+  /* Submit button */
+  .lp-btn {
+    width:100%; height:50px; border:none; border-radius:10px;
+    background:var(--primary); color:#fff;
+    font-size:15px; font-weight:700; font-family:inherit;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; gap:9px;
+    transition:background 150ms ease, transform 120ms ease, box-shadow 150ms ease;
+    position:relative; overflow:hidden;
+  }
+  .lp-btn::after {
+    content:''; position:absolute; inset:0;
+    background:rgba(255,255,255,0); transition:background 150ms;
+  }
+  .lp-btn:hover:not(:disabled)::after { background:rgba(255,255,255,0.06); }
+  .lp-btn:hover:not(:disabled) {
+    background:var(--primary-dark);
+    box-shadow:0 6px 20px rgba(29,78,216,0.3);
+    transform:translateY(-1px);
+  }
+  .lp-btn:active:not(:disabled) { transform:translateY(0); box-shadow:none; }
+  .lp-btn:disabled { cursor:not-allowed; opacity:0.75; }
+  .lp-spinner {
+    width:18px; height:18px; display:none;
+    border:2.5px solid rgba(255,255,255,0.3); border-top-color:#fff;
+    border-radius:50%; animation:spin 0.65s linear infinite;
+    flex-shrink:0;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* Divider */
+  .lp-divider {
+    display:flex; align-items:center; gap:14px; margin:22px 0;
+  }
+  .lp-divider::before, .lp-divider::after {
+    content:''; flex:1; height:1px; background:var(--border);
+  }
+  .lp-divider span { font-size:12px; color:#94a3b8; font-weight:500; white-space:nowrap; }
+
+  /* SSO buttons */
+  .lp-sso { display:flex; flex-direction:column; gap:10px; }
+  .lp-sso-btn {
+    width:100%; height:46px; padding:0 18px;
+    border:1.5px solid var(--border); border-radius:10px;
+    background:#fff; font-size:14px; font-weight:600; color:var(--dark);
+    font-family:inherit; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    transition:border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+    text-decoration:none; box-sizing:border-box; white-space:nowrap;
+  }
+  .lp-sso-btn:hover { border-color:#94a3b8; background:#f8fafc; }
+  .lp-sso-btn:active { background:#f1f5f9; }
+  .lp-sso-btn.loading {
+    opacity:0.65; pointer-events:none; cursor:default;
+  }
+
+  /* Footer */
+  .lp-foot {
+    text-align:center; margin-top:28px;
+    font-size:13.5px; color:var(--secondary);
+  }
+  .lp-foot a { color:var(--primary); font-weight:600; text-decoration:none; }
+  .lp-foot a:hover { text-decoration:underline; }
 
   /* ══ RESPONSIVE ══ */
   @media (max-width:1024px) {
     .lp-left { padding:44px 40px; }
-    .lp-heading { font-size:36px; }
+    .lp-heading { font-size:38px; }
   }
   @media (max-width:860px) {
     .lp-left { display:none; }
-    .lp-right { flex:1; background:#fff; }
-    .lp-card { max-width:400px; }
+    .lp-right { flex:1; background:#fff; padding:36px 24px; }
+    .lp-card { max-width:100%; }
     .lp-mobile-brand { display:flex !important; }
   }
-  .lp-mobile-brand { display:none; align-items:center; gap:11px; justify-content:center; margin-bottom:30px; }
-  .lp-mobile-brand .lp-brand-mark { width:40px; height:40px; font-size:13px; }
-  .lp-mobile-brand .lp-firm { color:var(--dark); font-size:16px; }
-  .lp-mobile-brand .lp-firm-sub { color:var(--secondary); }
 </style>
 </head>
 <body>
 
 <div class="lp-wrap">
 
-  <!-- ══ LEFT: BRANDING ══ -->
+  <!-- ══ LEFT ══ -->
   <div class="lp-left">
     <canvas id="bubble-canvas"></canvas>
     <div class="lp-dots"></div>
@@ -224,33 +286,30 @@
     </div>
 
     <div class="lp-mid">
-      <h1 class="lp-heading">Ind AS 116 Lease<br><span class="accent">Management Platform</span></h1>
-      <p class="lp-sub">A collaborative enterprise platform for Chartered Accountants to manage lease accounting, audit workpapers, disclosures and compliance.</p>
-
-
+      <h1 class="lp-heading">Ind AS 116<br>Lease <span class="accent">Management</span></h1>
+      <p class="lp-sub">A collaborative enterprise platform for Chartered Accountants — lease accounting, audit workpapers, disclosures and Ind AS compliance in one place.</p>
     </div>
 
     <div class="lp-trust">
       <div class="lp-trust-item">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-        Encrypted
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Bank-grade encryption
       </div>
       <div class="lp-trust-item">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+        Enterprise security
+      </div>
+      <div class="lp-trust-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         99.9% uptime
-      </div>
-      <div class="lp-trust-item">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-        Enterprise Security
       </div>
     </div>
   </div>
 
-  <!-- ══ RIGHT: AUTH ══ -->
+  <!-- ══ RIGHT ══ -->
   <div class="lp-right">
     <div class="lp-card">
 
-      <!-- mobile-only brand -->
       <div class="lp-mobile-brand">
         <div class="lp-brand-mark">KG</div>
         <div>
@@ -260,70 +319,73 @@
       </div>
 
       <div class="lp-card-head">
-        <div class="lp-title">Sign In</div>
-        <div class="lp-title-sub">Access your firm's audit engagements.</div>
+        <div class="lp-title">Welcome back</div>
+        <div class="lp-title-sub">Sign in to your audit workspace.</div>
       </div>
 
-      <!-- Tabs -->
-      <div class="lp-tabs">
-        <button class="lp-tab active" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
-        <button class="lp-tab" id="tab-register" onclick="switchTab('register')">Create Account</button>
-        <div class="lp-tab-underline" id="tab-underline"></div>
+      <div class="lp-tabs" role="tablist">
+        <button class="lp-tab active" id="tab-signin" role="tab" aria-selected="true" onclick="switchTab('signin')">Sign In</button>
+        <button class="lp-tab" id="tab-register" role="tab" aria-selected="false" onclick="switchTab('register')">Create Account</button>
+        <div class="lp-tab-underline" id="tab-underline" aria-hidden="true"></div>
       </div>
 
-      <!-- Error -->
-      <div class="lp-alert" id="alert-error">
+      <div class="lp-alert" id="alert-error" role="alert" aria-live="assertive">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <span id="alert-error-msg"></span>
+        <span id="alert-msg"></span>
       </div>
 
-      <!-- Email -->
       <div class="lp-field">
-        <label class="lp-label" for="email">Email</label>
-        <div class="lp-input-wrap">
-          <input class="lp-input" id="email" type="email" placeholder="you@kgsomani.com" autocomplete="email">
-        </div>
+        <label class="lp-label" for="email">Email address</label>
+        <input class="lp-input" id="email" type="email" placeholder="you@kgsomani.com" autocomplete="email" autocapitalize="off" spellcheck="false">
       </div>
 
-      <!-- Password -->
       <div class="lp-field">
         <label class="lp-label" for="password">Password</label>
         <div class="lp-input-wrap">
           <input class="lp-input has-icon" id="password" type="password" placeholder="Enter your password" autocomplete="current-password">
-          <button class="lp-eye" type="button" onclick="togglePw()" tabindex="-1" id="pw-toggle">👁</button>
+          <button class="lp-eye" type="button" id="pw-toggle" onclick="togglePw()" aria-label="Toggle password visibility" tabindex="-1">
+            <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
         </div>
       </div>
 
-      <!-- Remember + forgot -->
       <div class="lp-row">
-        <label class="lp-remember"><input type="checkbox" id="remember"> Remember me</label>
-        <a class="lp-forgot" href="#" onclick="return false;">Forgot password?</a>
+        <label class="lp-remember">
+          <input type="checkbox" id="remember"> Remember me
+        </label>
+        <a class="lp-forgot" href="#" onclick="handleForgotPassword(event)">Forgot password?</a>
       </div>
 
-      <!-- Submit -->
-      <button class="lp-btn" id="login-btn" onclick="doLogin()">
-        <div class="lp-spinner" id="spinner"></div>
+      <button class="lp-btn" id="login-btn" type="button" onclick="doLogin()">
+        <div class="lp-spinner" id="spinner" aria-hidden="true"></div>
         <span id="btn-text">Sign In</span>
       </button>
 
-      <!-- Divider -->
-      <div class="lp-divider"><span>OR</span></div>
+      <div class="lp-divider"><span>or continue with</span></div>
 
-      <!-- SSO -->
       <div class="lp-sso">
-        <a class="lp-sso-btn" href="/api/auth/google" id="btn-google">
-          <svg width="17" height="17" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0012 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 010-4.2V7.06H2.18a11 11 0 000 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1a11 11 0 00-9.82 6.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38z"/></svg>
+        <a class="lp-sso-btn" href="/api/auth/google" id="btn-google" role="button">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0012 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 010-4.2V7.06H2.18a11 11 0 000 9.88l3.66-2.84z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1a11 11 0 00-9.82 6.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38z"/>
+          </svg>
           Continue with Google
         </a>
-        <a class="lp-sso-btn" href="/api/auth/microsoft" id="btn-microsoft">
-          <svg width="16" height="16" viewBox="0 0 23 23"><path fill="#f35325" d="M1 1h10v10H1z"/><path fill="#81bc06" d="M12 1h10v10H12z"/><path fill="#05a6f0" d="M1 12h10v10H1z"/><path fill="#ffba08" d="M12 12h10v10H12z"/></svg>
+        <a class="lp-sso-btn" href="/api/auth/microsoft" id="btn-microsoft" role="button">
+          <svg width="17" height="17" viewBox="0 0 23 23" aria-hidden="true">
+            <path fill="#f35325" d="M1 1h10v10H1z"/>
+            <path fill="#81bc06" d="M12 1h10v10H12z"/>
+            <path fill="#05a6f0" d="M1 12h10v10H1z"/>
+            <path fill="#ffba08" d="M12 12h10v10H12z"/>
+          </svg>
           Continue with Microsoft
         </a>
       </div>
 
-      <!-- Footer -->
       <div class="lp-foot">
-        Need an account? <a href="register.html">Create one</a>
+        Don't have an account? <a href="register.html">Create one</a>
       </div>
 
     </div>
@@ -331,203 +393,241 @@
 </div>
 
 <script>
-  // ── Auth check — run BEFORE showing page ─────────────
-  (function() {
-    // Handle SSO callback — token delivered via query param to home.html
-    // (backend redirects there; this block also guards if it lands here)
-    var params = new URLSearchParams(window.location.search);
-    var ssoToken = params.get('sso_token');
-    if (ssoToken) {
-      try {
-        var sp = JSON.parse(atob(ssoToken.split('.')[1]));
-        if (sp.exp * 1000 > Date.now()) {
-          localStorage.setItem('rou_token', ssoToken);
-          localStorage.setItem('rou_user', JSON.stringify({ id: sp.id, name: sp.name, email: sp.email, role: sp.role }));
-          window.location.replace(sp.role === 'admin' ? 'admin.html' : 'home.html');
-          return;
-        }
-      } catch(e) {}
-    }
+// ══ BOOT: auth check + SSO param handling (runs before page shows) ══
+(function boot() {
+  var params = new URLSearchParams(window.location.search);
 
-    var token = localStorage.getItem('rou_token');
-    if (token) {
-      try {
-        var p = JSON.parse(atob(token.split('.')[1]));
-        if (p.exp * 1000 > Date.now()) {
-          window.location.replace(p.role === 'admin' ? 'admin.html' : 'home.html');
-          return;
-        }
-      } catch(e) {}
-      localStorage.removeItem('rou_token');
-      localStorage.removeItem('rou_user');
-    }
-    document.body.classList.add('ready');
-  })();
-
-  // Position the tab underline under the active tab
-  function positionUnderline() {
-    var active = document.querySelector('.lp-tab.active');
-    var ul = document.getElementById('tab-underline');
-    if (active && ul) { ul.style.left = active.offsetLeft + 'px'; ul.style.width = active.offsetWidth + 'px'; }
+  // Absorb sso_token if present (backup — usually lands on home.html)
+  var ssoToken = params.get('sso_token');
+  if (ssoToken) {
+    try {
+      var pad = ssoToken.split('.')[1];
+      pad += '='.repeat((4 - pad.length % 4) % 4);
+      var sp = JSON.parse(atob(pad));
+      if (sp.exp * 1000 > Date.now()) {
+        localStorage.setItem('rou_token', ssoToken);
+        localStorage.setItem('rou_user', JSON.stringify({ id:sp.id, name:sp.name, email:sp.email, role:sp.role }));
+        window.location.replace(sp.role === 'admin' ? 'admin.html' : 'home.html');
+        return;
+      }
+    } catch(e) { /* malformed — fall through */ }
   }
 
-  function switchTab(which) {
-    if (which === 'register') {
-      // Register has its own dedicated page/flow
-      window.location.href = 'register.html';
+  // Show SSO errors returned from backend redirect
+  var ssoErr = params.get('sso_error');
+  if (ssoErr) {
+    history.replaceState({}, '', window.location.pathname);
+    // Will be shown after page reveals
+    window.__pendingSSOError = decodeURIComponent(ssoErr);
+  }
+
+  // Already logged in? Forward to workspace
+  var token = localStorage.getItem('rou_token');
+  if (token) {
+    try {
+      var pad = token.split('.')[1];
+      pad += '='.repeat((4 - pad.length % 4) % 4);
+      var p = JSON.parse(atob(pad));
+      if (p.exp * 1000 > Date.now()) {
+        window.location.replace(p.role === 'admin' ? 'admin.html' : 'home.html');
+        return;
+      }
+    } catch(e) { /* invalid */ }
+    localStorage.removeItem('rou_token');
+    localStorage.removeItem('rou_user');
+  }
+
+  document.body.classList.add('ready');
+
+  // Show any deferred SSO error now that page is visible
+  if (window.__pendingSSOError) {
+    requestAnimationFrame(function() {
+      showAlert(window.__pendingSSOError);
+      window.__pendingSSOError = null;
+    });
+  }
+})();
+
+// ══ TAB UNDERLINE ══
+function positionUnderline() {
+  var active = document.querySelector('.lp-tab.active');
+  var ul = document.getElementById('tab-underline');
+  if (!active || !ul) return;
+  ul.style.left  = active.offsetLeft + 'px';
+  ul.style.width = active.offsetWidth + 'px';
+}
+
+function switchTab(which) {
+  if (which === 'register') {
+    window.location.href = 'register.html';
+    return;
+  }
+  document.getElementById('tab-signin').classList.add('active');
+  document.getElementById('tab-register').classList.remove('active');
+  positionUnderline();
+}
+
+// ══ PASSWORD TOGGLE ══
+function togglePw() {
+  var el  = document.getElementById('password');
+  var ico = document.getElementById('eye-icon');
+  var btn = document.getElementById('pw-toggle');
+  var isHidden = el.type === 'password';
+  el.type = isHidden ? 'text' : 'password';
+  btn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+  ico.innerHTML = isHidden
+    ? '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'
+    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+}
+
+// ══ ALERT ══
+function showAlert(msg) {
+  document.getElementById('alert-msg').textContent = msg;
+  document.getElementById('alert-error').classList.add('show');
+}
+function hideAlert() {
+  document.getElementById('alert-error').classList.remove('show');
+}
+
+// ══ LOADING STATE ══
+function setLoading(on) {
+  var btn = document.getElementById('login-btn');
+  btn.disabled = on;
+  document.getElementById('spinner').style.display = on ? 'block' : 'none';
+  document.getElementById('btn-text').textContent   = on ? 'Signing in…' : 'Sign In';
+}
+
+// ══ FORGOT PASSWORD ══
+function handleForgotPassword(e) {
+  e.preventDefault();
+  showAlert('Password reset is not available yet. Please contact your firm administrator.');
+}
+
+// ══ LOGIN ══
+async function doLogin() {
+  hideAlert();
+  var email    = document.getElementById('email').value.trim();
+  var password = document.getElementById('password').value;
+
+  if (!email)    { showAlert('Please enter your email address.'); document.getElementById('email').focus(); return; }
+  if (!password) { showAlert('Please enter your password.'); document.getElementById('password').focus(); return; }
+
+  setLoading(true);
+  try {
+    var r = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: password })
+    });
+    var data = await r.json();
+    if (!r.ok) {
+      showAlert(data.error || 'Login failed. Please try again.');
+      setLoading(false);
       return;
     }
-    document.getElementById('tab-signin').classList.add('active');
-    document.getElementById('tab-register').classList.remove('active');
-    positionUnderline();
+    localStorage.setItem('rou_token', data.token);
+    localStorage.setItem('rou_user', JSON.stringify(data.user));
+    // Fade out then redirect
+    document.body.style.opacity = '0';
+    setTimeout(function() {
+      window.location.replace(data.user.role === 'admin' ? 'admin.html' : 'home.html');
+    }, 280);
+  } catch(e) {
+    showAlert('Network error. Check your connection and try again.');
+    setLoading(false);
   }
+}
 
-  function togglePw() {
-    var el = document.getElementById('password');
-    var btn = document.getElementById('pw-toggle');
-    el.type = el.type === 'password' ? 'text' : 'password';
-    btn.textContent = el.type === 'password' ? '👁' : '🙈';
-  }
-
-  function showError(msg) {
-    document.getElementById('alert-error-msg').textContent = msg;
-    document.getElementById('alert-error').classList.add('show');
-  }
-
-  function setLoading(v) {
-    document.getElementById('login-btn').disabled = v;
-    document.getElementById('spinner').style.display = v ? 'block' : 'none';
-    document.getElementById('btn-text').textContent = v ? 'Signing in…' : 'Sign In';
-  }
-
-  // ── SSO query-param handling ──────────────────────────────
-  (function handleSSOParams() {
-    var params = new URLSearchParams(window.location.search);
-    var ssoErr = params.get('sso_error');
-    if (ssoErr) {
-      // Remove param from URL without reload
-      history.replaceState({}, '', window.location.pathname);
-      showError(decodeURIComponent(ssoErr));
-    }
-  })();
-
-  // ── SSO button loading state ──────────────────────────────
-  document.getElementById('btn-google').addEventListener('click', function() {
-    this.classList.add('sso-loading');
-    this.innerHTML = this.innerHTML.replace('Continue with Google', 'Redirecting…');
-  });
-  document.getElementById('btn-microsoft').addEventListener('click', function() {
-    this.classList.add('sso-loading');
-    this.innerHTML = this.innerHTML.replace('Continue with Microsoft', 'Redirecting…');
-  });
-
-  async function doLogin() {
-    document.getElementById('alert-error').classList.remove('show');
-    var email = document.getElementById('email').value.trim();
-    var password = document.getElementById('password').value;
-    if (!email || !password) { showError('Please enter your email and password.'); return; }
-
-    setLoading(true);
-    try {
-      var r = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, password: password })
-      });
-      var data = await r.json();
-      if (!r.ok) { showError(data.error || 'Login failed. Please try again.'); setLoading(false); return; }
-
-      localStorage.setItem('rou_token', data.token);
-      localStorage.setItem('rou_user', JSON.stringify(data.user));
-      // success — brief transition then redirect
-      document.body.style.transition = 'opacity 300ms ease';
-      document.body.style.opacity = '0';
-      setTimeout(function() {
-        window.location.replace(data.user.role === 'admin' ? 'admin.html' : 'home.html');
-      }, 300);
-    } catch(e) {
-      showError('Network error. Please check your connection and try again.');
-      setLoading(false);
+// ══ KEYBOARD ══
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    var focused = document.activeElement;
+    // Only trigger if focus is on a form field (not SSO buttons)
+    if (focused && (focused.id === 'email' || focused.id === 'password' || focused.id === 'remember')) {
+      if (!document.getElementById('login-btn').disabled) doLogin();
     }
   }
+});
 
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !document.getElementById('login-btn').disabled) doLogin();
-  });
+// ══ SSO LOADING STATES ══
+document.getElementById('btn-google').addEventListener('click', function(e) {
+  this.classList.add('loading');
+  this.textContent = 'Redirecting to Google…';
+});
+document.getElementById('btn-microsoft').addEventListener('click', function(e) {
+  this.classList.add('loading');
+  this.textContent = 'Redirecting to Microsoft…';
+});
 
-  window.addEventListener('load', positionUnderline);
-  window.addEventListener('resize', positionUnderline);
+// ══ INIT ══
+window.addEventListener('load', positionUnderline);
+window.addEventListener('resize', positionUnderline);
 </script>
 
 <script>
-// ── Bubble canvas animation ────────────────────────────────────────────
+// ══ BUBBLE ANIMATION ══
 (function() {
   var canvas = document.getElementById('bubble-canvas');
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
   var bubbles = [];
-  var RAF;
+  var rafId;
 
-  var PALETTE = [
-    'rgba(96,165,250,',   // blue-400
-    'rgba(147,197,253,',  // blue-300
-    'rgba(59,130,246,',   // blue-500
-    'rgba(191,219,254,',  // blue-200
-    'rgba(255,255,255,',  // white
+  var COLORS = [
+    'rgba(96,165,250,',
+    'rgba(147,197,253,',
+    'rgba(59,130,246,',
+    'rgba(191,219,254,',
+    'rgba(255,255,255,',
   ];
 
   function resize() {
-    var left = canvas.parentElement;
-    canvas.width  = left.offsetWidth;
-    canvas.height = left.offsetHeight;
+    var p = canvas.parentElement;
+    canvas.width  = p.offsetWidth;
+    canvas.height = p.offsetHeight;
   }
 
-  function rand(min, max) { return min + Math.random() * (max - min); }
+  function rnd(a, b) { return a + Math.random() * (b - a); }
 
-  function makeBubble(fromBottom) {
-    var r = rand(4, 26);
+  function makeBubble(atBottom) {
+    var r = rnd(4, 26);
     return {
-      x: rand(r, canvas.width - r),
-      y: fromBottom ? canvas.height + r + rand(0, canvas.height) : rand(0, canvas.height),
+      x: rnd(r, canvas.width - r),
+      y: atBottom ? canvas.height + r + rnd(0, canvas.height * 0.5) : rnd(0, canvas.height),
       r: r,
-      vx: rand(-0.28, 0.28),
-      vy: -rand(0.30, 0.85),
-      alpha: rand(0.06, 0.22),
-      strokeAlpha: rand(0.12, 0.38),
-      color: PALETTE[Math.floor(Math.random() * PALETTE.length)],
-      wobble: rand(0, Math.PI * 2),
-      wobbleSpeed: rand(0.008, 0.022),
-      wobbleAmp: rand(0.4, 1.1),
+      vx: rnd(-0.25, 0.25),
+      vy: -rnd(0.28, 0.80),
+      alpha: rnd(0.06, 0.20),
+      strokeAlpha: rnd(0.10, 0.32),
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      wobble: rnd(0, Math.PI * 2),
+      wobbleSpeed: rnd(0.008, 0.020),
+      wobbleAmp: rnd(0.35, 1.0),
     };
   }
 
   function initBubbles() {
     bubbles = [];
-    var count = Math.floor((canvas.width * canvas.height) / 14000);
-    count = Math.max(18, Math.min(count, 55));
-    for (var i = 0; i < count; i++) bubbles.push(makeBubble(false));
+    var n = Math.max(18, Math.min(55, Math.floor(canvas.width * canvas.height / 14000)));
+    for (var i = 0; i < n; i++) bubbles.push(makeBubble(false));
   }
 
   function drawBubble(b) {
     ctx.save();
-    // filled translucent circle
     ctx.beginPath();
     ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
     ctx.fillStyle = b.color + b.alpha + ')';
     ctx.fill();
 
-    // glossy ring
     ctx.beginPath();
     ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
     ctx.strokeStyle = b.color + b.strokeAlpha + ')';
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 1.1;
     ctx.stroke();
 
-    // specular highlight
-    var gx = b.x - b.r * 0.30;
-    var gy = b.y - b.r * 0.32;
-    var gr = ctx.createRadialGradient(gx, gy, 0, gx, gy, b.r * 0.65);
-    gr.addColorStop(0, 'rgba(255,255,255,' + (b.alpha * 1.8) + ')');
+    var gx = b.x - b.r * 0.28, gy = b.y - b.r * 0.30;
+    var gr = ctx.createRadialGradient(gx, gy, 0, gx, gy, b.r * 0.6);
+    gr.addColorStop(0, 'rgba(255,255,255,' + Math.min(b.alpha * 2, 0.35) + ')');
     gr.addColorStop(1, 'rgba(255,255,255,0)');
     ctx.beginPath();
     ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
@@ -536,30 +636,29 @@
     ctx.restore();
   }
 
-  function step() {
+  function tick() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (var i = bubbles.length - 1; i >= 0; i--) {
       var b = bubbles[i];
       b.wobble += b.wobbleSpeed;
-      b.x += b.vx + Math.sin(b.wobble) * b.wobbleAmp * 0.15;
+      b.x += b.vx + Math.sin(b.wobble) * b.wobbleAmp * 0.12;
       b.y += b.vy;
       drawBubble(b);
-      // recycle when fully above the panel
-      if (b.y + b.r < -10) {
-        bubbles[i] = makeBubble(true);
-      }
+      if (b.y + b.r < -8) bubbles[i] = makeBubble(true);
     }
-    RAF = requestAnimationFrame(step);
+    rafId = requestAnimationFrame(tick);
   }
 
-  window.addEventListener('resize', function() {
-    resize();
-    initBubbles();
+  // Pause when tab is hidden to save CPU
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) { cancelAnimationFrame(rafId); }
+    else { tick(); }
   });
 
+  window.addEventListener('resize', function() { resize(); initBubbles(); });
   resize();
   initBubbles();
-  step();
+  tick();
 })();
 </script>
 </body>
