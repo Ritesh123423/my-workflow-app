@@ -8,12 +8,19 @@ const auth    = require('../middleware/auth');
 const ADMIN_EMAIL    = process.env.ADMIN_EMAIL    || 'admin@kgsomani.com';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'KGSAdmin@2024';
 
+/* ── helpers ───────────────────────────────────────────────── */
+function makeJWT(user) {
+  return jwt.sign(
+    { id: user.id, role: user.role, name: user.name, email: user.email },
+    process.env.JWT_SECRET, { expiresIn: '8h' }
+  );
+}
+
 /* ── LOGIN ─────────────────────────────────────────────────── */
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password required.' });
 
-  // Hard-coded admin
   if (email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
     if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Invalid admin credentials.' });
     const token = jwt.sign(
@@ -31,11 +38,7 @@ router.post('/login', async (req, res) => {
     if (user.status === 'suspended') return res.status(403).json({ error: 'Account suspended. Contact admin.' });
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) return res.status(401).json({ error: 'Incorrect password.' });
-    const token = jwt.sign(
-      { id: user.id, role: user.role, name: user.name, email: user.email },
-      process.env.JWT_SECRET, { expiresIn: '8h' }
-    );
-    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+    res.json({ token: makeJWT(user), user: { id: user.id, name: user.name, email: user.email, role: user.role } });
   } catch (e) { console.error(e); res.status(500).json({ error: 'Server error.' }); }
 });
 
@@ -61,13 +64,142 @@ router.post('/register', async (req, res) => {
       [name.trim(), email.trim().toLowerCase(), hash, cleanRole, 'active']
     );
     const user = r.rows[0];
-    const token = jwt.sign(
-      { id: user.id, role: user.role, name: user.name, email: user.email },
-      process.env.JWT_SECRET, { expiresIn: '8h' }
-    );
-    res.status(201).json({ token, user });
+    res.status(201).json({ token: makeJWT(user), user });
   } catch (e) { console.error(e); res.status(500).json({ error: 'Server error.' }); }
 });
+
+/* ── GOOGLE OAUTH ──────────────────────────────────────────── */
+// Step 1 — redirect browser to Google
+router.get('/google', (req, res) => {
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    return res.redirect('/login.html?sso_error=Google+SSO+is+not+configured+for+this+deployment.');
+  }
+  const params = new URLSearchParams({
+    client_id:     process.env.GOOGLE_CLIENT_ID,
+    redirect_uri:  process.env.APP_URL + '/api/auth/google/callback',
+    response_type: 'code',
+    scope:         'openid email profile',
+    access_type:   'online',
+    prompt:        'select_account',
+  });
+  res.redirect('https://accounts.google.com/o/oauth2/v2/auth?' + params.toString());
+});
+
+// Step 2 — Google calls back with ?code=…
+router.get('/google/callback', async (req, res) => {
+  const { code, error } = req.query;
+  if (error || !code) {
+    return res.redirect('/login.html?sso_error=' + encodeURIComponent(error || 'Google sign-in was cancelled.'));
+  }
+  try {
+    // Exchange code for tokens
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id:     process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri:  process.env.APP_URL + '/api/auth/google/callback',
+        grant_type:    'authorization_code',
+      }),
+    });
+    const tokens = await tokenRes.json();
+    if (!tokenRes.ok || !tokens.access_token) throw new Error(tokens.error_description || 'Token exchange failed');
+
+    // Get user profile
+    const profileRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: 'Bearer ' + tokens.access_token },
+    });
+    const profile = await profileRes.json();
+    if (!profile.email) throw new Error('No email returned from Google.');
+
+    const user = await upsertSSOUser(profile.name || profile.email, profile.email, 'google');
+    const appToken = makeJWT(user);
+    res.redirect('/home.html?sso_token=' + encodeURIComponent(appToken));
+  } catch (e) {
+    console.error('Google OAuth error:', e.message);
+    res.redirect('/login.html?sso_error=' + encodeURIComponent('Google sign-in failed: ' + e.message));
+  }
+});
+
+/* ── MICROSOFT OAUTH ───────────────────────────────────────── */
+// Step 1 — redirect browser to Microsoft
+router.get('/microsoft', (req, res) => {
+  if (!process.env.MS_CLIENT_ID) {
+    return res.redirect('/login.html?sso_error=Microsoft+SSO+is+not+configured+for+this+deployment.');
+  }
+  const tenant = process.env.MS_TENANT_ID || 'common';
+  const params = new URLSearchParams({
+    client_id:     process.env.MS_CLIENT_ID,
+    redirect_uri:  process.env.APP_URL + '/api/auth/microsoft/callback',
+    response_type: 'code',
+    scope:         'openid email profile User.Read',
+    response_mode: 'query',
+    prompt:        'select_account',
+  });
+  res.redirect(`https://login.microsoftonline.com/${tenant}/oauth2/v2.0/authorize?` + params.toString());
+});
+
+// Step 2 — Microsoft calls back with ?code=…
+router.get('/microsoft/callback', async (req, res) => {
+  const { code, error, error_description } = req.query;
+  if (error || !code) {
+    return res.redirect('/login.html?sso_error=' + encodeURIComponent(error_description || error || 'Microsoft sign-in was cancelled.'));
+  }
+  try {
+    const tenant = process.env.MS_TENANT_ID || 'common';
+    // Exchange code for tokens
+    const tokenRes = await fetch(`https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id:     process.env.MS_CLIENT_ID,
+        client_secret: process.env.MS_CLIENT_SECRET,
+        redirect_uri:  process.env.APP_URL + '/api/auth/microsoft/callback',
+        grant_type:    'authorization_code',
+        scope:         'openid email profile User.Read',
+      }),
+    });
+    const tokens = await tokenRes.json();
+    if (!tokenRes.ok || !tokens.access_token) throw new Error(tokens.error_description || 'Token exchange failed');
+
+    // Get user profile
+    const profileRes = await fetch('https://graph.microsoft.com/v1.0/me', {
+      headers: { Authorization: 'Bearer ' + tokens.access_token },
+    });
+    const profile = await profileRes.json();
+    const email = profile.mail || profile.userPrincipalName;
+    if (!email) throw new Error('No email returned from Microsoft.');
+
+    const user = await upsertSSOUser(profile.displayName || email, email, 'microsoft');
+    const appToken = makeJWT(user);
+    res.redirect('/home.html?sso_token=' + encodeURIComponent(appToken));
+  } catch (e) {
+    console.error('Microsoft OAuth error:', e.message);
+    res.redirect('/login.html?sso_error=' + encodeURIComponent('Microsoft sign-in failed: ' + e.message));
+  }
+});
+
+/* ── SSO user upsert ───────────────────────────────────────── */
+// Find existing user by email, or auto-create with role=article and status=active
+async function upsertSSOUser(name, email, provider) {
+  const clean = email.trim().toLowerCase();
+  let r = await pool.query('SELECT * FROM users WHERE email=$1', [clean]);
+  if (r.rows.length) {
+    const u = r.rows[0];
+    if (u.status === 'suspended') throw new Error('Your account has been suspended. Contact your administrator.');
+    return u;
+  }
+  // New SSO user — auto-register as article
+  const placeholder = await bcrypt.hash(require('crypto').randomBytes(32).toString('hex'), 10);
+  const ins = await pool.query(
+    'INSERT INTO users(name,email,password,role,status) VALUES($1,$2,$3,$4,$5) RETURNING id,name,email,role',
+    [name.trim(), clean, placeholder, 'article', 'active']
+  );
+  return ins.rows[0];
+}
 
 /* ── ADMIN APPROVAL TOKEN ──────────────────────────────────── */
 router.post('/admin-approval-token', auth, auth.requireAdmin, (req, res) => {
@@ -97,11 +229,7 @@ router.put('/profile', auth, async (req, res) => {
     );
     if (!r.rows.length) return res.status(404).json({ error: 'User not found.' });
     const user = r.rows[0];
-    const token = jwt.sign(
-      { id: user.id, role: user.role, name: user.name, email: user.email },
-      process.env.JWT_SECRET, { expiresIn: '8h' }
-    );
-    res.json({ ok: true, token, user });
+    res.json({ ok: true, token: makeJWT(user), user });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
