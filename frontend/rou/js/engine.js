@@ -211,38 +211,24 @@ window.Engine = {
       
       if (N <= 0 || initialLiability <= 0) return null;
     } else {
-      // New lease: Use computed initial liability
-      const computedField = document.getElementById('f-computed-init-liab');
-      const computedValue = computedField ? parseFloat(computedField.dataset.computedValue) : 0;
-      
+      // New lease: compute initial liability from IBR (pure — no DOM access)
       N = this.tenureOriginalOf(rou);
       if (!N || N < 1) return null;
-      
-      if (computedValue > 0) {
-        initialLiability = computedValue;
-        console.log('Goal Seek: Using computed liability:', initialLiability);
-      } else {
-        // Fallback: calculate from IBR
-        const rentSched = this.buildRentSchedule(rou, N, { applyReassessments: false });
-        const baseRate = parseFloat(rou.ibr) || 9;
-        const baseR = baseRate / 12 / 100;
-        let pv0 = 0;
-        for (let m = 1; m <= N; m++) {
-          const exp = isAdvance ? (m - 1) : m;
-          pv0 += rentSched[m] / Math.pow(1 + baseR, exp);
-        }
-        initialLiability = this.r2(pv0);
-        console.log('Goal Seek: Calculated liability at IBR', baseRate + '%:', initialLiability);
+      const rentSched = this.buildRentSchedule(rou, N, { applyReassessments: false });
+      const baseRate  = parseFloat(rou.ibr) || 9;
+      const baseR     = baseRate / 12 / 100;
+      let pv0 = 0;
+      for (let m = 1; m <= N; m++) {
+        const exp = isAdvance ? (m - 1) : m;
+        pv0 += rentSched[m] / Math.pow(1 + baseR, exp);
       }
-      
+      initialLiability = this.r2(pv0);
       if (initialLiability <= 0) return null;
     }
 
     // Build rent schedule
     const totalMonths = isMidLease ? this.tenureOriginalOf(rou) : N;
     const rentSched = this.buildRentSchedule(rou, totalMonths, { applyReassessments: false });
-    
-    console.log('Goal Seek: Months:', totalMonths, 'Initial Liab:', initialLiability, 'Timing:', isAdvance ? 'Advance' : 'Arrears');
     
     // Function to calculate closing balance given an annual interest rate
     const getClosingBalance = (annualRatePct) => {
@@ -265,7 +251,6 @@ window.Engine = {
       }
       
       if (monthsProcessed !== totalMonths) {
-        console.error('ERROR: Only processed', monthsProcessed, 'months, expected', totalMonths);
       }
       
       return balance;
@@ -279,18 +264,14 @@ window.Engine = {
     const closeLo = getClosingBalance(lo);
     const closeHi = getClosingBalance(hi);
     
-    console.log('Goal Seek range check: at', lo + '%:', this.r2(closeLo), '| at', hi + '%:', this.r2(closeHi));
-    
     // Check if solution is in range (must have opposite signs)
     if ((closeLo > 0 && closeHi > 0) || (closeLo < 0 && closeHi < 0)) {
-      console.warn('Goal Seek: Solution not in range [-10%, 50%]. Extending search...');
       if (closeLo > 0) {
         lo = -99.0;  // Try more negative
       }
       if (closeHi < 0) {
         hi = 100.0;  // Try higher positive
       }
-      console.log('Extended range: at', lo + '%:', this.r2(getClosingBalance(lo)), '| at', hi + '%:', this.r2(getClosingBalance(hi)));
     }
     
     // Binary search with high precision
@@ -300,13 +281,11 @@ window.Engine = {
       
       // Log first 25 and last 10 iterations
       if (i < 25 || i >= maxIter - 10) {
-        console.log('  Iter', i + ':', 'lo=' + lo.toFixed(8) + '%', 'hi=' + hi.toFixed(8) + '%', 'mid=' + mid.toFixed(8) + '%', 'balance=' + this.r2(closeMid));
       }
       
       // Check convergence - very tight tolerance for exact result
       if (Math.abs(closeMid) < 0.001) {  // Within 0.1 paisa
         const result = Math.round(mid * 1e12) / 1e12;  // 12 decimal places
-        console.log('✓ Goal Seek SUCCESS: Rate =', result.toFixed(12) + '% p.a., Final balance =', this.r2(closeMid), '(iteration', i + ')');
         return result;
       }
       
@@ -323,7 +302,6 @@ window.Engine = {
       
       // Check if range is very small but keep going for precision
       if (Math.abs(hi - lo) < 1e-10 && i > 50) {
-        console.log('Goal Seek: Range very small at iteration', i, '- range:', (hi - lo).toExponential(4));
         break;
       }
     }
@@ -331,7 +309,6 @@ window.Engine = {
     // Return best result with very high precision
     const result = Math.round((lo + hi) / 2 * 1e12) / 1e12;  // 12 decimal places
     const finalBal = getClosingBalance(result);
-    console.log('Goal Seek FINAL: Rate =', result.toFixed(12) + '% p.a., Final balance =', this.r2(finalBal));
     return result;
   },
 
