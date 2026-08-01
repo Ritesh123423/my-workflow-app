@@ -1,9 +1,14 @@
 {
-  "name": "audit-workflow-backend",
+  "name": "kg-somani-rou-platform",
   "version": "1.0.0",
+  "description": "K G Somani & Co LLP — Ind AS 116 ROU Platform backend",
   "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node --watch server.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
